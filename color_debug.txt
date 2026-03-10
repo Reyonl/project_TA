@@ -1,0 +1,6 @@
+Top-Left: (244,244,247)
+Top-Right: (233,233,233)
+Center: (234,234,235)
+Center-Left: (225,224,225)
+Bottom-Left: (227,227,226)
+Bottom-Right: (222,222,221)

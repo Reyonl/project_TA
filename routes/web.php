@@ -40,7 +40,7 @@ Route::middleware('auth:customer')->prefix('customer')->name('customer.')->group
             $iconifySearch = \Illuminate\Support\Facades\Http::timeout(6)
                 ->get("https://api.iconify.design/search", [
                     'query'  => $query,
-                    'limit'  => 16,
+                    'limit'  => 36, // Tingkatkan variasi icon
                 ]);
 
             if ($iconifySearch->successful()) {
@@ -60,16 +60,15 @@ Route::middleware('auth:customer')->prefix('customer')->name('customer.')->group
                 }
             }
         } catch (\Exception $e) {
-            // Iconify tidak tersedia, lanjut ke DiceBear saja
+            // Lanjut ke DiceBear
         }
 
-        // ---- SUMBER 2: DiceBear (karakter kreatif / avatar unik per seed) ----
+        // ---- SUMBER 2: DiceBear (Avatar/Emoji unik berdasar text) ----
+        // Hanya kita sertakan style yang universal seperti fun-emoji dan shapes
         $seed  = str_replace(' ', '', ucwords($query));
         $dicebearStyles = [
             'fun-emoji'  => 'Emoji',
-            'bottts'     => 'Robot',
-            'pixel-art'  => 'Pixel Art',
-            'adventurer' => 'Karakter',
+            'shapes'     => 'Shape Art',
         ];
         foreach ($dicebearStyles as $api => $styleName) {
             $results[] = [
