@@ -507,7 +507,8 @@
                     id_produk: '{{ $produk->id_produk }}',
                     file_desain: canvasDataURL, 
                     lebar_cm: lebarCm,
-                    tinggi_cm: tinggiCm
+                    tinggi_cm: tinggiCm,
+                    warna_baju: activeBaseColor
                 };
 
                 const oldText = this.innerHTML;

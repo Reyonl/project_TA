@@ -40,6 +40,25 @@ class ReportController extends Controller
             $formattedMonthly[$i] = $monthlyRevenue[$i] ?? 0;
         }
 
-        return view('owner.reports.index', compact('totalOrders', 'totalRevenue', 'totalDesains', 'statusCounts', 'formattedMonthly'));
+        // Data Produk Terpopuler
+        $produkPopuler = \App\Models\OrderDetail::join('produks', 'order_details.id_produk', '=', 'produks.id_produk')
+                            ->select('produks.nama_produk', \DB::raw('SUM(order_details.quantity) as total_terjual'))
+                            ->groupBy('produks.id_produk', 'produks.nama_produk')
+                            ->orderByDesc('total_terjual')
+                            ->limit(5)
+                            ->get();
+
+        // Data Warna Baju Paling Diminati
+        $warnaPopuler = \App\Models\Desain::select('warna_baju', \DB::raw('count(*) as total'))
+                            ->whereNotNull('warna_baju')
+                            ->groupBy('warna_baju')
+                            ->orderByDesc('total')
+                            ->limit(5)
+                            ->get();
+
+        return view('owner.reports.index', compact(
+            'totalOrders', 'totalRevenue', 'totalDesains', 
+            'statusCounts', 'formattedMonthly', 'produkPopuler', 'warnaPopuler'
+        ));
     }
 }

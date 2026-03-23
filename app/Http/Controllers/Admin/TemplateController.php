@@ -41,6 +41,37 @@ class TemplateController extends Controller
         return redirect()->route('admin.templates.index')->with('success', 'Template berhasil diunggah.');
     }
 
+    public function edit(Template $template)
+    {
+        return view('admin.templates.edit', compact('template'));
+    }
+
+    public function update(Request $request, Template $template)
+    {
+        $request->validate([
+            'nama_template' => 'required',
+            'file_template' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
+            'kategori' => 'required'
+        ]);
+
+        $data = [
+            'nama_template' => $request->nama_template,
+            'kategori' => $request->kategori
+        ];
+
+        if ($request->hasFile('file_template')) {
+            // Delete old file
+            if ($template->file_template) {
+                Storage::disk('public')->delete($template->file_template);
+            }
+            $data['file_template'] = $request->file('file_template')->store('templates', 'public');
+        }
+
+        $template->update($data);
+
+        return redirect()->route('admin.templates.index')->with('success', 'Template berhasil diperbarui.');
+    }
+
     public function destroy(Template $template)
     {
         Storage::disk('public')->delete($template->file_template);

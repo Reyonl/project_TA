@@ -26,6 +26,7 @@ class DesignController extends Controller
             'file_desain' => 'required|string',
             'lebar_cm' => 'required|numeric',
             'tinggi_cm' => 'required|numeric',
+            'warna_baju' => 'nullable|string',
         ]);
 
         $base64_image = $request->file_desain;
@@ -60,6 +61,7 @@ class DesignController extends Controller
             'tinggi_cm' => $request->tinggi_cm,
             'harga_desain' => 20000, // Misal tarif sablon custom 20.000
             'tanggal_upload' => now(),
+            'warna_baju' => $request->warna_baju,
         ]);
 
         return response()->json(['success' => true, 'id_desain' => $desain->id_desain]);

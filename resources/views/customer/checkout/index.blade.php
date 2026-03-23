@@ -14,9 +14,34 @@
                     <div class="lg:w-1/2 flex flex-col gap-6 mb-8 lg:mb-0">
                         <h3 class="text-2xl font-bold text-slate-800 border-b pb-4">Ringkasan Desain</h3>
                         
-                        <!-- Preview Desain Hasil Canvas -->
+                        <!-- Preview Desain Hasil Canvas (Composite) -->
                         <div class="bg-slate-100 p-6 rounded-2xl flex items-center justify-center border border-slate-200">
-                            <img src="{{ Storage::url($desain->file_desain) }}" alt="Preview Desain" class="max-h-[300px] object-contain drop-shadow-md">
+                            <div class="relative w-[300px] h-[375px] rounded-xl overflow-hidden flex items-center justify-center shadow-inner bg-slate-50">
+                                @if($produk->jenis_produk == 'kaos')
+                                    <!-- Base Foto Kaos Nyata -->
+                                    <img src="{{ asset('images/mockups/kaos.png?v='.time()) }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow-lg opacity-90 z-0">
+                                    
+                                    <!-- Layer Masking Warna Kaos -->
+                                    <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10"
+                                         style="-webkit-mask-image: url('{{ asset('images/mockups/kaos.png?v='.time()) }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ asset('images/mockups/kaos.png?v='.time()) }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
+                                        <div class="w-full h-full" style="background-color: {{ $desain->warna_baju ?? '#ffffff' }};"></div>
+                                    </div>
+                                @elseif($produk->jenis_produk == 'hoodie')
+                                    <!-- Base Foto Hoodie Nyata -->
+                                    <img src="{{ asset('images/mockups/hoodie.png?v='.time()) }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow-lg opacity-90 z-0">
+                                    
+                                    <!-- Layer Masking Warna Hoodie -->
+                                    <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10"
+                                         style="-webkit-mask-image: url('{{ asset('images/mockups/hoodie.png?v='.time()) }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ asset('images/mockups/hoodie.png?v='.time()) }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
+                                        <div class="w-full h-full" style="background-color: {{ $desain->warna_baju ?? '#ffffff' }};"></div>
+                                    </div>
+                                @endif
+
+                                <!-- Canvas Design Print Area -->
+                                <div class="absolute z-20" style="top: 20%; left: 27.08%; width: 45.83%; height: 53.33%;">
+                                    <img src="{{ Str::startsWith($desain->file_desain, 'data:image') ? $desain->file_desain : Storage::url($desain->file_desain) }}" class="w-full h-full object-contain">
+                                </div>
+                            </div>
                         </div>
 
                         <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100">

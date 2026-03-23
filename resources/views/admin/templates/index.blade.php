@@ -23,13 +23,18 @@
                             <p class="font-semibold text-slate-800 truncate mb-1">{{ $template->nama_template }}</p>
                             <p class="text-xs text-slate-500 mb-3">{{ $template->kategori }}</p>
 
-                            <form action="{{ route('admin.templates.destroy', $template) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus template ini?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="w-full text-sm text-red-600 bg-red-50 hover:bg-red-100 py-1.5 rounded-md font-semibold transition">
-                                    🗑️ Hapus
-                                </button>
-                            </form>
+                            <div class="flex gap-2">
+                                <a href="{{ route('admin.templates.edit', $template) }}" class="flex-1 text-center text-sm text-slate-700 bg-slate-100 hover:bg-slate-200 py-1.5 rounded-md font-semibold transition">
+                                    ✏️ Edit
+                                </a>
+                                <form action="{{ route('admin.templates.destroy', $template) }}" method="POST" class="flex-1" onsubmit="return confirm('Yakin ingin menghapus template ini?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="w-full text-sm text-red-600 bg-red-50 hover:bg-red-100 py-1.5 rounded-md font-semibold transition">
+                                        🗑️ Hapus
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     @empty
                         <div class="col-span-full text-center py-8 text-slate-500">

@@ -53,6 +53,46 @@
                 </div>
             </div>
 
+            <!-- Statistik Aktivitas Desain -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Data Produk Terlaris -->
+                <div class="bg-white shadow-xl shadow-slate-100/50 sm:rounded-2xl border border-slate-100 p-6">
+                    <h4 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4 border-b pb-2 flex items-center gap-2">
+                        <span>📦</span> Top 5 Kategori Produk Terlaris
+                    </h4>
+                    <ul class="space-y-3">
+                        @forelse($produkPopuler as $item)
+                            <li class="flex items-center justify-between p-3 rounded-lg bg-slate-50 border border-slate-100 hover:bg-slate-100 transition duration-150">
+                                <span class="font-bold text-slate-700">{{ $item->nama_produk }}</span>
+                                <span class="text-sm font-black bg-indigo-100 text-indigo-700 px-3 py-1 rounded-lg shadow-sm border border-indigo-200">{{ $item->total_terjual }} Terjual</span>
+                            </li>
+                        @empty
+                            <p class="text-slate-500 text-sm italic text-center py-4">Belum ada data penjualan.</p>
+                        @endforelse
+                    </ul>
+                </div>
+
+                <!-- Data Warna Baju Favorit -->
+                <div class="bg-white shadow-xl shadow-slate-100/50 sm:rounded-2xl border border-slate-100 p-6">
+                    <h4 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4 border-b pb-2 flex items-center gap-2">
+                        <span>🎨</span> Top 5 Warna Sablon Paling Diminati
+                    </h4>
+                    <ul class="space-y-3">
+                        @forelse($warnaPopuler as $item)
+                            <li class="flex items-center justify-between p-3 rounded-lg bg-slate-50 border border-slate-100 hover:bg-slate-100 transition duration-150">
+                                <div class="flex items-center gap-3">
+                                    <span class="w-8 h-8 rounded-full border border-slate-300 shadow-sm block" style="background-color: {{ $item->warna_baju }}"></span>
+                                    <span class="font-black text-slate-700 uppercase tracking-wider text-sm">{{ $item->warna_baju }}</span>
+                                </div>
+                                <span class="text-sm font-black bg-emerald-100 text-emerald-700 px-3 py-1 rounded-lg shadow-sm border border-emerald-200">{{ $item->total }} Desain</span>
+                            </li>
+                        @empty
+                            <p class="text-slate-500 text-sm italic text-center py-4">Belum ada data warna baju.</p>
+                        @endforelse
+                    </ul>
+                </div>
+            </div>
+
         </div>
     </div>
 
