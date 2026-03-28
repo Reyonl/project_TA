@@ -15,33 +15,58 @@
                         <h3 class="text-2xl font-bold text-slate-800 border-b pb-4">Ringkasan Desain</h3>
                         
                         <!-- Preview Desain Hasil Canvas (Composite) -->
-                        <div class="bg-slate-100 p-6 rounded-2xl flex items-center justify-center border border-slate-200">
-                            <div class="relative w-[300px] h-[375px] rounded-xl overflow-hidden flex items-center justify-center shadow-inner bg-slate-50">
-                                @if($produk->jenis_produk == 'kaos')
-                                    <!-- Base Foto Kaos Nyata -->
-                                    <img src="{{ asset('images/mockups/kaos.png?v='.time()) }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow-lg opacity-90 z-0">
-                                    
-                                    <!-- Layer Masking Warna Kaos -->
-                                    <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10"
-                                         style="-webkit-mask-image: url('{{ asset('images/mockups/kaos.png?v='.time()) }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ asset('images/mockups/kaos.png?v='.time()) }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
-                                        <div class="w-full h-full" style="background-color: {{ $desain->warna_baju ?? '#ffffff' }};"></div>
-                                    </div>
-                                @elseif($produk->jenis_produk == 'hoodie')
-                                    <!-- Base Foto Hoodie Nyata -->
-                                    <img src="{{ asset('images/mockups/hoodie.png?v='.time()) }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow-lg opacity-90 z-0">
-                                    
-                                    <!-- Layer Masking Warna Hoodie -->
-                                    <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10"
-                                         style="-webkit-mask-image: url('{{ asset('images/mockups/hoodie.png?v='.time()) }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ asset('images/mockups/hoodie.png?v='.time()) }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
-                                        <div class="w-full h-full" style="background-color: {{ $desain->warna_baju ?? '#ffffff' }};"></div>
-                                    </div>
-                                @endif
+                        <div class="bg-slate-100 p-6 rounded-2xl flex flex-col md:flex-row flex-wrap gap-6 items-center justify-center border border-slate-200">
+                            
+                            <!-- DESAIN DEPAN -->
+                            <div class="flex flex-col items-center">
+                                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Bagian Depan</h4>
+                                <div class="relative w-[280px] h-[350px] rounded-xl overflow-hidden flex items-center justify-center shadow-inner bg-slate-50">
+                                    @if($produk->jenis_produk == 'kaos')
+                                        <img src="{{ asset('images/mockups/kaos.png?v='.time()) }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow-lg opacity-90 z-0">
+                                        <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10"
+                                             style="-webkit-mask-image: url('{{ asset('images/mockups/kaos.png?v='.time()) }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ asset('images/mockups/kaos.png?v='.time()) }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
+                                            <div class="w-full h-full" style="background-color: {{ $desain->warna_baju ?? '#ffffff' }};"></div>
+                                        </div>
+                                    @elseif($produk->jenis_produk == 'hoodie')
+                                        <img src="{{ asset('images/mockups/hoodie.png?v='.time()) }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow-lg opacity-90 z-0">
+                                        <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10"
+                                             style="-webkit-mask-image: url('{{ asset('images/mockups/hoodie.png?v='.time()) }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ asset('images/mockups/hoodie.png?v='.time()) }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
+                                            <div class="w-full h-full" style="background-color: {{ $desain->warna_baju ?? '#ffffff' }};"></div>
+                                        </div>
+                                    @endif
 
-                                <!-- Canvas Design Print Area -->
-                                <div class="absolute z-20" style="top: 20%; left: 27.08%; width: 45.83%; height: 53.33%;">
-                                    <img src="{{ Str::startsWith($desain->file_desain, 'data:image') ? $desain->file_desain : Storage::url($desain->file_desain) }}" class="w-full h-full object-contain">
+                                    <div class="absolute z-20" style="top: 20%; left: 27.08%; width: 45.83%; height: 53.33%;">
+                                        <img src="{{ Str::startsWith($desain->file_desain, 'data:image') ? $desain->file_desain : Storage::url($desain->file_desain) }}" class="w-full h-full object-contain">
+                                    </div>
                                 </div>
                             </div>
+
+                            <!-- DESAIN BELAKANG -->
+                            @if($desain->file_desain_belakang)
+                            <div class="flex flex-col items-center">
+                                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Bagian Belakang</h4>
+                                <div class="relative w-[280px] h-[350px] rounded-xl overflow-hidden flex items-center justify-center shadow-inner bg-slate-50">
+                                    @if($produk->jenis_produk == 'kaos')
+                                        <img src="{{ asset('images/mockups/kaos.png?v='.time()) }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow-lg opacity-90 z-0 -scale-x-100">
+                                        <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10 -scale-x-100"
+                                             style="-webkit-mask-image: url('{{ asset('images/mockups/kaos.png?v='.time()) }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ asset('images/mockups/kaos.png?v='.time()) }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
+                                            <div class="w-full h-full" style="background-color: {{ $desain->warna_baju ?? '#ffffff' }};"></div>
+                                        </div>
+                                    @elseif($produk->jenis_produk == 'hoodie')
+                                        <img src="{{ asset('images/mockups/hoodie.png?v='.time()) }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow-lg opacity-90 z-0 -scale-x-100">
+                                        <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10 -scale-x-100"
+                                             style="-webkit-mask-image: url('{{ asset('images/mockups/hoodie.png?v='.time()) }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ asset('images/mockups/hoodie.png?v='.time()) }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
+                                            <div class="w-full h-full" style="background-color: {{ $desain->warna_baju ?? '#ffffff' }};"></div>
+                                        </div>
+                                    @endif
+
+                                    <div class="absolute z-20" style="top: 20%; left: 27.08%; width: 45.83%; height: 53.33%;">
+                                        <img src="{{ Str::startsWith($desain->file_desain_belakang, 'data:image') ? $desain->file_desain_belakang : Storage::url($desain->file_desain_belakang) }}" class="w-full h-full object-contain">
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
+
                         </div>
 
                         <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100">

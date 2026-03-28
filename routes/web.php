@@ -2,14 +2,21 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Models\Produk;
+
 Route::get('/', function () {
-    return view('welcome');
+    // Dynamic products for landing page
+    $produks = Produk::take(3)->get();
+    return view('welcome', compact('produks'));
 })->name('home');
 
 use App\Http\Controllers\Customer\ProductController;
 use App\Http\Controllers\Customer\DesignController;
 use App\Http\Controllers\Customer\CheckoutController;
 use App\Http\Controllers\Customer\OrderController;
+
+// Public Catalog
+Route::get('/katalog/{produk}', [ProductController::class, 'show'])->name('katalog.show');
 
 // Customer Routes
 Route::middleware('auth:customer')->prefix('customer')->name('customer.')->group(function () {
