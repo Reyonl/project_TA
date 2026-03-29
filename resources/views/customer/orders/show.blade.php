@@ -171,9 +171,31 @@
 
                             <div class="text-right shrink-0">
                                 <p class="text-xs text-slate-500">Subtotal</p>
-                                <p class="font-bold text-indigo-600">Rp {{ number_format($detail->subtotal, 0, ',', '.') }}</p>
+                                <p class="font-bold text-indigo-600 text-lg">Rp {{ number_format($detail->subtotal, 0, ',', '.') }}</p>
                             </div>
                         </div>
+
+                        <!-- Status Revisi -->
+                        @if($detail->status_desain == 'revisi')
+                            <div class="mt-4 p-4 border border-red-200 bg-red-50 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                        <h5 class="font-bold text-red-700">Desain Perlu Diperbaiki</h5>
+                                    </div>
+                                    <p class="text-sm text-red-600">Catatan Admin: <span class="font-semibold italic">"{{ $detail->catatan_admin }}"</span></p>
+                                </div>
+                                <a href="{{ route('customer.designs.editor', ['produk' => $detail->produk->id_produk, 'revisi' => $detail->id_desain]) }}" class="shrink-0 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-5 rounded-lg text-sm shadow-sm transition">
+                                    Perbaiki Desain
+                                </a>
+                            </div>
+                        @elseif($detail->status_desain == 'disetujui')
+                            <div class="mt-4 p-3 border border-emerald-200 bg-emerald-50 rounded-lg flex items-center gap-2">
+                                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span class="text-sm font-bold text-emerald-700">Desain Telah Disetujui</span>
+                            </div>
+                        @endif
+
                     @endforeach
                 </div>
             </div>

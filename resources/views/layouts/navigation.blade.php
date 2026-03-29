@@ -57,6 +57,9 @@
                         <x-nav-link :href="route('customer.orders.index')" :active="request()->routeIs('customer.orders.*')">
                             🛍️ Pesanan Saya
                         </x-nav-link>
+                        <x-nav-link :href="route('customer.cart.index')" :active="request()->routeIs('customer.cart.*')">
+                            🛒 Keranjang
+                        </x-nav-link>
                     @endif
                 </div>
             </div>
@@ -122,6 +125,9 @@
                             <x-dropdown-link :href="route('customer.orders.index')">
                                 🛍️ Pesanan Saya
                             </x-dropdown-link>
+                            <x-dropdown-link :href="route('customer.cart.index')">
+                                🛒 Keranjang
+                            </x-dropdown-link>
                         @endif
 
                         {{-- Logout --}}
@@ -176,6 +182,9 @@
             @if($role === 'customer')
                 <x-responsive-nav-link :href="route('customer.orders.index')" :active="request()->routeIs('customer.orders.*')">
                     🛍️ Pesanan Saya
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('customer.cart.index')" :active="request()->routeIs('customer.cart.*')">
+                    🛒 Keranjang
                 </x-responsive-nav-link>
             @endif
         </div>

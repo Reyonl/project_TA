@@ -71,81 +71,83 @@
                                 <div class="w-full sm:w-5/12 flex-shrink-0 bg-white border border-slate-200 rounded-lg p-3 flex flex-col items-center justify-center min-h-[160px] gap-4">
                                     <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 w-full border-b pb-2">Preview Hasil</p>
                                     @if($detail->desain)
-                                        <!-- FRONT DESIGN -->
-                                        @if($detail->desain->file_desain)
-                                            <div class="flex flex-col items-center w-full">
-                                                <span class="text-[10px] font-bold text-slate-400 mb-1">DEPAN</span>
-                                                <div class="relative w-[280px] h-[350px] rounded-lg overflow-hidden flex items-center justify-center shadow-inner bg-slate-50 border border-slate-200 group transition-all">
-                                                    @if($detail->produk->jenis_produk == 'kaos')
-                                                        <img src="{{ asset('images/mockups/kaos.png?v='.time()) }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-95 z-0 transition-transform group-hover:scale-105">
-                                                        <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10 transition-transform group-hover:scale-105"
-                                                             style="-webkit-mask-image: url('{{ asset('images/mockups/kaos.png?v='.time()) }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ asset('images/mockups/kaos.png?v='.time()) }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
-                                                            <div class="w-full h-full" style="background-color: {{ $detail->desain->warna_baju ?: '#ffffff' }};"></div>
-                                                        </div>
-                                                    @elseif($detail->produk->jenis_produk == 'hoodie')
-                                                        <img src="{{ asset('images/mockups/hoodie.png?v='.time()) }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-95 z-0 transition-transform group-hover:scale-105">
-                                                        <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10 transition-transform group-hover:scale-105"
-                                                             style="-webkit-mask-image: url('{{ asset('images/mockups/hoodie.png?v='.time()) }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ asset('images/mockups/hoodie.png?v='.time()) }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
-                                                            <div class="w-full h-full" style="background-color: {{ $detail->desain->warna_baju ?: '#ffffff' }};"></div>
-                                                        </div>
-                                                    @endif
+                                        <div class="flex flex-row overflow-x-auto w-full gap-5 pb-2 snap-x snap-mandatory pl-1">
+                                            <!-- FRONT DESIGN -->
+                                            @if($detail->desain->file_desain)
+                                                <div class="flex flex-col items-center shrink-0 w-[280px] snap-center">
+                                                    <span class="text-[10px] font-bold text-slate-400 mb-1">DEPAN</span>
+                                                    <div class="relative w-full h-[350px] rounded-lg overflow-hidden flex items-center justify-center shadow-inner bg-slate-50 border border-slate-200 group transition-all">
+                                                        @if($detail->produk->jenis_produk == 'kaos')
+                                                            <img src="{{ asset('images/mockups/kaos.png?v='.time()) }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-95 z-0 transition-transform group-hover:scale-105">
+                                                            <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10 transition-transform group-hover:scale-105"
+                                                                 style="-webkit-mask-image: url('{{ asset('images/mockups/kaos.png?v='.time()) }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ asset('images/mockups/kaos.png?v='.time()) }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
+                                                                <div class="w-full h-full" style="background-color: {{ $detail->desain->warna_baju ?: '#ffffff' }};"></div>
+                                                            </div>
+                                                        @elseif($detail->produk->jenis_produk == 'hoodie')
+                                                            <img src="{{ asset('images/mockups/hoodie.png?v='.time()) }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-95 z-0 transition-transform group-hover:scale-105">
+                                                            <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10 transition-transform group-hover:scale-105"
+                                                                 style="-webkit-mask-image: url('{{ asset('images/mockups/hoodie.png?v='.time()) }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ asset('images/mockups/hoodie.png?v='.time()) }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
+                                                                <div class="w-full h-full" style="background-color: {{ $detail->desain->warna_baju ?: '#ffffff' }};"></div>
+                                                            </div>
+                                                        @endif
 
-                                                    <div class="absolute z-20 transition-transform group-hover:scale-105" style="top: 20%; left: 27.08%; width: 45.83%; height: 53.33%;">
-                                                        <img src="{{ Str::startsWith($detail->desain->file_desain, 'data:image') ? $detail->desain->file_desain : Storage::url($detail->desain->file_desain) }}" class="w-full h-full object-contain">
+                                                        <div class="absolute z-20 transition-transform group-hover:scale-105" style="top: 20%; left: 27.08%; width: 45.83%; height: 53.33%;">
+                                                            <img src="{{ Str::startsWith($detail->desain->file_desain, 'data:image') ? $detail->desain->file_desain : Storage::url($detail->desain->file_desain) }}" class="w-full h-full object-contain">
+                                                        </div>
                                                     </div>
+                                                    @php
+                                                        $desainUrl = Str::startsWith($detail->desain->file_desain, 'data:image') ? $detail->desain->file_desain : Storage::url($detail->desain->file_desain);
+                                                        $bajuType = $detail->produk->jenis_produk;
+                                                        $bajuColor = $detail->desain->warna_baju ?: '#ffffff';
+                                                        $mockupUrl = asset('images/mockups/' . $bajuType . '.png?v='.time());
+                                                    @endphp
+                                                    <button type="button" onclick="openDesignModal('{{ $desainUrl }}', '{{ $mockupUrl }}', '{{ $bajuColor }}', '{{ $bajuType }}', false)" class="mt-2 w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[11px] font-bold py-2 px-3 rounded-lg border border-indigo-200 transition duration-200 flex items-center justify-center gap-1.5 shadow-sm">
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
+                                                        Full Mockup Depan
+                                                    </button>
                                                 </div>
-                                                @php
-                                                    $desainUrl = Str::startsWith($detail->desain->file_desain, 'data:image') ? $detail->desain->file_desain : Storage::url($detail->desain->file_desain);
-                                                    $bajuType = $detail->produk->jenis_produk;
-                                                    $bajuColor = $detail->desain->warna_baju ?: '#ffffff';
-                                                    $mockupUrl = asset('images/mockups/' . $bajuType . '.png?v='.time());
-                                                @endphp
-                                                <button type="button" onclick="openDesignModal('{{ $desainUrl }}', '{{ $mockupUrl }}', '{{ $bajuColor }}', '{{ $bajuType }}', false)" class="mt-2 w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[11px] font-bold py-2 px-3 rounded-lg border border-indigo-200 transition duration-200 flex items-center justify-center gap-1.5 shadow-sm">
-                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
-                                                    Full Mockup Depan
-                                                </button>
-                                            </div>
-                                        @endif
+                                            @endif
 
-                                        <!-- BACK DESIGN -->
-                                        @if($detail->desain->file_desain_belakang)
-                                            <div class="flex flex-col items-center w-full mt-4 pt-4 border-t border-slate-100">
-                                                <span class="text-[10px] font-bold text-slate-400 mb-1">BELAKANG</span>
-                                                <div class="relative w-[280px] h-[350px] rounded-lg overflow-hidden flex items-center justify-center shadow-inner bg-slate-50 border border-slate-200 group transition-all">
-                                                    @if($detail->produk->jenis_produk == 'kaos')
-                                                        <img src="{{ asset('images/mockups/kaos_belakang.png?v='.time()) }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-95 z-0 transition-transform group-hover:scale-105">
-                                                        <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10 transition-transform group-hover:scale-105"
-                                                             style="-webkit-mask-image: url('{{ asset('images/mockups/kaos_belakang.png?v='.time()) }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ asset('images/mockups/kaos_belakang.png?v='.time()) }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
-                                                            <div class="w-full h-full" style="background-color: {{ $detail->desain->warna_baju ?: '#ffffff' }};"></div>
-                                                        </div>
-                                                    @elseif($detail->produk->jenis_produk == 'hoodie')
-                                                        <img src="{{ asset('images/mockups/hoodie_belakang.png?v='.time()) }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-95 z-0 transition-transform group-hover:scale-105">
-                                                        <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10 transition-transform group-hover:scale-105"
-                                                             style="-webkit-mask-image: url('{{ asset('images/mockups/hoodie_belakang.png?v='.time()) }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ asset('images/mockups/hoodie_belakang.png?v='.time()) }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
-                                                            <div class="w-full h-full" style="background-color: {{ $detail->desain->warna_baju ?: '#ffffff' }};"></div>
-                                                        </div>
-                                                    @endif
+                                            <!-- BACK DESIGN -->
+                                            @if($detail->desain->file_desain_belakang)
+                                                <div class="flex flex-col items-center shrink-0 w-[280px] snap-center">
+                                                    <span class="text-[10px] font-bold text-slate-400 mb-1">BELAKANG</span>
+                                                    <div class="relative w-full h-[350px] rounded-lg overflow-hidden flex items-center justify-center shadow-inner bg-slate-50 border border-slate-200 group transition-all">
+                                                        @if($detail->produk->jenis_produk == 'kaos')
+                                                            <img src="{{ asset('images/mockups/kaos_belakang.png?v='.time()) }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-95 z-0 transition-transform group-hover:scale-105">
+                                                            <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10 transition-transform group-hover:scale-105"
+                                                                 style="-webkit-mask-image: url('{{ asset('images/mockups/kaos_belakang.png?v='.time()) }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ asset('images/mockups/kaos_belakang.png?v='.time()) }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
+                                                                <div class="w-full h-full" style="background-color: {{ $detail->desain->warna_baju ?: '#ffffff' }};"></div>
+                                                            </div>
+                                                        @elseif($detail->produk->jenis_produk == 'hoodie')
+                                                            <img src="{{ asset('images/mockups/hoodie_belakang.png?v='.time()) }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-95 z-0 transition-transform group-hover:scale-105">
+                                                            <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10 transition-transform group-hover:scale-105"
+                                                                 style="-webkit-mask-image: url('{{ asset('images/mockups/hoodie_belakang.png?v='.time()) }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ asset('images/mockups/hoodie_belakang.png?v='.time()) }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
+                                                                <div class="w-full h-full" style="background-color: {{ $detail->desain->warna_baju ?: '#ffffff' }};"></div>
+                                                            </div>
+                                                        @endif
 
-                                                    <div class="absolute z-20 transition-transform group-hover:scale-105" style="top: 20%; left: 27.08%; width: 45.83%; height: 53.33%;">
-                                                        <img src="{{ Str::startsWith($detail->desain->file_desain_belakang, 'data:image') ? $detail->desain->file_desain_belakang : Storage::url($detail->desain->file_desain_belakang) }}" class="w-full h-full object-contain">
+                                                        <div class="absolute z-20 transition-transform group-hover:scale-105" style="top: 20%; left: 27.08%; width: 45.83%; height: 53.33%;">
+                                                            <img src="{{ Str::startsWith($detail->desain->file_desain_belakang, 'data:image') ? $detail->desain->file_desain_belakang : Storage::url($detail->desain->file_desain_belakang) }}" class="w-full h-full object-contain">
+                                                        </div>
                                                     </div>
+                                                    @php
+                                                        $desainUrlB = Str::startsWith($detail->desain->file_desain_belakang, 'data:image') ? $detail->desain->file_desain_belakang : Storage::url($detail->desain->file_desain_belakang);
+                                                        $bajuType = $detail->produk->jenis_produk;
+                                                        $bajuColor = $detail->desain->warna_baju ?: '#ffffff';
+                                                        $mockupUrlB = asset('images/mockups/' . $bajuType . '_belakang.png?v='.time());
+                                                    @endphp
+                                                    <button type="button" onclick="openDesignModal('{{ $desainUrlB }}', '{{ $mockupUrlB }}', '{{ $bajuColor }}', '{{ $bajuType }}', true)" class="mt-2 w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold py-2 px-3 rounded-lg border border-slate-300 transition duration-200 flex items-center justify-center gap-1.5 shadow-sm">
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
+                                                        Full Mockup Belakang
+                                                    </button>
                                                 </div>
-                                                @php
-                                                    $desainUrlB = Str::startsWith($detail->desain->file_desain_belakang, 'data:image') ? $detail->desain->file_desain_belakang : Storage::url($detail->desain->file_desain_belakang);
-                                                    $bajuType = $detail->produk->jenis_produk;
-                                                    $bajuColor = $detail->desain->warna_baju ?: '#ffffff';
-                                                    $mockupUrlB = asset('images/mockups/' . $bajuType . '_belakang.png?v='.time());
-                                                @endphp
-                                                <button type="button" onclick="openDesignModal('{{ $desainUrlB }}', '{{ $mockupUrlB }}', '{{ $bajuColor }}', '{{ $bajuType }}', true)" class="mt-2 w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold py-2 px-3 rounded-lg border border-slate-300 transition duration-200 flex items-center justify-center gap-1.5 shadow-sm">
-                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
-                                                    Full Mockup Belakang
-                                                </button>
-                                            </div>
-                                        @endif
-                                        
-                                        @if(!$detail->desain->file_desain && !$detail->desain->file_desain_belakang)
-                                             <span class="text-slate-400 text-sm py-8">Tidak ada desain kustom</span>
-                                        @endif
+                                            @endif
+                                            
+                                            @if(!$detail->desain->file_desain && !$detail->desain->file_desain_belakang)
+                                                 <span class="text-slate-400 text-sm py-8 w-full text-center">Tidak ada desain kustom</span>
+                                            @endif
+                                        </div>
                                     @else
                                         <span class="text-slate-400 text-sm py-8">Tidak ada desain kustom</span>
                                     @endif
@@ -181,6 +183,49 @@
                                         <span class="font-bold text-slate-600">Subtotal Item:</span>
                                         <span class="font-black text-indigo-600 text-lg">Rp {{ number_format($detail->subtotal, 0, ',', '.') }}</span>
                                     </div>
+
+                                    @if($detail->status_desain == 'revisi')
+                                        <div class="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                                            <p class="text-xs font-bold text-red-600 uppercase mb-1">Status: Menunggu Revisi Customer</p>
+                                            <p class="text-sm text-red-700 italic">"{{ $detail->catatan_admin }}"</p>
+                                        </div>
+                                    @elseif($detail->status_desain == 'disetujui')
+                                        <div class="mt-3 p-2 bg-emerald-50 border border-emerald-200 rounded-lg text-center">
+                                            <p class="text-xs font-bold text-emerald-600 uppercase">Status: Desain Disetujui</p>
+                                        </div>
+                                    @else
+                                        <div class="mt-4 flex gap-2">
+                                            <button onclick="document.getElementById('modalRevisi_{{ $detail->id_order_detail }}').showModal()" class="flex-1 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-bold py-2 rounded-lg text-sm transition">
+                                                Tolak & Minta Revisi
+                                            </button>
+                                            <form action="{{ route('admin.orders.updateStatusDesain', [$order->id_order, $detail->id_order_detail]) }}" method="POST" class="flex-1">
+                                                @csrf @method('PATCH')
+                                                <input type="hidden" name="status_desain" value="disetujui">
+                                                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-lg text-sm transition">
+                                                    Setujui Desain
+                                                </button>
+                                            </form>
+                                        </div>
+                                    @endif
+
+                                    <!-- Modal Form Revisi -->
+                                    <dialog id="modalRevisi_{{ $detail->id_order_detail }}" class="p-0 rounded-2xl shadow-2xl backdrop:bg-slate-900/50 w-full max-w-lg">
+                                        <div class="p-6">
+                                            <h3 class="text-lg font-bold text-slate-800 mb-2">Tolak & Minta Revisi Desain</h3>
+                                            <p class="text-sm text-slate-500 mb-4">Berikan catatan perbaikan agar pelanggan dapat memperbaiki desainnya.</p>
+                                            
+                                            <form action="{{ route('admin.orders.updateStatusDesain', [$order->id_order, $detail->id_order_detail]) }}" method="POST">
+                                                @csrf @method('PATCH')
+                                                <input type="hidden" name="status_desain" value="revisi">
+                                                <textarea name="catatan_admin" rows="4" class="w-full rounded-lg border-slate-300 focus:ring-red-500 focus:border-red-500 text-sm mb-4" placeholder="Misal: Resolusi gambar depan terlalu kecil / pecah..." required></textarea>
+                                                
+                                                <div class="flex gap-2 justify-end">
+                                                    <button type="button" onclick="document.getElementById('modalRevisi_{{ $detail->id_order_detail }}').close()" class="px-4 py-2 bg-slate-100 font-bold text-slate-600 rounded-lg">Batal</button>
+                                                    <button type="submit" class="px-4 py-2 bg-red-600 hover:bg-red-700 font-bold text-white rounded-lg transition">Kirim Permintaan Revisi</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </dialog>
                                 </div>
                             </div>
                         @endforeach
@@ -212,8 +257,8 @@
             </button>
             
             <div class="bg-white/5 p-4 rounded-2xl border border-white/10 shadow-2xl backdrop-blur-md pointer-events-auto flex flex-col items-center">
-                <!-- Container Komposit Mockup HD (W: 500px, H: 625px ratio 4:5 same as 280:350) -->
-                <div id="mockupContainerFull" class="relative w-[500px] h-[625px] rounded-xl overflow-hidden shadow-inner bg-slate-50 flex items-center justify-center">
+                <!-- Container Komposit Mockup HD (Rasio 4:5 proporsi presisi) -->
+                <div id="mockupContainerFull" class="relative rounded-xl overflow-hidden shadow-inner bg-slate-50 flex items-center justify-center mx-auto" style="height: 70vh; max-height: 625px; aspect-ratio: 4/5;">
                     <!-- Base Image -->
                     <img id="modalMockupBase" src="" crossorigin="anonymous" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-95 z-0">
                     <!-- Color Masking -->

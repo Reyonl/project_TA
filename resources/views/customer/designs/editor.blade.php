@@ -118,10 +118,21 @@
                     </div>
                     
                     <button id="saveDesignBtn" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg shadow-lg hover:bg-indigo-500 transition hover:-translate-y-0.5 shadow-indigo-200 flex items-center gap-2 text-sm">
-                        <span>Lanjut Order</span>
+                        <span>{{ $desainRevisi ? 'Simpan Revisi' : 'Simpan Desain' }}</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                     </button>
                 </div>
+
+                @if($desainRevisi)
+                <div class="bg-red-50 border-b border-red-200 p-4 sticky top-[73px] z-10 flex gap-3 shadow-inner">
+                    <svg class="w-6 h-6 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <div>
+                        <h4 class="font-bold text-red-800">Revisi Permintaan Admin</h4>
+                        <p class="text-sm text-red-700">Silakan buat ulang desain Anda sesuai catatan: <strong class="italic">'{{ \App\Models\OrderDetail::where('id_desain', $desainRevisi->id_desain)->value('catatan_admin') }}'</strong></p>
+                        <p class="text-xs text-red-500 mt-1">*Desain lama Anda tidak dapat dimuat otomatis karena telah dirender jadi gambar permanen. Silakan desain baru.</p>
+                    </div>
+                </div>
+                @endif
 
                 <!-- Canvas Workspace Container -->
                 <div class="flex-1 overflow-auto flex justify-center items-center py-8 relative">
@@ -704,21 +715,23 @@
                 this.innerHTML = 'Memproses... ⏳';
                 this.disabled = true;
 
-                fetch('{{ route('customer.designs.store') }}', {
-                    method: 'POST',
+                let submitUrl = '{{ route('customer.designs.store') }}';
+                let httpMethod = 'POST';
+                
+                @if($desainRevisi)
+                    submitUrl = '{{ route('customer.designs.update', $desainRevisi->id_desain) }}';
+                    payload._method = 'PATCH';
+                @endif
+
+                fetch(submitUrl, {
+                    method: httpMethod,
                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                     body: JSON.stringify(payload)
                 })
                 .then(res => res.json())
                 .then(data => {
                     if(data.success) {
-                        const checkoutUrl = new URL('{{ route('customer.checkout.index') }}', window.location.origin);
-                        checkoutUrl.searchParams.append('id_produk', '{{ $produk->id_produk }}');
-                        checkoutUrl.searchParams.append('id_desain', data.id_desain);
-                        // Optional pass base color
-                        // checkoutUrl.searchParams.append('warna_baju', activeBaseColor);
-
-                        window.location.href = checkoutUrl;
+                        window.location.href = data.redirect_url;
                     } else { alert('Gagal menyimpan desain!'); }
                 })
                 .catch(error => {

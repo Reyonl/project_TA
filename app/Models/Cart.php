@@ -4,26 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class OrderDetail extends Model
+class Cart extends Model
 {
-    protected $table = 'order_details';
-    protected $primaryKey = 'id_order_detail';
+    protected $table = 'carts';
+    protected $primaryKey = 'id_cart';
 
     protected $fillable = [
-        'id_order',
+        'id_customer',
         'id_produk',
         'id_desain',
         'quantity',
-        'harga_produk',
-        'harga_desain',
-        'subtotal',
-        'status_desain',
-        'catatan_admin',
     ];
 
-    public function order()
+    public function customer()
     {
-        return $this->belongsTo(Order::class, 'id_order', 'id_order');
+        return $this->belongsTo(Customer::class, 'id_customer', 'id_customer');
     }
 
     public function produk()
