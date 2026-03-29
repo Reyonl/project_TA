@@ -7,7 +7,7 @@
         </h2>
     </x-slot>
 
-    <div class="h-[calc(100vh-65px)] overflow-hidden" x-data="{ activeTab: 'templates', baseColor: '#ffffff', activeSide: 'front' }" x-init="if(typeof switchCanvasSide === 'function') $watch('activeSide', value => switchCanvasSide(value))">
+    <div class="h-[calc(100vh-65px)] overflow-hidden" x-data="{ activeTab: 'templates', baseColor: '#ffffff', activeSide: 'front' }">
         <div class="flex h-full bg-slate-50">
             
             <!-- Navbar Kiri Tepi (Icon Only) -->
@@ -101,8 +101,8 @@
                         <span class="font-bold text-slate-700">{{ $produk->nama_produk }}</span>
                         <!-- Sisi Baju Toggle -->
                         <div class="flex items-center bg-slate-100 rounded-lg p-1 border border-slate-200 ml-4">
-                            <button @click="activeSide = 'front'" :class="activeSide === 'front' ? 'bg-white shadow-sm text-indigo-700 font-bold' : 'text-slate-500 hover:text-slate-700'" class="px-4 py-1 text-sm rounded-md transition-all">Depan</button>
-                            <button @click="activeSide = 'back'" :class="activeSide === 'back' ? 'bg-white shadow-sm text-indigo-700 font-bold' : 'text-slate-500 hover:text-slate-700'" class="px-4 py-1 text-sm rounded-md transition-all">Belakang</button>
+                            <button @click="activeSide = 'front'; window.switchCanvasSide('front')" :class="activeSide === 'front' ? 'bg-white shadow-sm text-indigo-700 font-bold' : 'text-slate-500 hover:text-slate-700'" class="px-4 py-1 text-sm rounded-md transition-all">Depan</button>
+                            <button @click="activeSide = 'back'; window.switchCanvasSide('back')" :class="activeSide === 'back' ? 'bg-white shadow-sm text-indigo-700 font-bold' : 'text-slate-500 hover:text-slate-700'" class="px-4 py-1 text-sm rounded-md transition-all">Belakang</button>
                         </div>
                         <!-- Base Color Picker -->
                         <div class="flex items-center gap-2 border-l border-slate-200 pl-4">
@@ -183,24 +183,24 @@
                         </div>
                         
                         <!-- Latar Baju Fotorealistis (Statik/Locked Background) -->
-                        <div class="absolute inset-0 z-0 pointer-events-none" id="baseColorContainer" :class="activeSide === 'back' ? '-scale-x-100' : ''">
+                        <div class="absolute inset-0 z-0 pointer-events-none" id="baseColorContainer">
                              <div class="w-full h-full flex items-center justify-center relative overflow-hidden">
                                 @if($produk->jenis_produk == 'kaos')
                                     <!-- Base Foto Kaos Nyata -->
-                                    <img src="{{ asset('images/mockups/kaos.png?v='.time()) }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow-2xl opacity-90">
+                                    <img :src="activeSide === 'front' ? '{{ asset('images/mockups/kaos.png?v='.time()) }}' : '{{ asset('images/mockups/kaos_belakang.png?v='.time()) }}'" class="absolute w-[85%] h-[85%] object-contain drop-shadow-2xl opacity-90">
                                     
                                     <!-- Layer Masking Warna Kaos (Tepat di atas foto, mix-blend multiply) -->
                                     <div class="absolute w-[85%] h-[85%] mix-blend-multiply"
-                                         style="-webkit-mask-image: url('{{ asset('images/mockups/kaos.png?v='.time()) }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ asset('images/mockups/kaos.png?v='.time()) }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
+                                         :style="`-webkit-mask-image: url('${activeSide === 'front' ? '{{ asset('images/mockups/kaos.png?v='.time()) }}' : '{{ asset('images/mockups/kaos_belakang.png?v='.time()) }}'}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('${activeSide === 'front' ? '{{ asset('images/mockups/kaos.png?v='.time()) }}' : '{{ asset('images/mockups/kaos_belakang.png?v='.time()) }}'}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;`">
                                         <div class="w-full h-full transition-colors duration-300" :style="`background-color: ${baseColor};`"></div>
                                     </div>
                                 @elseif($produk->jenis_produk == 'hoodie')
                                     <!-- Base Foto Hoodie Nyata -->
-                                    <img src="{{ asset('images/mockups/hoodie.png?v='.time()) }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow-2xl opacity-90">
+                                    <img :src="activeSide === 'front' ? '{{ asset('images/mockups/hoodie.png?v='.time()) }}' : '{{ asset('images/mockups/hoodie_belakang.png?v='.time()) }}'" class="absolute w-[85%] h-[85%] object-contain drop-shadow-2xl opacity-90">
                                     
                                     <!-- Layer Masking Warna Hoodie -->
                                     <div class="absolute w-[85%] h-[85%] mix-blend-multiply"
-                                         style="-webkit-mask-image: url('{{ asset('images/mockups/hoodie.png?v='.time()) }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ asset('images/mockups/hoodie.png?v='.time()) }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
+                                         :style="`-webkit-mask-image: url('${activeSide === 'front' ? '{{ asset('images/mockups/hoodie.png?v='.time()) }}' : '{{ asset('images/mockups/hoodie_belakang.png?v='.time()) }}'}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('${activeSide === 'front' ? '{{ asset('images/mockups/hoodie.png?v='.time()) }}' : '{{ asset('images/mockups/hoodie_belakang.png?v='.time()) }}'}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;`">
                                         <div class="w-full h-full transition-colors duration-300" :style="`background-color: ${baseColor};`"></div>
                                     </div>
                                 @endif
@@ -256,7 +256,9 @@
     <!-- Script Logika Fabric.js & Kontrol Editor -->
     <script>
         // Alpine data binding bridge
+        window.activeBaseColorLocal = '#ffffff'; // Default putih
         window.canvasBackgroundChange = function(color) {
+            window.activeBaseColorLocal = color;
             // Kita render warna base via html agar tidak mengotori DataURL save format png
             const printbox = document.getElementById('printAreaBox');
             if(color === '#1e293b') {
@@ -669,7 +671,7 @@
                 canvasBack.discardActiveObject(); 
                 canvasBack.renderAll();
 
-                const activeBaseColor = document.getElementById('baseColorContainer').style.backgroundColor || '#ffffff';
+                const activeBaseColor = window.activeBaseColorLocal || '#ffffff';
                 const lebarCm = 30; // Proporsi standar A3 sablon
                 const tinggiCm = 45;
 
