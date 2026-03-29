@@ -7,7 +7,7 @@
         </h2>
     </x-slot>
 
-    <div class="h-[calc(100vh-65px)] overflow-hidden" x-data="{ activeTab: 'templates', baseColor: '#ffffff' }">
+    <div class="h-[calc(100vh-65px)] overflow-hidden" x-data="{ activeTab: 'templates', baseColor: '#ffffff', activeSide: 'front' }">
         <div class="flex h-full bg-slate-50">
             
             <!-- Navbar Kiri Tepi (Icon Only) -->
@@ -99,6 +99,11 @@
                 <div class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shadow-sm z-10 w-full flex-shrink-0">
                     <div class="flex items-center gap-4">
                         <span class="font-bold text-slate-700">{{ $produk->nama_produk }}</span>
+                        <!-- Sisi Baju Toggle -->
+                        <div class="flex items-center bg-slate-100 rounded-lg p-1 border border-slate-200 ml-4">
+                            <button @click="activeSide = 'front'; window.switchCanvasSide('front')" :class="activeSide === 'front' ? 'bg-white shadow-sm text-indigo-700 font-bold' : 'text-slate-500 hover:text-slate-700'" class="px-4 py-1 text-sm rounded-md transition-all">Depan</button>
+                            <button @click="activeSide = 'back'; window.switchCanvasSide('back')" :class="activeSide === 'back' ? 'bg-white shadow-sm text-indigo-700 font-bold' : 'text-slate-500 hover:text-slate-700'" class="px-4 py-1 text-sm rounded-md transition-all">Belakang</button>
+                        </div>
                         <!-- Base Color Picker -->
                         <div class="flex items-center gap-2 border-l border-slate-200 pl-4">
                             <span class="text-sm text-slate-500 font-medium">Warna Baju:</span>
@@ -113,16 +118,40 @@
                     </div>
                     
                     <button id="saveDesignBtn" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg shadow-lg hover:bg-indigo-500 transition hover:-translate-y-0.5 shadow-indigo-200 flex items-center gap-2 text-sm">
-                        <span>Lanjut Order</span>
+                        <span>{{ $desainRevisi ? 'Simpan Revisi' : 'Simpan Desain' }}</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                     </button>
                 </div>
+
+                @if($desainRevisi)
+                <div class="bg-red-50 border-b border-red-200 p-4 sticky top-[73px] z-10 flex gap-3 shadow-inner">
+                    <svg class="w-6 h-6 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <div>
+                        <h4 class="font-bold text-red-800">Revisi Permintaan Admin</h4>
+                        <p class="text-sm text-red-700">Silakan buat ulang desain Anda sesuai catatan: <strong class="italic">'{{ \App\Models\OrderDetail::where('id_desain', $desainRevisi->id_desain)->value('catatan_admin') }}'</strong></p>
+                        <p class="text-xs text-red-500 mt-1">*Desain lama Anda tidak dapat dimuat otomatis karena telah dirender jadi gambar permanen. Silakan desain baru.</p>
+                    </div>
+                </div>
+                @endif
 
                 <!-- Canvas Workspace Container -->
                 <div class="flex-1 overflow-auto flex justify-center items-center py-8 relative">
                     <!-- Layer Control Floating Tool (Muncul saat diklik) -->
                     <div id="editorControls" class="absolute top-12 left-1/2 transform -translate-x-1/2 bg-white px-4 py-2 border border-slate-200 shadow-xl rounded-xl items-center gap-3 z-50 hidden transition-all">
                         
+                        <!-- Image Controls (Remove Background) -->
+                        <div id="imageControls" class="hidden items-center gap-2 border-r border-slate-200 pr-3 mr-1">
+                            <button id="removeBgBtn" title="Hapus Background Putih/Polos" class="bg-indigo-50 border border-indigo-200 text-indigo-600 text-xs font-bold px-3 py-1.5 rounded hover:bg-indigo-100 flex items-center gap-1 transition">
+                                <span>✨ Hapus BG Putih</span>
+                            </button>
+                        </div>
+
+                        <!-- SVG Vector Controls -->
+                        <div id="svgControls" class="hidden items-center gap-2 border-r border-slate-200 pr-3 mr-1">
+                            <span class="text-xs font-bold text-slate-500">Warna Vektor:</span>
+                            <input type="color" id="svgColorControl" class="w-8 h-8 p-0.5 border-0 rounded cursor-pointer" value="#000000" title="Ubah Warna Vektor">
+                        </div>
+
                         <!-- Text Controls -->
                         <div id="textControls" class="hidden items-center gap-2 border-r border-slate-200 pr-3 mr-1">
                             <select id="fontFamilyControl" class="text-sm border-slate-300 rounded py-1 pl-2 pr-8 focus:ring-indigo-500 focus:border-indigo-500" style="padding-top:0.25rem; padding-bottom:0.25rem;">
@@ -132,7 +161,20 @@
                                 <option value="Impact">Impact</option>
                                 <option value="'Comic Sans MS'">Comic Sans</option>
                             </select>
-                            <input type="color" id="textColorControl" class="w-8 h-8 p-0.5 border-0 rounded cursor-pointer" value="#000000">
+                            <input type="color" id="textColorControl" class="w-8 h-8 p-0.5 border-0 rounded cursor-pointer" value="#000000" title="Warna Teks">
+                            <div class="h-6 w-px bg-slate-200 mx-1"></div>
+                            
+                            <!-- Advanced Text Features -->
+                            <div class="flex items-center gap-1" title="Outline / Stroke Teks">
+                                <span class="text-[10px] font-bold text-slate-400">Outline:</span>
+                                <input type="color" id="textStrokeColor" class="w-6 h-6 p-0 border-0 rounded cursor-pointer" value="#ffffff">
+                                <input type="range" id="textStrokeWidth" min="0" max="10" value="0" class="w-12 h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                            </div>
+                            <div class="h-6 w-px bg-slate-200 mx-1"></div>
+                            <label class="flex items-center gap-1 cursor-pointer text-xs font-bold text-slate-500" title="Efek Bayangan">
+                                <input type="checkbox" id="textShadowToggle" class="rounded text-indigo-600 form-checkbox h-4 w-4">
+                                Shadow
+                            </label>
                         </div>
 
                         <!-- Layer Control -->
@@ -146,25 +188,30 @@
                     <!-- Container Absolute 480x600 untuk Mockup Static Background -->
                     <div class="relative shadow-2xl rounded-xl overflow-hidden pointer-events-auto flex items-center justify-center bg-slate-100" id="mockupContainer" style="width: 480px; height: 600px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);">
                         
+                        <!-- Indikator Sisi Baju -->
+                        <div class="absolute top-4 left-4 z-30 pointer-events-none">
+                            <span class="bg-indigo-600/90 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-lg border border-indigo-400/50 uppercase tracking-widest backdrop-blur-sm" x-text="activeSide === 'front' ? 'Bagian Depan' : 'Bagian Belakang'">Bagian Depan</span>
+                        </div>
+                        
                         <!-- Latar Baju Fotorealistis (Statik/Locked Background) -->
                         <div class="absolute inset-0 z-0 pointer-events-none" id="baseColorContainer">
                              <div class="w-full h-full flex items-center justify-center relative overflow-hidden">
                                 @if($produk->jenis_produk == 'kaos')
                                     <!-- Base Foto Kaos Nyata -->
-                                    <img src="{{ asset('images/mockups/kaos.png?v='.time()) }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow-2xl opacity-90">
+                                    <img :src="activeSide === 'front' ? '{{ asset('images/mockups/kaos.png?v='.time()) }}' : '{{ asset('images/mockups/kaos_belakang.png?v='.time()) }}'" class="absolute w-[85%] h-[85%] object-contain drop-shadow-2xl opacity-90">
                                     
                                     <!-- Layer Masking Warna Kaos (Tepat di atas foto, mix-blend multiply) -->
                                     <div class="absolute w-[85%] h-[85%] mix-blend-multiply"
-                                         style="-webkit-mask-image: url('{{ asset('images/mockups/kaos.png?v='.time()) }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ asset('images/mockups/kaos.png?v='.time()) }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
+                                         :style="`-webkit-mask-image: url('${activeSide === 'front' ? '{{ asset('images/mockups/kaos.png?v='.time()) }}' : '{{ asset('images/mockups/kaos_belakang.png?v='.time()) }}'}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('${activeSide === 'front' ? '{{ asset('images/mockups/kaos.png?v='.time()) }}' : '{{ asset('images/mockups/kaos_belakang.png?v='.time()) }}'}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;`">
                                         <div class="w-full h-full transition-colors duration-300" :style="`background-color: ${baseColor};`"></div>
                                     </div>
                                 @elseif($produk->jenis_produk == 'hoodie')
                                     <!-- Base Foto Hoodie Nyata -->
-                                    <img src="{{ asset('images/mockups/hoodie.png?v='.time()) }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow-2xl opacity-90">
+                                    <img :src="activeSide === 'front' ? '{{ asset('images/mockups/hoodie.png?v='.time()) }}' : '{{ asset('images/mockups/hoodie_belakang.png?v='.time()) }}'" class="absolute w-[85%] h-[85%] object-contain drop-shadow-2xl opacity-90">
                                     
                                     <!-- Layer Masking Warna Hoodie -->
                                     <div class="absolute w-[85%] h-[85%] mix-blend-multiply"
-                                         style="-webkit-mask-image: url('{{ asset('images/mockups/hoodie.png?v='.time()) }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ asset('images/mockups/hoodie.png?v='.time()) }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
+                                         :style="`-webkit-mask-image: url('${activeSide === 'front' ? '{{ asset('images/mockups/hoodie.png?v='.time()) }}' : '{{ asset('images/mockups/hoodie_belakang.png?v='.time()) }}'}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('${activeSide === 'front' ? '{{ asset('images/mockups/hoodie.png?v='.time()) }}' : '{{ asset('images/mockups/hoodie_belakang.png?v='.time()) }}'}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;`">
                                         <div class="w-full h-full transition-colors duration-300" :style="`background-color: ${baseColor};`"></div>
                                     </div>
                                 @endif
@@ -184,8 +231,11 @@
 
                         <!-- Fabric.js Canvas hanya sebesar area cetak didada -->
                         <!-- Sehingga desain user TIDAK AKAN PERNAH bisa digeser keluar dari area dada kaos -->
-                        <div class="absolute z-20" style="top: 120px; left: 130px; width: 220px; height: 320px;">
-                            <canvas id="tshirt-canvas" width="220" height="320"></canvas>
+                        <div class="absolute z-20" style="top: 120px; left: 130px; width: 220px; height: 320px;" x-show="activeSide === 'front'">
+                            <canvas id="tshirt-canvas-front" width="220" height="320"></canvas>
+                        </div>
+                        <div class="absolute z-20" style="top: 120px; left: 130px; width: 220px; height: 320px;" x-show="activeSide === 'back'" style="display: none;">
+                            <canvas id="tshirt-canvas-back" width="220" height="320"></canvas>
                         </div>
                     </div>
 
@@ -217,7 +267,9 @@
     <!-- Script Logika Fabric.js & Kontrol Editor -->
     <script>
         // Alpine data binding bridge
+        window.activeBaseColorLocal = '#ffffff'; // Default putih
         window.canvasBackgroundChange = function(color) {
+            window.activeBaseColorLocal = color;
             // Kita render warna base via html agar tidak mengotori DataURL save format png
             const printbox = document.getElementById('printAreaBox');
             if(color === '#1e293b') {
@@ -229,10 +281,25 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             // Inisialisasi Canvas Fabric (Ukuran baru: 480x600)
-            const canvas = new fabric.Canvas('tshirt-canvas', {
+            const canvasFront = new fabric.Canvas('tshirt-canvas-front', {
                 preserveObjectStacking: true,
                 selection: true
             });
+            const canvasBack = new fabric.Canvas('tshirt-canvas-back', {
+                preserveObjectStacking: true,
+                selection: true
+            });
+            
+            let canvas = canvasFront; // pointer ke canvas yang aktif saat ini
+
+            window.switchCanvasSide = function(side) {
+                if(canvas) {
+                    canvas.discardActiveObject();
+                    canvas.renderAll();
+                }
+                if (typeof hideControls === 'function') hideControls();
+                canvas = side === 'front' ? canvasFront : canvasBack;
+            };
 
             // Batasan Area Cetak (Canvas sekarang HANYA seukuran Print Area)
             const printArea = { top: 0, left: 0, width: 220, height: 320 };
@@ -246,6 +313,15 @@
             const textControls   = document.getElementById('textControls');
             const fontFamilyControl = document.getElementById('fontFamilyControl');
             const textColorControl  = document.getElementById('textColorControl');
+            const textStrokeColor = document.getElementById('textStrokeColor');
+            const textStrokeWidth = document.getElementById('textStrokeWidth');
+            const textShadowToggle = document.getElementById('textShadowToggle');
+
+            const imageControls = document.getElementById('imageControls');
+            const removeBgBtn = document.getElementById('removeBgBtn');
+
+            const svgControls = document.getElementById('svgControls');
+            const svgColorControl = document.getElementById('svgColorControl');
 
             // --- FUNGSI GLOBAL CANVAS ---
             
@@ -358,6 +434,40 @@
                 }
             });
 
+            // Stroke (Outline) Teks
+            textStrokeColor.addEventListener('input', function() {
+                const activeObj = canvas.getActiveObject();
+                if(activeObj && activeObj.type === 'i-text') {
+                    activeObj.set({ stroke: this.value, strokeWidth: parseInt(textStrokeWidth.value) });
+                    canvas.renderAll();
+                }
+            });
+            textStrokeWidth.addEventListener('input', function() {
+                const activeObj = canvas.getActiveObject();
+                if(activeObj && activeObj.type === 'i-text') {
+                    activeObj.set({ stroke: textStrokeColor.value, strokeWidth: parseInt(this.value) });
+                    canvas.renderAll();
+                }
+            });
+
+            // Shadow Teks
+            textShadowToggle.addEventListener('change', function() {
+                const activeObj = canvas.getActiveObject();
+                if(activeObj && activeObj.type === 'i-text') {
+                    if(this.checked) {
+                        activeObj.set('shadow', new fabric.Shadow({
+                            color: 'rgba(0,0,0,0.6)',
+                            blur: 4,
+                            offsetX: 2,
+                            offsetY: 2
+                        }));
+                    } else {
+                        activeObj.set('shadow', null);
+                    }
+                    canvas.renderAll();
+                }
+            });
+
             // Setup Layer Management
             bringForwardBtn.addEventListener('click', function() {
                 const activeObj = canvas.getActiveObject();
@@ -378,6 +488,7 @@
                     else if(img.width < 40) img.scaleToWidth(80);
                     
                     img.set({ left: 20, top: 20 });
+                    img.customType = 'custom-image'; // Penanda image statis
                     canvas.add(img);
                     canvas.setActiveObject(img);
                 };
@@ -395,6 +506,7 @@
                     if (maxDim > 0) group.scale(targetSize / maxDim);
                     
                     group.set({ left: 20, top: 20 });
+                    group.customType = 'custom-svg'; // Penanda object adalah SVG Vector
                     canvas.add(group);
                     canvas.setActiveObject(group);
                 });
@@ -410,6 +522,7 @@
                         var img = new fabric.Image(imgObj);
                         if(img.width > printArea.width) img.scaleToWidth(printArea.width - 20);
                         img.set({ left: 10, top: 10 });
+                        img.customType = 'custom-image';
                         canvas.add(img);
                         canvas.setActiveObject(img);
                     }
@@ -457,24 +570,100 @@
             stickerSearchInput.addEventListener('keypress', (e) => { if(e.key === 'Enter' && stickerSearchInput.value.trim()) loadStickers(stickerSearchInput.value.trim()); });
 
             // --- EDITOR CONTROLS LOGIC ---
-            canvas.on('selection:created', showControls);
-            canvas.on('selection:updated', showControls);
-            canvas.on('selection:cleared', hideControls);
+            [canvasFront, canvasBack].forEach(c => {
+                c.on('selection:created', showControls);
+                c.on('selection:updated', showControls);
+                c.on('selection:cleared', hideControls);
+            });
 
             function showControls(e) {
                 editorControls.classList.remove('hidden');
                 editorControls.classList.add('flex');
                 const activeObj = e.selected[0];
+                
+                // Hide All Contextual Controls first
+                textControls.classList.add('hidden'); textControls.classList.remove('flex');
+                imageControls.classList.add('hidden'); imageControls.classList.remove('flex');
+                svgControls.classList.add('hidden'); svgControls.classList.remove('flex');
+
                 if(activeObj && activeObj.type === 'i-text') {
                     textControls.classList.remove('hidden');
                     textControls.classList.add('flex');
                     fontFamilyControl.value = activeObj.fontFamily.replace(/["']/g, "");
                     textColorControl.value = activeObj.fill;
-                } else {
-                    textControls.classList.add('hidden');
-                    textControls.classList.remove('flex');
+                    textStrokeColor.value = activeObj.stroke || '#ffffff';
+                    textStrokeWidth.value = activeObj.strokeWidth || 0;
+                    textShadowToggle.checked = !!activeObj.shadow;
+                } 
+                else if (activeObj && activeObj.type === 'image' && activeObj.customType === 'custom-image') {
+                    imageControls.classList.remove('hidden');
+                    imageControls.classList.add('flex');
+                }
+                else if (activeObj && activeObj.type === 'group' && activeObj.customType === 'custom-svg') {
+                    svgControls.classList.remove('hidden');
+                    svgControls.classList.add('flex');
+                    // Get initial color from the first path of SVG
+                    if(activeObj._objects && activeObj._objects.length > 0) {
+                        // Some SVGs use 'fill', some 'stroke'. Prefer fill.
+                        let initialColor = activeObj._objects[0].fill;
+                        if(initialColor && typeof initialColor === 'string' && initialColor.startsWith('#')) {
+                            svgColorControl.value = initialColor;
+                        }
+                    }
                 }
             }
+
+            // Logic Remove Background (Magic Eraser) for Images
+            removeBgBtn.addEventListener('click', function() {
+                const activeObj = canvas.getActiveObject();
+                if(activeObj && activeObj.type === 'image') {
+                    // Cek jika filter RemoveColor sudah ada
+                    const hasFilter = activeObj.filters.some(f => f.type === 'RemoveColor');
+                    if(hasFilter) {
+                        alert('Background sudah dihancurkan pada gambar ini.');
+                        return;
+                    }
+
+                    const oldHtml = this.innerHTML;
+                    this.innerHTML = 'Memproses...';
+                    this.disabled = true;
+
+                    // Apply Fabric.js RemoveColor filter untuk membuang warna putih/polos
+                    // distance adalah tingkat sensitivitas toleransi warna putih (mirip magic wand tolerance)
+                    const filter = new fabric.Image.filters.RemoveColor({
+                        color: '#FFFFFF',
+                        distance: 0.15 
+                    });
+
+                    activeObj.filters.push(filter);
+                    activeObj.applyFilters();
+                    canvas.renderAll();
+
+                    setTimeout(() => {
+                        this.innerHTML = oldHtml;
+                        this.disabled = false;
+                    }, 500);
+                }
+            });
+
+            // Logic Merubah Warna Dynamic pada SVG
+            svgColorControl.addEventListener('input', function() {
+                const activeObj = canvas.getActiveObject();
+                if(activeObj && activeObj.type === 'group' && activeObj.customType === 'custom-svg') {
+                    const newColor = this.value;
+                    // Loop setiap elemen di dalam grup vektor SVG
+                    activeObj._objects.forEach(pathObj => {
+                        // Jangan warnai elemen yang tidak punya fill atau transparan
+                        if(pathObj.fill && pathObj.fill !== 'none' && pathObj.fill !== 'transparent') {
+                            pathObj.set('fill', newColor);
+                        }
+                        if(pathObj.stroke && pathObj.stroke !== 'none' && pathObj.stroke !== 'transparent') {
+                             pathObj.set('stroke', newColor);
+                        }
+                    });
+                    canvas.renderAll();
+                }
+            });
 
             function hideControls() {
                 editorControls.classList.add('hidden');
@@ -488,47 +677,61 @@
 
             // --- SUBMIT SAVE TO SERVER ---
             document.getElementById('saveDesignBtn').addEventListener('click', function() {
-                canvas.discardActiveObject(); // deselect elemen untuk hasil simpan yang bersih
-                canvas.renderAll();
+                canvasFront.discardActiveObject(); 
+                canvasFront.renderAll();
+                canvasBack.discardActiveObject(); 
+                canvasBack.renderAll();
 
-                // Kita menyimpan GAMBAR DARI CANVAS (Area Cetak 220x320 px).
-                // Menggunakan multiplier 4 untuk menjaga kualitas gambar tetap Extra HD (880x1280) saat dikirim ke admin vendor
-                const canvasDataURL = canvas.toDataURL({ format: 'png', quality: 1, multiplier: 4 }); 
-                
-                // baseColor disimpan agar saat admin melihat desain, ia tahu warna bodi bajunya
-                // Kita kirim lewat Alpine store (atau window scope)
-                const activeBaseColor = document.getElementById('baseColorContainer').style.backgroundColor || '#ffffff';
-
+                const activeBaseColor = window.activeBaseColorLocal || '#ffffff';
                 const lebarCm = 30; // Proporsi standar A3 sablon
                 const tinggiCm = 45;
+
+                let frontDataURL = '';
+                let backDataURL = '';
+
+                // Ambil data jika ada objek (atau jika canvas kosong, kita kirimkan blank untuk depan sebagai mandatory)
+                frontDataURL = canvasFront.toDataURL({ format: 'png', quality: 1, multiplier: 4 });
+                
+                if (canvasBack.getObjects().length > 0) {
+                    backDataURL = canvasBack.toDataURL({ format: 'png', quality: 1, multiplier: 4 });
+                }
 
                 const payload = {
                     _token: '{{ csrf_token() }}',
                     id_produk: '{{ $produk->id_produk }}',
-                    file_desain: canvasDataURL, 
+                    file_desain: frontDataURL, 
                     lebar_cm: lebarCm,
-                    tinggi_cm: tinggiCm
+                    tinggi_cm: tinggiCm,
+                    warna_baju: activeBaseColor
                 };
+
+                if (backDataURL !== '') {
+                    payload.file_desain_belakang = backDataURL;
+                    payload.lebar_cm_belakang = lebarCm;
+                    payload.tinggi_cm_belakang = tinggiCm;
+                }
 
                 const oldText = this.innerHTML;
                 this.innerHTML = 'Memproses... ⏳';
                 this.disabled = true;
 
-                fetch('{{ route('customer.designs.store') }}', {
-                    method: 'POST',
+                let submitUrl = '{{ route('customer.designs.store') }}';
+                let httpMethod = 'POST';
+                
+                @if($desainRevisi)
+                    submitUrl = '{{ route('customer.designs.update', $desainRevisi->id_desain) }}';
+                    payload._method = 'PATCH';
+                @endif
+
+                fetch(submitUrl, {
+                    method: httpMethod,
                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                     body: JSON.stringify(payload)
                 })
                 .then(res => res.json())
                 .then(data => {
                     if(data.success) {
-                        const checkoutUrl = new URL('{{ route('customer.checkout.index') }}', window.location.origin);
-                        checkoutUrl.searchParams.append('id_produk', '{{ $produk->id_produk }}');
-                        checkoutUrl.searchParams.append('id_desain', data.id_desain);
-                        // Optional pass base color
-                        // checkoutUrl.searchParams.append('warna_baju', activeBaseColor);
-
-                        window.location.href = checkoutUrl;
+                        window.location.href = data.redirect_url;
                     } else { alert('Gagal menyimpan desain!'); }
                 })
                 .catch(error => {

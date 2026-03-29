@@ -14,6 +14,7 @@ class Order extends Model
         'tanggal_order',
         'status_order',
         'total_harga',
+        'bukti_pembayaran',
     ];
 
     public function customer()

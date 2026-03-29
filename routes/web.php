@@ -2,14 +2,22 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Models\Produk;
+
 Route::get('/', function () {
-    return view('welcome');
+    // Dynamic products for landing page
+    $produks = Produk::take(3)->get();
+    return view('welcome', compact('produks'));
 })->name('home');
 
 use App\Http\Controllers\Customer\ProductController;
 use App\Http\Controllers\Customer\DesignController;
 use App\Http\Controllers\Customer\CheckoutController;
 use App\Http\Controllers\Customer\OrderController;
+use App\Http\Controllers\Customer\CartController;
+
+// Public Catalog
+Route::get('/katalog/{produk}', [ProductController::class, 'show'])->name('katalog.show');
 
 // Customer Routes
 Route::middleware('auth:customer')->prefix('customer')->name('customer.')->group(function () {
@@ -18,9 +26,15 @@ Route::middleware('auth:customer')->prefix('customer')->name('customer.')->group
     
     Route::get('/design/{produk}', [DesignController::class, 'index'])->name('designs.editor');
     Route::post('/design', [DesignController::class, 'store'])->name('designs.store');
+    Route::patch('/design/{desain}', [DesignController::class, 'update'])->name('designs.update');
     
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+
+    // Keranjang Belanja
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::patch('/cart/{cart}/quantity', [CartController::class, 'updateQuantity'])->name('cart.updateQuantity');
+    Route::delete('/cart/{cart}', [CartController::class, 'destroy'])->name('cart.destroy');
 
     // Pesanan Customer
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
@@ -145,6 +159,7 @@ Route::middleware('auth:admin')->prefix('admin')->name('admin.')->group(function
         Route::get('orders', [AdminOrderController::class, 'index'])->name('orders.index');
         Route::get('orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
         Route::patch('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.updateStatus');
+        Route::patch('orders/{order}/desain/{orderDetail}', [AdminOrderController::class, 'updateStatusDesain'])->name('orders.updateStatusDesain');
     });
 
     // Owner Only
