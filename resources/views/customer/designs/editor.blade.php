@@ -7,86 +7,98 @@
         </h2>
     </x-slot>
 
-    <div class="h-[calc(100vh-65px)] overflow-hidden" x-data="{ activeTab: 'templates', baseColor: '#ffffff', activeSide: 'front' }">
+    <div class="h-[calc(100vh-65px)] overflow-hidden" x-data="{ activeTab: 'templates', baseColor: '#ffffff', activeSide: 'front', sidebarOpen: true }">
         <div class="flex h-full bg-slate-50">
             
             <!-- Navbar Kiri Tepi (Icon Only) -->
-            <div class="w-16 bg-white border-r border-slate-200 flex flex-col items-center py-4 gap-4 z-20 shadow-sm flex-shrink-0">
-                <button @click="activeTab = 'templates'" :class="activeTab === 'templates' ? 'text-indigo-600 bg-indigo-50' : 'text-slate-500 hover:text-indigo-600 hover:bg-slate-50'" class="w-12 h-12 flex flex-col items-center justify-center rounded-xl transition">
+            <div class="w-16 bg-white border-r border-slate-200 flex flex-col items-center py-4 gap-4 z-30 shadow-sm flex-shrink-0">
+                <button @click="activeTab = 'templates'; sidebarOpen = true" :class="activeTab === 'templates' && sidebarOpen ? 'text-sky-600 bg-sky-50' : 'text-slate-500 hover:text-sky-600 hover:bg-slate-50'" class="w-12 h-12 flex flex-col items-center justify-center rounded-xl transition">
                     <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path></svg>
-                    <span class="text-[9px] font-bold">Template</span>
+                    <span class="text-[9px] font-bold uppercase tracking-tighter">Tools</span>
                 </button>
-                <button @click="activeTab = 'upload'" :class="activeTab === 'upload' ? 'text-indigo-600 bg-indigo-50' : 'text-slate-500 hover:text-indigo-600 hover:bg-slate-50'" class="w-12 h-12 flex flex-col items-center justify-center rounded-xl transition">
+                <button @click="activeTab = 'upload'; sidebarOpen = true" :class="activeTab === 'upload' && sidebarOpen ? 'text-sky-600 bg-sky-50' : 'text-slate-500 hover:text-sky-600 hover:bg-slate-50'" class="w-12 h-12 flex flex-col items-center justify-center rounded-xl transition">
                     <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                    <span class="text-[9px] font-bold">Upload</span>
+                    <span class="text-[9px] font-bold uppercase tracking-tighter">Upload</span>
                 </button>
-                <button @click="activeTab = 'stickers'" :class="activeTab === 'stickers' ? 'text-indigo-600 bg-indigo-50' : 'text-slate-500 hover:text-indigo-600 hover:bg-slate-50'" class="w-12 h-12 flex flex-col items-center justify-center rounded-xl transition">
+                <button @click="activeTab = 'stickers'; sidebarOpen = true" :class="activeTab === 'stickers' && sidebarOpen ? 'text-sky-600 bg-sky-50' : 'text-slate-500 hover:text-sky-600 hover:bg-slate-50'" class="w-12 h-12 flex flex-col items-center justify-center rounded-xl transition">
                     <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <span class="text-[9px] font-bold">Stiker</span>
+                    <span class="text-[9px] font-bold uppercase tracking-tighter">Stiker</span>
                 </button>
-                <button @click="activeTab = 'text'" :class="activeTab === 'text' ? 'text-indigo-600 bg-indigo-50' : 'text-slate-500 hover:text-indigo-600 hover:bg-slate-50'" class="w-12 h-12 flex flex-col items-center justify-center rounded-xl transition">
+                <button @click="activeTab = 'text'; sidebarOpen = true" :class="activeTab === 'text' && sidebarOpen ? 'text-sky-600 bg-sky-50' : 'text-slate-500 hover:text-sky-600 hover:bg-slate-50'" class="w-12 h-12 flex flex-col items-center justify-center rounded-xl transition">
                     <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
-                    <span class="text-[9px] font-bold">Teks</span>
+                    <span class="text-[9px] font-bold uppercase tracking-tighter">Teks</span>
                 </button>
+                
+                <div class="mt-auto pb-4">
+                    <button @click="sidebarOpen = !sidebarOpen" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition text-slate-400 group" title="Toggle Sidebar">
+                        <svg class="w-5 h-5 transition-transform duration-300" :class="!sidebarOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path></svg>
+                    </button>
+                </div>
             </div>
 
-            <!-- Panel Tools Kiri (Membuka sesuai Tab yang Aktif) -->
-            <div class="w-72 bg-white border-r border-slate-200 shadow-sm flex flex-col flex-shrink-0 relative z-10">
-                <div class="p-5 border-b border-slate-100">
-                    <h3 class="font-bold text-slate-800 text-lg" x-text="
+            <!-- Panel Tools Kiri (Collapsible) -->
+            <div x-show="sidebarOpen" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full" class="w-72 bg-white border-r border-slate-200 shadow-sm flex flex-col flex-shrink-0 relative z-20">
+                <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                    <h3 class="font-black text-slate-800 text-sm uppercase tracking-widest" x-text="
                         activeTab === 'templates' ? 'Template Desain' :
                         (activeTab === 'upload' ? 'Upload Gambar' :
                         (activeTab === 'stickers' ? 'Cari Stiker' : 'Tambahkan Teks'))
                     "></h3>
+                    <button @click="sidebarOpen = false" class="text-slate-400 hover:text-slate-600">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
                 </div>
                 
                 <div class="flex-1 overflow-y-auto p-5 custom-scrollbar">
 
                     <!-- Tab: TEMPLATE -->
                     <div x-show="activeTab === 'templates'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-x-2" class="space-y-4">
-                        <p class="text-xs text-slate-500 mb-2">Pilih template desain yang sudah disediakan admin.</p>
+                        <p class="text-[11px] font-bold text-slate-400 mb-2 uppercase tracking-tight">Katalog Aset Desain</p>
                         <div class="grid grid-cols-2 gap-3">
                             @forelse($templates as $template)
-                                <div class="bg-white border border-slate-200 rounded-lg cursor-pointer hover:border-indigo-500 hover:shadow-md transition aspect-square flex items-center justify-center bg-slate-50 p-2 template-item" data-url="{{ Storage::url($template->file_template) }}">
-                                    <img src="{{ Storage::url($template->file_template) }}" alt="Template" class="w-full h-full object-contain pointer-events-none">
+                                <div class="bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-sky-500 hover:shadow-lg hover:shadow-sky-100 transition aspect-square flex items-center justify-center bg-slate-50 p-2 template-item group" data-url="{{ Storage::url($template->file_template) }}">
+                                    <img src="{{ Storage::url($template->file_template) }}" alt="Template" class="w-full h-full object-contain pointer-events-none group-hover:scale-110 transition-transform">
                                 </div>
                             @empty
-                                <div class="col-span-2 text-center text-sm text-slate-400 py-4">Belum ada template terdaftar.</div>
+                                <div class="col-span-2 text-center text-sm text-slate-400 py-4">Belum ada template.</div>
                             @endforelse
                         </div>
                     </div>
 
                     <!-- Tab: UPLOAD -->
                     <div x-show="activeTab === 'upload'" style="display: none;" class="space-y-4">
-                        <p class="text-xs text-slate-500 mb-2">Unggah logo atau desain Anda sendiri (gunakan format transparan PNG/SVG untuk hasil sempurna).</p>
-                        <label class="block w-full border-2 border-dashed border-indigo-200 rounded-xl p-6 text-center hover:bg-indigo-50 hover:border-indigo-400 cursor-pointer transition">
+                        <p class="text-[11px] font-bold text-slate-400 mb-2 uppercase tracking-tight">Unggah Aset Anda</p>
+                        <label class="block w-full border-2 border-dashed border-sky-100 rounded-2xl p-8 text-center hover:bg-sky-50 hover:border-sky-300 cursor-pointer transition group">
                             <input type="file" id="imageLoader" accept="image/png, image/jpeg, image/svg+xml" class="hidden"/>
-                            <div class="text-indigo-500 mb-2 font-bold text-2xl">☁️</div>
-                            <span class="text-indigo-600 font-bold block">Klik untuk Upload</span>
-                            <span class="text-slate-400 text-xs mt-1 block">Max 2MB.</span>
+                            <div class="text-sky-500 mb-3 group-hover:scale-125 transition-transform duration-300">
+                                <svg class="w-10 h-10 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                            </div>
+                            <span class="text-sky-600 font-black block text-sm">KLIK UNTUK UNGGAH</span>
+                            <span class="text-slate-400 text-[10px] mt-1 block font-bold">PNG / JPG / SVG (Max 2MB)</span>
                         </label>
                     </div>
 
                     <!-- Tab: STIKER -->
                     <div x-show="activeTab === 'stickers'" style="display: none;" class="flex flex-col h-full bg-white">
-                         <!-- Search Box Stiker -->
-                         <div class="flex mb-4">
-                            <input type="text" id="stickerSearchInput" placeholder="Cari ikon (cth: cat, fire, car)" class="flex-1 border border-slate-300 rounded-l-lg px-3 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500">
-                            <button id="searchStickerBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-r-lg text-sm font-medium transition-colors">
+                         <div class="flex mb-4 group">
+                            <input type="text" id="stickerSearchInput" placeholder="Cari ikon..." class="flex-1 border border-slate-200 rounded-l-xl px-3 py-2 text-sm focus:ring-sky-500 focus:border-sky-500 bg-slate-50">
+                            <button id="searchStickerBtn" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-r-xl text-sm font-bold transition-colors">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                             </button>
                         </div>
                         <div id="stickersContainer" class="grid grid-cols-2 gap-3 overflow-y-auto pb-4 custom-scrollbar">
-                            <div class="col-span-2 text-center text-xs text-slate-400 py-4">Memuat stiker...</div>
+                            <div class="col-span-2 text-center text-xs text-slate-400 py-4 italic tracking-widest">Memuat library...</div>
                         </div>
                     </div>
 
                     <!-- Tab: TEKS -->
                     <div x-show="activeTab === 'text'" style="display: none;" class="space-y-4">
-                        <button id="addTextBtn" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:bg-indigo-500 transition shadow-indigo-200">
-                            + Tambahkan Teks Baru
+                        <button id="addTextBtn" class="w-full bg-sky-600 text-white font-black py-4 px-4 rounded-2xl shadow-xl shadow-sky-100 hover:bg-sky-500 transition hover:-translate-y-1">
+                            + TAMBAH TEKS BARU
                         </button>
-                        <p class="text-xs text-slate-400 text-center">Modifikasi warna dan font dari menu kontrol saat teks di-klik.</p>
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                            <p class="text-[10px] text-slate-500 text-center font-bold leading-relaxed">Pilih objek teks pada kanvas untuk memunculkan panel pengaturan font dan warna.</p>
+                        </div>
                     </div>
 
                 </div>
@@ -95,33 +107,46 @@
             <!-- Canvas Area Tengah -->
             <div class="flex-1 flex flex-col relative bg-slate-100 overflow-hidden">
                 
-                <!-- Toolbar Atas (Ganti Warna Base & Info) -->
-                <div class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shadow-sm z-10 w-full flex-shrink-0">
+                <!-- Toolbar Atas (Floating Glass Style) -->
+                <div class="h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-6 shadow-sm z-10 w-full flex-shrink-0">
                     <div class="flex items-center gap-4">
-                        <span class="font-bold text-slate-700">{{ $produk->nama_produk }}</span>
-                        <!-- Sisi Baju Toggle -->
-                        <div class="flex items-center bg-slate-100 rounded-lg p-1 border border-slate-200 ml-4">
-                            <button @click="activeSide = 'front'; window.switchCanvasSide('front')" :class="activeSide === 'front' ? 'bg-white shadow-sm text-indigo-700 font-bold' : 'text-slate-500 hover:text-slate-700'" class="px-4 py-1 text-sm rounded-md transition-all">Depan</button>
-                            <button @click="activeSide = 'back'; window.switchCanvasSide('back')" :class="activeSide === 'back' ? 'bg-white shadow-sm text-indigo-700 font-bold' : 'text-slate-500 hover:text-slate-700'" class="px-4 py-1 text-sm rounded-md transition-all">Belakang</button>
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 bg-sky-600 rounded flex items-center justify-center">
+                                <span class="text-white text-[10px] font-black">D</span>
+                            </div>
+                            <span class="font-black text-slate-800 text-sm tracking-tighter uppercase">{{ $produk->nama_produk }}</span>
                         </div>
+                        
+                        <!-- Toggle Sidebar for Mobile/Small Screens if hidden -->
+                        <button x-show="!sidebarOpen" @click="sidebarOpen = true" class="p-2 text-sky-600 hover:bg-sky-50 rounded-lg transition ml-2">
+                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>
+                        </button>
+
+                        <!-- Sisi Baju Toggle -->
+                        <div class="flex items-center bg-slate-100 rounded-xl p-1 border border-slate-200 ml-4 shadow-inner">
+                            <button @click="activeSide = 'front'; window.switchCanvasSide('front')" :class="activeSide === 'front' ? 'bg-white shadow-sm text-sky-700 font-extrabold' : 'text-slate-500 hover:text-slate-700'" class="px-5 py-1.5 text-xs rounded-lg transition-all">DEPAN</button>
+                            <button @click="activeSide = 'back'; window.switchCanvasSide('back')" :class="activeSide === 'back' ? 'bg-white shadow-sm text-sky-700 font-extrabold' : 'text-slate-500 hover:text-slate-700'" class="px-5 py-1.5 text-xs rounded-lg transition-all">BELAKANG</button>
+                        </div>
+                        
                         <!-- Base Color Picker -->
-                        <div class="flex items-center gap-2 border-l border-slate-200 pl-4">
-                            <span class="text-sm text-slate-500 font-medium">Warna Baju:</span>
-                            <div class="flex gap-2">
-                                <button @click="baseColor = '#ffffff'; canvasBackgroundChange('#ffffff')" class="w-6 h-6 rounded-full bg-white border border-slate-300 shadow-sm hover:ring-2 hover:ring-indigo-400 hover:ring-offset-1 transition"></button>
-                                <button @click="baseColor = '#1e293b'; canvasBackgroundChange('#1e293b')" class="w-6 h-6 rounded-full bg-slate-800 border border-transparent shadow-sm hover:ring-2 hover:ring-indigo-400 hover:ring-offset-1 transition"></button>
-                                <button @click="baseColor = '#ef4444'; canvasBackgroundChange('#ef4444')" class="w-6 h-6 rounded-full bg-red-500 border border-transparent shadow-sm hover:ring-2 hover:ring-indigo-400 hover:ring-offset-1 transition"></button>
-                                <button @click="baseColor = '#3b82f6'; canvasBackgroundChange('#3b82f6')" class="w-6 h-6 rounded-full bg-blue-500 border border-transparent shadow-sm hover:ring-2 hover:ring-indigo-400 hover:ring-offset-1 transition"></button>
-                                <button @click="baseColor = '#f59e0b'; canvasBackgroundChange('#f59e0b')" class="w-6 h-6 rounded-full bg-amber-500 border border-transparent shadow-sm hover:ring-2 hover:ring-indigo-400 hover:ring-offset-1 transition"></button>
+                        <div class="flex items-center gap-3 border-l border-slate-200 pl-4">
+                            <span class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Warna Dasar:</span>
+                            <div class="flex gap-1.5">
+                                <button @click="baseColor = '#ffffff'; canvasBackgroundChange('#ffffff')" class="w-5 h-5 rounded-full bg-white border border-slate-300 shadow-sm hover:ring-2 hover:ring-sky-400 hover:ring-offset-2 transition" title="Putih"></button>
+                                <button @click="baseColor = '#1e293b'; canvasBackgroundChange('#1e293b')" class="w-5 h-5 rounded-full bg-slate-800 border border-transparent shadow-sm hover:ring-2 hover:ring-sky-400 hover:ring-offset-2 transition" title="Navy"></button>
+                                <button @click="baseColor = '#ef4444'; canvasBackgroundChange('#ef4444')" class="w-5 h-5 rounded-full bg-red-500 border border-transparent shadow-sm hover:ring-2 hover:ring-sky-400 hover:ring-offset-2 transition" title="Merah"></button>
+                                <button @click="baseColor = '#0284c7'; canvasBackgroundChange('#0284c7')" class="w-5 h-5 rounded-full bg-sky-600 border border-transparent shadow-sm hover:ring-2 hover:ring-sky-400 hover:ring-offset-2 transition" title="Sky Blue"></button>
+                                <button @click="baseColor = '#059669'; canvasBackgroundChange('#059669')" class="w-5 h-5 rounded-full bg-emerald-600 border border-transparent shadow-sm hover:ring-2 hover:ring-sky-400 hover:ring-offset-2 transition" title="Hijau"></button>
                             </div>
                         </div>
                     </div>
                     
-                    <button id="saveDesignBtn" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg shadow-lg hover:bg-indigo-500 transition hover:-translate-y-0.5 shadow-indigo-200 flex items-center gap-2 text-sm">
-                        <span>{{ $desainRevisi ? 'Simpan Revisi' : 'Simpan Desain' }}</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    <button id="saveDesignBtn" class="bg-sky-600 text-white font-black py-2.5 px-8 rounded-xl shadow-xl shadow-sky-100 hover:bg-sky-500 transition hover:-translate-y-1 flex items-center gap-2 text-xs uppercase tracking-widest">
+                        <span>{{ $desainRevisi ? 'SIMPAN REVISI' : 'KONFIRMASI DESAIN' }}</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
                     </button>
                 </div>
+iv>
 
                 @if($desainRevisi)
                 <div class="bg-red-50 border-b border-red-200 p-4 sticky top-[73px] z-10 flex gap-3 shadow-inner">
@@ -141,47 +166,47 @@
                         
                         <!-- Image Controls (Remove Background) -->
                         <div id="imageControls" class="hidden items-center gap-2 border-r border-slate-200 pr-3 mr-1">
-                            <button id="removeBgBtn" title="Hapus Background Putih/Polos" class="bg-indigo-50 border border-indigo-200 text-indigo-600 text-xs font-bold px-3 py-1.5 rounded hover:bg-indigo-100 flex items-center gap-1 transition">
-                                <span>✨ Hapus BG Putih</span>
+                            <button id="removeBgBtn" title="Hapus Background Putih/Polos" class="bg-sky-50 border border-sky-200 text-sky-600 text-[10px] font-black px-3 py-1.5 rounded-lg hover:bg-sky-100 flex items-center gap-1 transition uppercase tracking-widest leading-none">
+                                <span>✨ HAPUS BG PUTIH</span>
                             </button>
                         </div>
 
                         <!-- SVG Vector Controls -->
                         <div id="svgControls" class="hidden items-center gap-2 border-r border-slate-200 pr-3 mr-1">
-                            <span class="text-xs font-bold text-slate-500">Warna Vektor:</span>
-                            <input type="color" id="svgColorControl" class="w-8 h-8 p-0.5 border-0 rounded cursor-pointer" value="#000000" title="Ubah Warna Vektor">
+                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Warna Vektor:</span>
+                            <input type="color" id="svgColorControl" class="w-8 h-8 p-0.5 border-0 rounded-lg cursor-pointer bg-slate-100" value="#000000" title="Ubah Warna Vektor">
                         </div>
 
                         <!-- Text Controls -->
                         <div id="textControls" class="hidden items-center gap-2 border-r border-slate-200 pr-3 mr-1">
-                            <select id="fontFamilyControl" class="text-sm border-slate-300 rounded py-1 pl-2 pr-8 focus:ring-indigo-500 focus:border-indigo-500" style="padding-top:0.25rem; padding-bottom:0.25rem;">
+                            <select id="fontFamilyControl" class="text-xs font-bold border-slate-200 rounded-lg py-1.5 pl-2 pr-8 focus:ring-sky-500 focus:border-sky-500 bg-slate-50 uppercase tracking-tighter" style="min-width: 120px;">
                                 <option value="Arial">Arial</option>
                                 <option value="'Times New Roman'">Times New Roman</option>
                                 <option value="Courier New">Courier</option>
                                 <option value="Impact">Impact</option>
                                 <option value="'Comic Sans MS'">Comic Sans</option>
                             </select>
-                            <input type="color" id="textColorControl" class="w-8 h-8 p-0.5 border-0 rounded cursor-pointer" value="#000000" title="Warna Teks">
+                            <input type="color" id="textColorControl" class="w-8 h-8 p-0.5 border-0 rounded-lg cursor-pointer bg-slate-100" value="#000000" title="Warna Teks">
                             <div class="h-6 w-px bg-slate-200 mx-1"></div>
                             
                             <!-- Advanced Text Features -->
-                            <div class="flex items-center gap-1" title="Outline / Stroke Teks">
-                                <span class="text-[10px] font-bold text-slate-400">Outline:</span>
-                                <input type="color" id="textStrokeColor" class="w-6 h-6 p-0 border-0 rounded cursor-pointer" value="#ffffff">
-                                <input type="range" id="textStrokeWidth" min="0" max="10" value="0" class="w-12 h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex items-center gap-2" title="Outline / Stroke Teks">
+                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Outline:</span>
+                                <input type="color" id="textStrokeColor" class="w-5 h-5 p-0 border-0 rounded-full cursor-pointer bg-slate-100" value="#ffffff">
+                                <input type="range" id="textStrokeWidth" min="0" max="10" value="0" class="w-12 h-1 bg-slate-200 rounded-full appearance-none cursor-pointer accent-sky-600">
                             </div>
                             <div class="h-6 w-px bg-slate-200 mx-1"></div>
-                            <label class="flex items-center gap-1 cursor-pointer text-xs font-bold text-slate-500" title="Efek Bayangan">
-                                <input type="checkbox" id="textShadowToggle" class="rounded text-indigo-600 form-checkbox h-4 w-4">
+                            <label class="flex items-center gap-1 cursor-pointer text-[9px] font-black text-slate-500 uppercase tracking-widest" title="Efek Bayangan">
+                                <input type="checkbox" id="textShadowToggle" class="rounded text-sky-600 form-checkbox h-3 w-3 shadow-none focus:ring-0">
                                 Shadow
                             </label>
                         </div>
 
                         <!-- Layer Control -->
-                        <button id="bringForwardBtn" title="Bawa ke Depan" class="w-8 h-8 rounded shrink-0 bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-600 transition border border-slate-200"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4-4m0 0L8 12m4-4v12"></path></svg></button>
-                        <button id="sendBackwardBtn" title="Pindah ke Belakang" class="w-8 h-8 rounded shrink-0 bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-600 transition border border-slate-200"><svg class="w-4 h-4 transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4-4m0 0L8 12m4-4v12"></path></svg></button>
+                        <button id="bringForwardBtn" title="Bawa ke Depan" class="w-8 h-8 rounded-lg shrink-0 bg-slate-50 hover:bg-sky-50 hover:text-sky-600 flex items-center justify-center text-slate-400 transition border border-slate-200"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 12m4-4v12"></path></svg></button>
+                        <button id="sendBackwardBtn" title="Pindah ke Belakang" class="w-8 h-8 rounded-lg shrink-0 bg-slate-50 hover:bg-sky-50 hover:text-sky-600 flex items-center justify-center text-slate-400 transition border border-slate-200"><svg class="w-4 h-4 transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4-4m0 0L8 12m4-4v12"></path></svg></button>
                         <div class="h-6 w-px bg-slate-200 mx-1"></div>
-                        <button id="deleteObjBtn" title="Hapus Objek" class="w-8 h-8 rounded shrink-0 bg-red-50 hover:bg-red-100 flex items-center justify-center text-red-500 transition border border-red-200"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                        <button id="deleteObjBtn" title="Hapus Objek" class="w-8 h-8 rounded-lg shrink-0 bg-red-50 hover:bg-red-500 hover:text-white flex items-center justify-center text-red-500 transition border border-red-100 shadow-sm shadow-red-100"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
                     </div>
 
                     <!-- Layout Canvas + Base -->
@@ -219,14 +244,13 @@
                         </div>
                         
                         <!-- Print Area Visualizer (Kotak Dashed) Transparan yang letaknya pas di dada -->
-                        <!-- Z-index 10 di belakang canvas, Z-index 20 canvasnya -->
                         <div class="absolute z-10 border border-dashed border-slate-600/40 pointer-events-none rounded transition-colors group" id="printAreaBox" style="width: 220px; height: 320px; top: 120px; left: 130px;">
-                            <span class="absolute -top-7 left-1/2 transform -translate-x-1/2 text-[10px] text-slate-700/60 font-bold uppercase tracking-wider bg-white/50 px-2 rounded backdrop-blur border border-white/50 ">Area Cetak</span>
-                            <!-- Grip lines corners -->
-                            <div class="absolute -top-1 -left-1 w-2 h-2 border-t border-l border-indigo-400"></div>
-                            <div class="absolute -top-1 -right-1 w-2 h-2 border-t border-r border-indigo-400"></div>
-                            <div class="absolute -bottom-1 -left-1 w-2 h-2 border-b border-l border-indigo-400"></div>
-                            <div class="absolute -bottom-1 -right-1 w-2 h-2 border-b border-r border-indigo-400"></div>
+                            <span class="absolute -top-7 left-1/2 transform -translate-x-1/2 text-[10px] text-slate-600 font-black uppercase tracking-widest bg-sky-50/80 px-3 py-1 rounded-full backdrop-blur border border-sky-200/50 shadow-sm ">Area Cetak</span>
+                            <!-- Glow Corners -->
+                            <div class="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-sky-400"></div>
+                            <div class="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-sky-400"></div>
+                            <div class="absolute -bottom-1 -left-1 w-3 h-3 border-b-2 border-l-2 border-sky-400"></div>
+                            <div class="absolute -bottom-1 -right-1 w-3 h-3 border-b-2 border-r-2 border-sky-400"></div>
                         </div>
 
                         <!-- Fabric.js Canvas hanya sebesar area cetak didada -->
@@ -328,16 +352,16 @@
             // Setup global style untuk corner control fabric
             fabric.Object.prototype.transparentCorners = false;
             fabric.Object.prototype.cornerColor = '#ffffff';
-            fabric.Object.prototype.cornerStrokeColor = '#e2e8f0';
-            fabric.Object.prototype.borderColor = '#6366f1';
-            fabric.Object.prototype.cornerSize = 12;
-            fabric.Object.prototype.padding = 8;
+            fabric.Object.prototype.cornerStrokeColor = '#bae6fd';
+            fabric.Object.prototype.borderColor = '#0284c7';
+            fabric.Object.prototype.cornerSize = 14;
+            fabric.Object.prototype.padding = 10;
             fabric.Object.prototype.borderDashArray = [4, 4];
 
             // Setup Custom Icons SVG
-            const deleteIconSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23ef4444' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16'/%3E%3C/svg%3E";
-            const scaleIconSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236366f1' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4'/%3E%3C/svg%3E";
-            const rotateIconSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236366f1' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15'/%3E%3C/svg%3E";
+            const deleteIconSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23ef4444' stroke-width='3'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16'/%3E%3C/svg%3E";
+            const scaleIconSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%230284c7' stroke-width='3'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4'/%3E%3C/svg%3E";
+            const rotateIconSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%230284c7' stroke-width='3'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15'/%3E%3C/svg%3E";
 
             const delImg = document.createElement('img'); delImg.src = deleteIconSvg;
             const sclImg = document.createElement('img'); sclImg.src = scaleIconSvg;
@@ -542,7 +566,7 @@
             const stickersContainer  = document.getElementById('stickersContainer');
 
             function loadStickers(query = 'cool') {
-                stickersContainer.innerHTML = '<div class="col-span-2 text-center py-5"><svg class="animate-spin h-5 w-5 text-indigo-500 mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg></div>';
+                stickersContainer.innerHTML = '<div class="col-span-2 text-center py-5"><svg class="animate-spin h-5 w-5 text-sky-500 mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg></div>';
                 
                 fetch(`{{ route('customer.api.stickers') }}?q=${encodeURIComponent(query)}`)
                     .then(res => res.json())
@@ -632,7 +656,7 @@
                     // distance adalah tingkat sensitivitas toleransi warna putih (mirip magic wand tolerance)
                     const filter = new fabric.Image.filters.RemoveColor({
                         color: '#FFFFFF',
-                        distance: 0.15 
+                        distance: 0.12 
                     });
 
                     activeObj.filters.push(filter);

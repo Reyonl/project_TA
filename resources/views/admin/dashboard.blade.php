@@ -1,25 +1,29 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-slate-800 leading-tight">
-            {{ __('Admin Dashboard') }}
+        <h2 class="font-black text-2xl text-slate-800 leading-tight font-outfit uppercase tracking-tight">
+            {{ __('Admin Control Panel') }}
         </h2>
     </x-slot>
-
+ 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-xl shadow-indigo-100/50 sm:rounded-2xl border border-slate-100 p-8">
-                <h3 class="text-2xl font-bold text-slate-800 mb-4">Selamat Datang, Admin SablonQu!</h3>
-                <p class="text-slate-600 mb-8">Ini adalah pusat kendali untuk mengelola pesanan masuk dan template desain untuk pelanggan.</p>
+            <div class="bg-white overflow-hidden shadow-[0_20px_50px_rgba(8,_112,_184,_0.05)] sm:rounded-[2.5rem] border border-slate-100 p-10 relative overflow-hidden group">
+                <div class="absolute -top-10 -right-10 w-40 h-40 bg-sky-50 rounded-full blur-3xl opacity-50 group-hover:scale-150 transition-transform duration-1000"></div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <a href="{{ route('admin.orders.index') }}" class="block p-6 bg-indigo-50 rounded-xl border border-indigo-100 hover:bg-indigo-600 hover:text-white transition group">
-                        <h4 class="text-xl font-bold text-indigo-900 group-hover:text-white mb-2">Kelola Pesanan</h4>
-                        <p class="text-indigo-700 group-hover:text-indigo-100 text-sm">Lihat order masuk, verifikasi desain mockup, dan update status pengerjaan.</p>
+                <h3 class="text-3xl font-black text-slate-900 mb-2 font-outfit uppercase tracking-tight relative z-10">Selamat Datang, Admin <span class="text-sky-600">DAILY.CO</span>!</h3>
+                <p class="text-slate-500 mb-10 font-medium italic relative z-10">Kelola operasional, verifikasi desain, dan pantau pertumbuhan brand Anda dari sini.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+                    <a href="{{ route('admin.orders.index') }}" class="block p-8 bg-sky-50 rounded-3xl border border-sky-100 hover:bg-sky-600 hover:text-white transition-all duration-300 transform hover:-translate-y-2 group/card shadow-sm hover:shadow-2xl hover:shadow-sky-200">
+                        <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-sm group-hover/card:scale-110 transition-transform">🛍️</div>
+                        <h4 class="text-xl font-black text-sky-900 group-hover/card:text-white mb-2 font-outfit uppercase tracking-tight">Kelola Pesanan</h4>
+                        <p class="text-sky-700/70 group-hover/card:text-sky-100 text-sm font-medium leading-relaxed">Verifikasi pembayaran, cek mockup desain pelanggan, dan perbarui status produksi secara realtime.</p>
                     </a>
-
-                    <a href="{{ route('admin.templates.index') }}" class="block p-6 bg-slate-50 rounded-xl border border-slate-200 hover:bg-slate-800 hover:text-white transition group">
-                        <h4 class="text-xl font-bold text-slate-900 group-hover:text-white mb-2">Master Template</h4>
-                        <p class="text-slate-600 group-hover:text-slate-300 text-sm">Upload gambar template desain opsional untuk dipilih pelanggan saat mendesain.</p>
+ 
+                    <a href="{{ route('admin.templates.index') }}" class="block p-8 bg-slate-50 rounded-3xl border border-slate-200 hover:bg-slate-900 hover:text-white transition-all duration-300 transform hover:-translate-y-2 group/card shadow-sm hover:shadow-2xl hover:shadow-slate-200">
+                        <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-sm group-hover/card:scale-110 transition-transform">🎨</div>
+                        <h4 class="text-xl font-black text-slate-900 group-hover/card:text-white mb-2 font-outfit uppercase tracking-tight">Master Template</h4>
+                        <p class="text-slate-600 group-hover/card:text-slate-400 text-sm font-medium leading-relaxed">Kelola aset library desain untuk memudahkan pelanggan berkreasi di editor mockup Interaktif.</p>
                     </a>
                 </div>
             </div>

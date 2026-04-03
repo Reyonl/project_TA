@@ -3,40 +3,54 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>{{ $produk->nama_produk }} - Katalog SablonQu</title>
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap" rel="stylesheet" />
+        <title>{{ $produk->nama_produk }} - DAILY.CO Premium Mockup</title>
+        <!-- Fonts: Inter & Outfit -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        <style>
+            .font-outfit { font-family: 'Outfit', sans-serif; }
+            .glass {
+                background: rgba(255, 255, 255, 0.7);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+            }
+        </style>
     </head>
-    <body class="bg-white text-slate-900 font-sans antialiased selection:bg-indigo-500 selection:text-white">
+    <body class="bg-slate-50 text-slate-900 font-sans antialiased selection:bg-sky-500 selection:text-white">
         
         <!-- Navbar -->
-        <nav class="w-full py-4 px-4 sm:px-6 lg:px-8 border-b border-slate-200 sticky top-0 bg-white/95 backdrop-blur-sm z-50">
+        <nav class="w-full py-4 px-4 sm:px-6 lg:px-8 border-b border-slate-200 sticky top-0 bg-white/80 backdrop-blur-md z-[100]">
             <div class="max-w-[1400px] mx-auto flex justify-between items-center">
                 <div class="flex items-center gap-12">
-                    <a href="{{ route('home') }}" class="text-2xl font-black tracking-tight text-indigo-700">
-                        SablonQu
+                    <a href="{{ route('home') }}" class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-sky-600 rounded-lg flex items-center justify-center shadow-lg shadow-sky-100">
+                             <span class="text-white font-black text-sm font-outfit">D</span>
+                        </div>
+                        <span class="text-xl font-black font-outfit tracking-tighter text-slate-900">
+                            DAILY<span class="text-sky-600">.CO</span>
+                        </span>
                     </a>
                     <!-- Breadcrumbs -->
-                    <div class="hidden md:flex items-center gap-2 text-sm font-medium text-slate-500">
-                        <a href="{{ route('home') }}" class="hover:text-indigo-600 transition">Katalog Produk</a>
-                        <span>/</span>
-                        <a href="#" class="hover:text-indigo-600 transition capitalize">{{ $produk->jenis_produk }}</a>
+                    <div class="hidden md:flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                        <a href="{{ route('home') }}" class="hover:text-sky-600 transition">Katalog</a>
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        <span class="text-slate-600">{{ $produk->nama_produk }}</span>
                     </div>
                 </div>
-                <div class="flex gap-4 items-center">
+                <div class="flex gap-6 items-center">
                     @auth('customer')
-                        <a href="{{ route('customer.dashboard') }}" class="font-semibold text-slate-600 hover:text-indigo-600 transition">Dashboard</a>
+                        <a href="{{ route('customer.dashboard') }}" class="text-xs font-bold text-slate-600 hover:text-sky-600 transition uppercase tracking-widest">Dashboard</a>
                     @else
                         @auth('admin')
-                            <a href="{{ route('admin.dashboard') }}" class="font-semibold text-slate-600 hover:text-indigo-600 transition">Admin Panel</a>
+                            <a href="{{ route('admin.dashboard') }}" class="text-xs font-bold text-slate-600 hover:text-sky-600 transition uppercase tracking-widest">Admin Panel</a>
                         @else
-                            <a href="{{ route('login') }}" class="font-semibold text-slate-600 hover:text-indigo-600 transition">Masuk</a>
+                            <a href="{{ route('login') }}" class="text-xs font-bold text-slate-600 hover:text-sky-600 transition uppercase tracking-widest">Masuk</a>
                             @if (Route::has('register'))
-                                <a href="{{ route('register') }}" class="font-semibold bg-red-600 text-white px-5 py-2.5 rounded hover:bg-red-700 transition shadow-sm">Pesanan Baru</a>
+                                <a href="{{ route('register') }}" class="text-xs font-black bg-sky-600 text-white px-5 py-2.5 rounded-xl hover:bg-sky-500 transition shadow-lg shadow-sky-100 uppercase tracking-widest">Mulai Desain</a>
                             @endif
                         @endauth
                     @endauth
@@ -104,13 +118,18 @@
                     </div>
                 </div>
 
-                <!-- Info Box (Printful Style) -->
-                <div class="bg-indigo-50 border border-indigo-100 rounded-lg p-4 mb-8 flex gap-4 shadow-sm relative overflow-hidden">
-                    <div class="absolute inset-y-0 left-0 w-1 bg-indigo-500"></div>
+                <!-- Info Box (Premium Style) -->
+                <div class="bg-sky-50 border border-sky-100 rounded-2xl p-6 mb-8 flex gap-4 shadow-sm relative overflow-hidden group">
+                    <div class="absolute -right-2 -bottom-2 text-sky-200/40 group-hover:scale-110 transition-transform duration-700">
+                         <svg class="w-20 h-20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                    </div>
                     <div>
-                        <h4 class="font-bold text-indigo-900 text-sm mb-1">Butuh bantuan tentang bahan & ukuran?</h4>
-                        <p class="text-sm text-indigo-700/80 mb-2">Lihat panduan lengkap kami untuk memastikan brand Anda mendapatkan yang terbaik.</p>
-                        <a href="#" class="text-sm font-semibold text-indigo-600 hover:text-indigo-800">Cari Tahu Lebih Lanjut &rarr;</a>
+                        <h4 class="font-black text-sky-900 text-sm mb-1 uppercase tracking-tight">Panduan Bahan & Ukuran</h4>
+                        <p class="text-sm text-sky-700/80 mb-3 leading-relaxed font-medium italic">Pastikan brand Anda mendapatkan kualitas terbaik dengan panduan presisi kami.</p>
+                        <a href="#" class="text-xs font-black text-sky-600 hover:text-sky-800 flex items-center gap-1 uppercase tracking-widest">
+                            LIHAT DETAIL
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                        </a>
                     </div>
                 </div>
 
@@ -218,11 +237,16 @@
 
                 <!-- Call to Action -->
                 <div class="mt-auto">
-                    <a href="{{ route('customer.designs.editor', $produk->id_produk) }}" class="block w-full text-center py-4 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-lg shadow-lg shadow-red-200 hover:-translate-y-1 transition transform active:scale-95 duration-200 mb-3">
-                        Mulai Desain Sekarang
+                    <a href="{{ route('customer.designs.editor', $produk->id_produk) }}" class="group relative block w-full text-center py-5 rounded-2xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xl shadow-2xl shadow-sky-200 transition-all duration-300 transform active:scale-[0.98] overflow-hidden">
+                        <span class="relative z-10 flex items-center justify-center gap-3">
+                            MULAI DESAIN SEKARANG
+                            <svg class="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                        </span>
                     </a>
                     
-                    <p class="text-xs text-center text-slate-500 font-medium">*Harga sablon dan biaya pengiriman dihitung saat Check Out.</p>
+                    <p class="text-[10px] text-center text-slate-400 font-bold mt-4 uppercase tracking-widest leading-relaxed">
+                        *Estimasi biaya akhir akan dikalkulasi secara otomatis saat checkout.
+                    </p>
                 </div>
 
                 <div class="mt-6 border border-slate-200 rounded-lg p-4 bg-white shadow-sm flex items-center justify-between">
