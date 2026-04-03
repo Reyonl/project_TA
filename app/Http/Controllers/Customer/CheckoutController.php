@@ -80,6 +80,7 @@ class CheckoutController extends Controller
                 'harga_desain' => $cart->desain->harga_desain,
                 'subtotal' => $subtotalDetail,
                 'status_desain' => 'pending',
+                'tipe_proses' => $cart->tipe_proses,
             ]);
         }
 

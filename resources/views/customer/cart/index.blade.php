@@ -30,8 +30,15 @@
                                         @php
                                             $bajuType = $cart->produk->jenis_produk;
                                             $bajuColor = $cart->desain->warna_baju ?: '#ffffff';
-                                            $mockupUrl = asset('images/mockups/' . $bajuType . '.png?v='.time());
-                                            $mockupUrlB = asset('images/mockups/' . $bajuType . '_belakang.png?v='.time());
+                                            $mockupBase = match($bajuType) {
+                                                'kaos' => 'kaos',
+                                                'hoodie' => 'hoodie',
+                                                'topi' => 'topi',
+                                                'polo' => 'polo',
+                                                'seragam' => 'seragam',
+                                                default => 'kaos'
+                                            };
+                                            $mockupUrl = asset('images/mockups/' . $mockupBase . '.png');
                                         @endphp
                                         
                                         <!-- Mini Composite -->
@@ -60,8 +67,11 @@
                                         <div>
                                             <h4 class="font-bold text-slate-800 text-lg">{{ $cart->produk->nama_produk }}</h4>
                                             <div class="flex items-center gap-4 mt-2">
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
-                                                    {{ ucfirst($cart->produk->jenis_produk) }}
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-900 text-white">
+                                                    {{ $cart->produk->jenis_produk }}
+                                                </span>
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest {{ $cart->tipe_proses == 'bordir' ? 'bg-red-600 text-white' : 'bg-sky-500 text-white' }}">
+                                                    {{ $cart->tipe_proses }}
                                                 </span>
                                                 <div class="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
                                                     Warna: 

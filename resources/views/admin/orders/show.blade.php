@@ -77,21 +77,32 @@
                                                 <div class="flex flex-col items-center shrink-0 w-[280px] snap-center">
                                                     <span class="text-[10px] font-bold text-slate-400 mb-1">DEPAN</span>
                                                     <div class="relative w-full h-[350px] rounded-lg overflow-hidden flex items-center justify-center shadow-inner bg-slate-50 border border-slate-200 group transition-all">
-                                                        @if($detail->produk->jenis_produk == 'kaos')
-                                                            <img src="{{ asset('images/mockups/kaos.png?v='.time()) }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-95 z-0 transition-transform group-hover:scale-105">
-                                                            <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10 transition-transform group-hover:scale-105"
-                                                                 style="-webkit-mask-image: url('{{ asset('images/mockups/kaos.png?v='.time()) }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ asset('images/mockups/kaos.png?v='.time()) }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
-                                                                <div class="w-full h-full" style="background-color: {{ $detail->desain->warna_baju ?: '#ffffff' }};"></div>
-                                                            </div>
-                                                        @elseif($detail->produk->jenis_produk == 'hoodie')
-                                                            <img src="{{ asset('images/mockups/hoodie.png?v='.time()) }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-95 z-0 transition-transform group-hover:scale-105">
-                                                            <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10 transition-transform group-hover:scale-105"
-                                                                 style="-webkit-mask-image: url('{{ asset('images/mockups/hoodie.png?v='.time()) }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ asset('images/mockups/hoodie.png?v='.time()) }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
-                                                                <div class="w-full h-full" style="background-color: {{ $detail->desain->warna_baju ?: '#ffffff' }};"></div>
-                                                            </div>
-                                                        @endif
+                                                        @php
+                                                            $mockupBase = match($detail->produk->jenis_produk) {
+                                                                'kaos' => 'kaos',
+                                                                'hoodie' => 'hoodie',
+                                                                'topi' => 'topi',
+                                                                'polo' => 'polo',
+                                                                'seragam' => 'seragam',
+                                                                default => 'kaos'
+                                                            };
+                                                            $mockupPath = asset('images/mockups/' . $mockupBase . '.png');
+                                                        @endphp
+                                                        <img src="{{ $mockupPath }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-95 z-0 transition-transform group-hover:scale-105">
+                                                        <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10 transition-transform group-hover:scale-105"
+                                                             style="-webkit-mask-image: url('{{ $mockupPath }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ $mockupPath }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
+                                                            <div class="w-full h-full" style="background-color: {{ $detail->desain->warna_baju ?: '#ffffff' }};"></div>
+                                                        </div>
 
-                                                        <div class="absolute z-20 transition-transform group-hover:scale-105" style="top: 20%; left: 27.08%; width: 45.83%; height: 53.33%;">
+                                                        @php
+                                                            $overlayStyle = match($detail->produk->jenis_produk) {
+                                                                'topi' => 'top: 40%; left: 35%; width: 30%; height: 25%;',
+                                                                'polo' => 'top: 30%; left: 30%; width: 20%; height: 18%;',
+                                                                'seragam' => 'top: 30%; left: 28%; width: 22%; height: 20%;',
+                                                                default => 'top: 20%; left: 27.08%; width: 45.83%; height: 53.33%;'
+                                                            };
+                                                        @endphp
+                                                        <div class="absolute z-20 transition-transform group-hover:scale-105" style="{{ $overlayStyle }}">
                                                             <img src="{{ Str::startsWith($detail->desain->file_desain, 'data:image') ? $detail->desain->file_desain : Storage::url($detail->desain->file_desain) }}" class="w-full h-full object-contain">
                                                         </div>
                                                     </div>
@@ -99,7 +110,7 @@
                                                         $desainUrl = Str::startsWith($detail->desain->file_desain, 'data:image') ? $detail->desain->file_desain : Storage::url($detail->desain->file_desain);
                                                         $bajuType = $detail->produk->jenis_produk;
                                                         $bajuColor = $detail->desain->warna_baju ?: '#ffffff';
-                                                        $mockupUrl = asset('images/mockups/' . $bajuType . '.png?v='.time());
+                                                        $mockupUrl = $mockupPath;
                                                     @endphp
                                                     <button type="button" onclick="openDesignModal('{{ $desainUrl }}', '{{ $mockupUrl }}', '{{ $bajuColor }}', '{{ $bajuType }}', false)" class="mt-2 w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[11px] font-bold py-2 px-3 rounded-lg border border-indigo-200 transition duration-200 flex items-center justify-center gap-1.5 shadow-sm">
                                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
@@ -113,19 +124,15 @@
                                                 <div class="flex flex-col items-center shrink-0 w-[280px] snap-center">
                                                     <span class="text-[10px] font-bold text-slate-400 mb-1">BELAKANG</span>
                                                     <div class="relative w-full h-[350px] rounded-lg overflow-hidden flex items-center justify-center shadow-inner bg-slate-50 border border-slate-200 group transition-all">
-                                                        @if($detail->produk->jenis_produk == 'kaos')
-                                                            <img src="{{ asset('images/mockups/kaos_belakang.png?v='.time()) }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-95 z-0 transition-transform group-hover:scale-105">
-                                                            <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10 transition-transform group-hover:scale-105"
-                                                                 style="-webkit-mask-image: url('{{ asset('images/mockups/kaos_belakang.png?v='.time()) }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ asset('images/mockups/kaos_belakang.png?v='.time()) }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
-                                                                <div class="w-full h-full" style="background-color: {{ $detail->desain->warna_baju ?: '#ffffff' }};"></div>
-                                                            </div>
-                                                        @elseif($detail->produk->jenis_produk == 'hoodie')
-                                                            <img src="{{ asset('images/mockups/hoodie_belakang.png?v='.time()) }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-95 z-0 transition-transform group-hover:scale-105">
-                                                            <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10 transition-transform group-hover:scale-105"
-                                                                 style="-webkit-mask-image: url('{{ asset('images/mockups/hoodie_belakang.png?v='.time()) }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ asset('images/mockups/hoodie_belakang.png?v='.time()) }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
-                                                                <div class="w-full h-full" style="background-color: {{ $detail->desain->warna_baju ?: '#ffffff' }};"></div>
-                                                            </div>
-                                                        @endif
+                                                    @php $hasBack = in_array($detail->produk->jenis_produk, ['kaos', 'hoodie', 'polo', 'seragam']); @endphp
+                                                    @if($hasBack)
+                                                        @php $mockupPathB = asset('images/mockups/' . $mockupBase . '_belakang.png'); @endphp
+                                                        <img src="{{ $mockupPathB }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-95 z-0 transition-transform group-hover:scale-105" onerror="this.src='{{ $mockupPath }}'">
+                                                        <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10 transition-transform group-hover:scale-105"
+                                                             style="-webkit-mask-image: url('{{ $mockupPathB }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ $mockupPathB }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
+                                                            <div class="w-full h-full" style="background-color: {{ $detail->desain->warna_baju ?: '#ffffff' }};"></div>
+                                                        </div>
+                                                    @endif
 
                                                         <div class="absolute z-20 transition-transform group-hover:scale-105" style="top: 20%; left: 27.08%; width: 45.83%; height: 53.33%;">
                                                             <img src="{{ Str::startsWith($detail->desain->file_desain_belakang, 'data:image') ? $detail->desain->file_desain_belakang : Storage::url($detail->desain->file_desain_belakang) }}" class="w-full h-full object-contain">
@@ -157,6 +164,10 @@
                                 <div class="w-full sm:w-7/12 flex flex-col justify-center">
                                     <h5 class="font-black text-lg text-slate-800">{{ $detail->produk->nama_produk ?? 'Produk Custom' }}</h5>
                                     
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="px-2 py-0.5 bg-slate-900 text-white text-[9px] font-black uppercase tracking-widest rounded">{{ $detail->produk->jenis_produk }}</span>
+                                        <span class="px-2 py-0.5 {{ $detail->tipe_proses == 'bordir' ? 'bg-red-600' : 'bg-sky-500' }} text-white text-[9px] font-black uppercase tracking-widest rounded">{{ $detail->tipe_proses }}</span>
+                                    </div>
                                     <div class="flex items-center gap-2 mb-2">
                                         <p class="text-sm text-slate-500">Desain: {{ $detail->desain->nama_desain ?? 'Desain Kustom' }}</p>
                                         @if($detail->desain && $detail->desain->warna_baju)
@@ -266,7 +277,7 @@
                         <div id="modalMockupColor" class="w-full h-full" style="background-color: #ffffff;"></div>
                     </div>
                     <!-- Design Layer -->
-                    <div class="absolute z-20" style="top: 20%; left: 27.08%; width: 45.83%; height: 53.33%;">
+                    <div id="modalOverlayContainer" class="absolute z-20" style="top: 20%; left: 27.08%; width: 45.83%; height: 53.33%;">
                         <img id="modalDesignImage" src="" alt="Full Design Sablon" crossorigin="anonymous" class="w-full h-full object-contain">
                     </div>
                 </div>
@@ -320,6 +331,20 @@
             // Set Label
             modalJenis.textContent = bajuType + (flip ? ' (Belakang)' : ' (Depan)');
             
+            // Atur posisi overlay mockup HD dinamis
+            const overlayContainer = document.getElementById('modalOverlayContainer');
+            const styles = {
+                'topi': { top: '40%', left: '35%', width: '30%', height: '25%' },
+                'polo': { top: '30%', left: '30%', width: '20%', height: '18%' },
+                'seragam': { top: '30%', left: '28%', width: '22%', height: '20%' },
+                'default': { top: '20%', left: '27.08%', width: '45.83%', height: '53.33%' }
+            };
+            const s = styles[bajuType] || styles['default'];
+            overlayContainer.style.top = s.top;
+            overlayContainer.style.left = s.left;
+            overlayContainer.style.width = s.width;
+            overlayContainer.style.height = s.height;
+
             modalBase.style.transform = 'none';
             modalMask.style.transform = 'none';
             
@@ -427,11 +452,19 @@
                 ctx.globalCompositeOperation = "source-over";
 
                 // --- LAYER 3: Desain Sablon Pilihan ---
-                // Sesuai layout visual di CSS: top: 20%; left: 27.08%; width: 45.83%; height: 53.33%;
-                const dX = W * 0.2708;
-                const dY = H * 0.20;
-                const dW = W * 0.4583;
-                const dH = H * 0.5333;
+                // Sesuai layout visual di CSS dinamis
+                const styles = {
+                    'topi': { top: 0.40, left: 0.35, width: 0.30, height: 0.25 },
+                    'polo': { top: 0.30, left: 0.30, width: 0.20, height: 0.18 },
+                    'seragam': { top: 0.30, left: 0.28, width: 0.22, height: 0.20 },
+                    'default': { top: 0.20, left: 0.2708, width: 0.4583, height: 0.5333 }
+                };
+                const s = styles['{{ $detail->produk->jenis_produk }}'] || styles['default'];
+
+                const dX = W * s.left;
+                const dY = H * s.top;
+                const dW = W * s.width;
+                const dH = H * s.height;
                 
                 ctx.drawImage(designImgDOM, dX, dY, dW, dH);
 

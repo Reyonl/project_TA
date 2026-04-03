@@ -108,22 +108,36 @@
                                 <!-- DESAIN DEPAN -->
                                 <div class="w-[80px] h-[100px] rounded-lg overflow-hidden bg-slate-50 border border-slate-200 shrink-0 flex items-center justify-center relative shadow-inner">
                                     <span class="absolute top-0.5 left-0.5 z-30 bg-white/80 text-[8px] font-bold px-1 rounded shadow-sm">Depan</span>
+                                    @php
+                                        $mockupBase = match($detail->produk->jenis_produk) {
+                                            'kaos' => 'kaos',
+                                            'hoodie' => 'hoodie',
+                                            'topi' => 'topi',
+                                            'polo' => 'polo',
+                                            'seragam' => 'seragam',
+                                            default => 'kaos'
+                                        };
+                                        $mockupPath = asset('images/mockups/' . $mockupBase . '.png');
+                                        $hasBack = in_array($detail->produk->jenis_produk, ['kaos', 'hoodie', 'polo', 'seragam']);
+                                    @endphp
+
                                     @if($detail->desain && $detail->desain->file_desain)
-                                        @if($detail->produk->jenis_produk == 'kaos')
-                                            <img src="{{ asset('images/mockups/kaos.png?v='.time()) }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-90 z-0">
-                                            <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10"
-                                                 style="-webkit-mask-image: url('{{ asset('images/mockups/kaos.png?v='.time()) }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ asset('images/mockups/kaos.png?v='.time()) }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
-                                                <div class="w-full h-full" style="background-color: {{ $detail->desain->warna_baju ?: '#ffffff' }};"></div>
-                                            </div>
-                                        @elseif($detail->produk->jenis_produk == 'hoodie')
-                                            <img src="{{ asset('images/mockups/hoodie.png?v='.time()) }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-90 z-0">
-                                            <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10"
-                                                 style="-webkit-mask-image: url('{{ asset('images/mockups/hoodie.png?v='.time()) }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ asset('images/mockups/hoodie.png?v='.time()) }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
-                                                <div class="w-full h-full" style="background-color: {{ $detail->desain->warna_baju ?: '#ffffff' }};"></div>
-                                            </div>
-                                        @endif
+                                        <img src="{{ $mockupPath }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-90 z-0">
+                                        <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10"
+                                             style="-webkit-mask-image: url('{{ $mockupPath }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ $mockupPath }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
+                                            <div class="w-full h-full" style="background-color: {{ $detail->desain->warna_baju ?: '#ffffff' }};"></div>
+                                        </div>
                                         
-                                        <div class="absolute z-20" style="top: 20%; left: 27.08%; width: 45.83%; height: 53.33%;">
+                                        @php
+                                            // Dynamic overlay positioning
+                                            $overlayStyle = match($detail->produk->jenis_produk) {
+                                                'topi' => 'top: 40%; left: 35%; width: 30%; height: 25%;',
+                                                'polo' => 'top: 30%; left: 30%; width: 20%; height: 18%;',
+                                                'seragam' => 'top: 30%; left: 28%; width: 22%; height: 20%;',
+                                                default => 'top: 20%; left: 27.08%; width: 45.83%; height: 53.33%;'
+                                            };
+                                        @endphp
+                                        <div class="absolute z-20" style="{{ $overlayStyle }}">
                                             <img src="{{ Str::startsWith($detail->desain->file_desain, 'data:image') ? $detail->desain->file_desain : asset('storage/' . $detail->desain->file_desain) }}" class="w-full h-full object-contain">
                                         </div>
                                     @else
@@ -132,22 +146,15 @@
                                 </div>
 
                                 <!-- DESAIN BELAKANG -->
-                                @if($detail->desain && $detail->desain->file_desain_belakang)
+                                @if($detail->desain && $detail->desain->file_desain_belakang && $hasBack)
                                 <div class="w-[80px] h-[100px] rounded-lg overflow-hidden bg-slate-50 border border-slate-200 shrink-0 flex items-center justify-center relative shadow-inner">
                                     <span class="absolute top-0.5 left-0.5 z-30 bg-white/80 text-[8px] font-bold px-1 rounded shadow-sm">Belakang</span>
-                                    @if($detail->produk->jenis_produk == 'kaos')
-                                        <img src="{{ asset('images/mockups/kaos_belakang.png?v='.time()) }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-90 z-0">
-                                        <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10"
-                                             style="-webkit-mask-image: url('{{ asset('images/mockups/kaos_belakang.png?v='.time()) }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ asset('images/mockups/kaos_belakang.png?v='.time()) }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
-                                            <div class="w-full h-full" style="background-color: {{ $detail->desain->warna_baju ?: '#ffffff' }};"></div>
-                                        </div>
-                                    @elseif($detail->produk->jenis_produk == 'hoodie')
-                                        <img src="{{ asset('images/mockups/hoodie_belakang.png?v='.time()) }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-90 z-0">
-                                        <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10"
-                                             style="-webkit-mask-image: url('{{ asset('images/mockups/hoodie_belakang.png?v='.time()) }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ asset('images/mockups/hoodie_belakang.png?v='.time()) }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
-                                            <div class="w-full h-full" style="background-color: {{ $detail->desain->warna_baju ?: '#ffffff' }};"></div>
-                                        </div>
-                                    @endif
+                                    @php $mockupPathB = asset('images/mockups/' . $mockupBase . '_belakang.png'); @endphp
+                                    <img src="{{ $mockupPathB }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-90 z-0" onerror="this.src='{{ $mockupPath }}'">
+                                    <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10"
+                                         style="-webkit-mask-image: url('{{ $mockupPathB }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ $mockupPathB }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
+                                        <div class="w-full h-full" style="background-color: {{ $detail->desain->warna_baju ?: '#ffffff' }};"></div>
+                                    </div>
                                     
                                     <div class="absolute z-20" style="top: 20%; left: 27.08%; width: 45.83%; height: 53.33%;">
                                         <img src="{{ Str::startsWith($detail->desain->file_desain_belakang, 'data:image') ? $detail->desain->file_desain_belakang : asset('storage/' . $detail->desain->file_desain_belakang) }}" class="w-full h-full object-contain">
@@ -157,8 +164,11 @@
 
                             <div class="flex-1">
                                 <p class="font-bold text-slate-800">{{ $detail->produk->nama_produk ?? 'Produk' }}</p>
-                                <p class="text-xs text-slate-500 mt-0.5">{{ ucfirst($detail->produk->jenis_produk ?? '') }}</p>
-                                <div class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-600">
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="px-2 py-0.5 bg-slate-900 text-white text-[9px] font-black uppercase tracking-widest rounded-md">{{ $detail->produk->jenis_produk }}</span>
+                                    <span class="px-2 py-0.5 {{ $detail->tipe_proses == 'bordir' ? 'bg-red-600' : 'bg-sky-500' }} text-white text-[9px] font-black uppercase tracking-widest rounded-md">{{ $detail->tipe_proses }}</span>
+                                </div>
+                                <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-600">
                                     <span>Jumlah: <strong>{{ $detail->quantity }} pcs</strong></span>
                                     <span>Harga Produk: <strong>Rp {{ number_format($detail->harga_produk, 0, ',', '.') }}</strong></span>
                                     <span>Harga Desain: <strong>Rp {{ number_format($detail->harga_desain, 0, ',', '.') }}</strong></span>

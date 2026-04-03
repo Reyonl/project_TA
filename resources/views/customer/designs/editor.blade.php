@@ -1,13 +1,27 @@
 <x-app-layout>
-    <!-- Tambahkan library Fabric.js -->
+    <!-- Tambahkan library Fabric.js & Google Fonts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Dancing+Script:wght@700&family=Lobster&family=Montserrat:wght@400;700&family=Pacifico&family=Playfair+Display:wght@700&family=Roboto:wght@400;700&family=Oswald:wght@500&family=Anton&display=swap" rel="stylesheet">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-slate-800 leading-tight">
             {{ __('Editor Desain Sablon') }} - {{ $produk->nama_produk }}
         </h2>
     </x-slot>
 
-    <div class="h-[calc(100vh-65px)] overflow-hidden" x-data="{ activeTab: 'templates', baseColor: '#ffffff', activeSide: 'front', sidebarOpen: true }">
+    <div class="h-[calc(100vh-65px)] overflow-hidden" 
+         x-data="{ 
+             activeTab: 'templates', 
+             baseColor: new URLSearchParams(window.location.search).get('color') ? (selectedColorFromMap = {
+                 'White': '#ffffff', 'Black': '#1e293b', 'Navy': '#1e3a8a', 
+                 'Dark Grey': '#334155', 'Red': '#dc2626', 'Forest Green': '#14532d', 
+                 'Maroon': '#7f1d1d', 'Military Green': '#4B5320', 'Sand': '#D2B48C',
+                 'Light Blue': '#93c5fd', 'Pink': '#f472b6', 'Purple': '#6d28d9',
+                 'Orange': '#f97316', 'Yellow': '#facc15', 'Teal': '#0d9488'
+             }[new URLSearchParams(window.location.search).get('color')] || '#ffffff') : '#ffffff', 
+             activeSide: 'front', 
+             sidebarOpen: true,
+             technique: new URLSearchParams(window.location.search).get('technique') || 'sablon'
+         }" x-init="window.canvasBackgroundChange(baseColor)">
         <div class="flex h-full bg-slate-50">
             
             <!-- Navbar Kiri Tepi (Icon Only) -->
@@ -140,12 +154,7 @@
                         </div>
                     </div>
                     
-                    <button id="saveDesignBtn" class="bg-red-600 text-white font-black py-2.5 px-8 rounded-xl shadow-xl shadow-red-100 hover:bg-red-500 transition hover:-translate-y-1 flex items-center gap-2 text-xs uppercase tracking-widest">
-                        <span>{{ $desainRevisi ? 'SIMPAN REVISI' : 'KONFIRMASI DESAIN' }}</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                    </button>
                 </div>
-iv>
 
                 @if($desainRevisi)
                 <div class="bg-red-50 border-b border-red-200 p-4 sticky top-[73px] z-10 flex gap-3 shadow-inner">
@@ -159,54 +168,8 @@ iv>
                 @endif
 
                 <!-- Canvas Workspace Container -->
-                <div class="flex-1 overflow-auto flex justify-center items-center py-8 relative">
-                    <!-- Layer Control Floating Tool (Muncul saat diklik) -->
-                    <div id="editorControls" class="absolute top-12 left-1/2 transform -translate-x-1/2 bg-white px-4 py-2 border border-slate-200 shadow-xl rounded-xl items-center gap-3 z-50 hidden transition-all">
-                        
-                        <!-- Image Controls (Remove Background) -->
-                        <div id="imageControls" class="hidden items-center gap-2 border-r border-slate-200 pr-3 mr-1">
-                            <button id="removeBgBtn" title="Hapus Background Putih/Polos" class="bg-sky-50 border border-sky-200 text-sky-600 text-[10px] font-black px-3 py-1.5 rounded-lg hover:bg-sky-100 flex items-center gap-1 transition uppercase tracking-widest leading-none">
-                                <span>✨ HAPUS BG PUTIH</span>
-                            </button>
-                        </div>
+                <div class="flex-1 overflow-auto flex justify-center items-center py-8 relative bg-slate-50">
 
-                        <!-- SVG Vector Controls -->
-                        <div id="svgControls" class="hidden items-center gap-2 border-r border-slate-200 pr-3 mr-1">
-                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Warna Vektor:</span>
-                            <input type="color" id="svgColorControl" class="w-8 h-8 p-0.5 border-0 rounded-lg cursor-pointer bg-slate-100" value="#000000" title="Ubah Warna Vektor">
-                        </div>
-
-                        <!-- Text Controls -->
-                        <div id="textControls" class="hidden items-center gap-2 border-r border-slate-200 pr-3 mr-1">
-                            <select id="fontFamilyControl" class="text-xs font-bold border-slate-200 rounded-lg py-1.5 pl-2 pr-8 focus:ring-sky-500 focus:border-sky-500 bg-slate-50 uppercase tracking-tighter" style="min-width: 120px;">
-                                <option value="Arial">Arial</option>
-                                <option value="'Times New Roman'">Times New Roman</option>
-                                <option value="Courier New">Courier</option>
-                                <option value="Impact">Impact</option>
-                                <option value="'Comic Sans MS'">Comic Sans</option>
-                            </select>
-                            <input type="color" id="textColorControl" class="w-8 h-8 p-0.5 border-0 rounded-lg cursor-pointer bg-slate-100" value="#000000" title="Warna Teks">
-                            <div class="h-6 w-px bg-slate-200 mx-1"></div>
-                            
-                            <!-- Advanced Text Features -->
-                            <div class="flex items-center gap-2" title="Outline / Stroke Teks">
-                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Outline:</span>
-                                <input type="color" id="textStrokeColor" class="w-5 h-5 p-0 border-0 rounded-full cursor-pointer bg-slate-100" value="#ffffff">
-                                <input type="range" id="textStrokeWidth" min="0" max="10" value="0" class="w-12 h-1 bg-slate-200 rounded-full appearance-none cursor-pointer accent-sky-600">
-                            </div>
-                            <div class="h-6 w-px bg-slate-200 mx-1"></div>
-                            <label class="flex items-center gap-1 cursor-pointer text-[9px] font-black text-slate-500 uppercase tracking-widest" title="Efek Bayangan">
-                                <input type="checkbox" id="textShadowToggle" class="rounded text-sky-600 form-checkbox h-3 w-3 shadow-none focus:ring-0">
-                                Shadow
-                            </label>
-                        </div>
-
-                        <!-- Layer Control -->
-                        <button id="bringForwardBtn" title="Bawa ke Depan" class="w-8 h-8 rounded-lg shrink-0 bg-slate-50 hover:bg-sky-50 hover:text-sky-600 flex items-center justify-center text-slate-400 transition border border-slate-200"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 12m4-4v12"></path></svg></button>
-                        <button id="sendBackwardBtn" title="Pindah ke Belakang" class="w-8 h-8 rounded-lg shrink-0 bg-slate-50 hover:bg-sky-50 hover:text-sky-600 flex items-center justify-center text-slate-400 transition border border-slate-200"><svg class="w-4 h-4 transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4-4m0 0L8 12m4-4v12"></path></svg></button>
-                        <div class="h-6 w-px bg-slate-200 mx-1"></div>
-                        <button id="deleteObjBtn" title="Hapus Objek" class="w-8 h-8 rounded-lg shrink-0 bg-red-50 hover:bg-red-500 hover:text-white flex items-center justify-center text-red-500 transition border border-red-100 shadow-sm shadow-red-100"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
-                    </div>
 
                     <!-- Layout Canvas + Base -->
                     <!-- Container Absolute 480x600 untuk Mockup Static Background -->
@@ -220,48 +183,181 @@ iv>
                         <!-- Latar Baju Fotorealistis (Statik/Locked Background) -->
                         <div class="absolute inset-0 z-0 pointer-events-none" id="baseColorContainer">
                              <div class="w-full h-full flex items-center justify-center relative overflow-hidden">
-                                @if($produk->jenis_produk == 'kaos')
-                                    <!-- Base Foto Kaos Nyata -->
-                                    <img :src="activeSide === 'front' ? '{{ asset('images/mockups/kaos.png?v='.time()) }}' : '{{ asset('images/mockups/kaos_belakang.png?v='.time()) }}'" class="absolute w-[85%] h-[85%] object-contain drop-shadow-2xl opacity-90">
-                                    
-                                    <!-- Layer Masking Warna Kaos (Tepat di atas foto, mix-blend multiply) -->
-                                    <div class="absolute w-[85%] h-[85%] mix-blend-multiply"
-                                         :style="`-webkit-mask-image: url('${activeSide === 'front' ? '{{ asset('images/mockups/kaos.png?v='.time()) }}' : '{{ asset('images/mockups/kaos_belakang.png?v='.time()) }}'}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('${activeSide === 'front' ? '{{ asset('images/mockups/kaos.png?v='.time()) }}' : '{{ asset('images/mockups/kaos_belakang.png?v='.time()) }}'}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;`">
-                                        <div class="w-full h-full transition-colors duration-300" :style="`background-color: ${baseColor};`"></div>
-                                    </div>
-                                @elseif($produk->jenis_produk == 'hoodie')
-                                    <!-- Base Foto Hoodie Nyata -->
-                                    <img :src="activeSide === 'front' ? '{{ asset('images/mockups/hoodie.png?v='.time()) }}' : '{{ asset('images/mockups/hoodie_belakang.png?v='.time()) }}'" class="absolute w-[85%] h-[85%] object-contain drop-shadow-2xl opacity-90">
-                                    
-                                    <!-- Layer Masking Warna Hoodie -->
-                                    <div class="absolute w-[85%] h-[85%] mix-blend-multiply"
-                                         :style="`-webkit-mask-image: url('${activeSide === 'front' ? '{{ asset('images/mockups/hoodie.png?v='.time()) }}' : '{{ asset('images/mockups/hoodie_belakang.png?v='.time()) }}'}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('${activeSide === 'front' ? '{{ asset('images/mockups/hoodie.png?v='.time()) }}' : '{{ asset('images/mockups/hoodie_belakang.png?v='.time()) }}'}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;`">
-                                        <div class="w-full h-full transition-colors duration-300" :style="`background-color: ${baseColor};`"></div>
-                                    </div>
-                                @endif
+                                @php
+                                    $hasBack = in_array($produk->jenis_produk, ['kaos', 'hoodie', 'polo', 'seragam']);
+                                    $mockupBase = match($produk->jenis_produk) {
+                                        'kaos' => 'kaos',
+                                        'hoodie' => 'hoodie',
+                                        'topi' => 'topi',
+                                        'polo' => 'polo',
+                                        'seragam' => 'seragam',
+                                        default => 'kaos'
+                                    };
+                                @endphp
+
+                                <!-- Base Mockup Texture -->
+                                <img :src="activeSide === 'front' ? '{{ asset('images/mockups/'.$mockupBase.'.png?v='.time()) }}' : '{{ asset('images/mockups/'.$mockupBase.'_belakang.png?v='.time()) }}'" 
+                                     class="absolute object-contain drop-shadow-2xl opacity-90 transition-all duration-500"
+                                     :class="technique === 'bordir' || '{{ $produk->jenis_produk }}' === 'topi' ? 'w-[100%] h-[100%] scale-150 translate-y-10' : 'w-[85%] h-[85%]'"
+                                     onerror="this.src='{{ asset('images/mockups/'.$mockupBase.'.png') }}'">
+                                
+                                <!-- Color Tint Layer -->
+                                <div class="absolute mix-blend-multiply transition-all duration-500"
+                                     :class="technique === 'bordir' || '{{ $produk->jenis_produk }}' === 'topi' ? 'w-[100%] h-[100%] scale-150 translate-y-10' : 'w-[85%] h-[85%]'"
+                                     :style="`-webkit-mask-image: url('${activeSide === 'front' ? '{{ asset('images/mockups/'.$mockupBase.'.png?v='.time()) }}' : '{{ asset('images/mockups/'.$mockupBase.'_belakang.png?v='.time()) }}'}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('${activeSide === 'front' ? '{{ asset('images/mockups/'.$mockupBase.'.png?v='.time()) }}' : '{{ asset('images/mockups/'.$mockupBase.'_belakang.png?v='.time()) }}'}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;`"
+                                     x-effect="if($el.style.maskImage.includes('_belakang.png') && !'{{ $hasBack }}') $el.style.maskImage = $el.style.maskImage.replace('_belakang.png', '.png')">
+                                    <div class="w-full h-full transition-colors duration-300" :style="`background-color: ${baseColor};`"></div>
+                                </div>
                              </div>
                         </div>
                         
-                        <!-- Print Area Visualizer (Kotak Dashed) Transparan yang letaknya pas di dada -->
-                        <div class="absolute z-10 border border-dashed border-slate-600/40 pointer-events-none rounded transition-colors group" id="printAreaBox" style="width: 220px; height: 320px; top: 120px; left: 130px;">
-                            <span class="absolute -top-7 left-1/2 transform -translate-x-1/2 text-[10px] text-slate-600 font-black uppercase tracking-widest bg-red-50/80 px-3 py-1 rounded-full backdrop-blur border border-red-200/50 shadow-sm ">Area Cetak</span>
-                            <!-- Glow Corners -->
-                            <div class="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-red-400"></div>
-                            <div class="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-red-400"></div>
-                            <div class="absolute -bottom-1 -left-1 w-3 h-3 border-b-2 border-l-2 border-red-400"></div>
-                            <div class="absolute -bottom-1 -right-1 w-3 h-3 border-b-2 border-r-2 border-red-400"></div>
+                        @php
+                            // Dynamic Print Area Logic
+                            $printArea = match($produk->jenis_produk) {
+                                'topi' => ['width' => 120, 'height' => 85, 'top' => 210, 'left' => 180, 'label' => 'Bordir'],
+                                'polo' => ['width' => 90, 'height' => 90, 'top' => 180, 'left' => 140, 'label' => 'Pocket'],
+                                'seragam' => ['width' => 100, 'height' => 100, 'top' => 180, 'left' => 135, 'label' => 'Dada'],
+                                default => ['width' => 220, 'height' => 320, 'top' => 120, 'left' => 130, 'label' => 'Area Cetak']
+                            };
+                        @endphp
+
+                        <!-- Print Area Visualizer -->
+                        <div class="absolute z-10 border border-dashed border-slate-600/40 pointer-events-none rounded transition-colors group" 
+                             id="printAreaBox" 
+                             style="width: {{ $printArea['width'] }}px; height: {{ $printArea['height'] }}px; top: {{ $printArea['top'] }}px; left: {{ $printArea['left'] }}px;">
+                            <span class="absolute -top-7 left-1/2 transform -translate-x-1/2 text-[10px] text-slate-600 font-black uppercase tracking-widest bg-red-50/80 px-3 py-1 rounded-full backdrop-blur border border-red-200/50 shadow-sm ">
+                                <span x-text="technique === 'bordir' ? 'Bordir Box' : '{{ $printArea['label'] }}'"></span>
+                            </span>
+                             <!-- Glow Corners -->
+                             <div class="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-red-400"></div>
+                             <div class="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-red-400"></div>
+                             <div class="absolute -bottom-1 -left-1 w-3 h-3 border-b-2 border-l-2 border-red-400"></div>
+                             <div class="absolute -bottom-1 -right-1 w-3 h-3 border-b-2 border-r-2 border-red-400"></div>
                         </div>
 
-                        <!-- Fabric.js Canvas hanya sebesar area cetak didada -->
-                        <!-- Sehingga desain user TIDAK AKAN PERNAH bisa digeser keluar dari area dada kaos -->
-                        <div class="absolute z-20" style="top: 120px; left: 130px; width: 220px; height: 320px;" x-show="activeSide === 'front'">
-                            <canvas id="tshirt-canvas-front" width="220" height="320"></canvas>
+                        <!-- Fabric.js Canvas -->
+                        <div class="absolute z-20" 
+                             style="top: {{ $printArea['top'] }}px; left: {{ $printArea['left'] }}px; width: {{ $printArea['width'] }}px; height: {{ $printArea['height'] }}px;" 
+                             x-show="activeSide === 'front'">
+                            <canvas id="tshirt-canvas-front" width="{{ $printArea['width'] }}" height="{{ $printArea['height'] }}"></canvas>
                         </div>
-                        <div class="absolute z-20" style="top: 120px; left: 130px; width: 220px; height: 320px;" x-show="activeSide === 'back'" style="display: none;">
+                        <div class="absolute z-20" 
+                             style="top: 120px; left: 130px; width: 220px; height: 320px;" 
+                             x-show="activeSide === 'back'" 
+                             x-cloak>
                             <canvas id="tshirt-canvas-back" width="220" height="320"></canvas>
                         </div>
                     </div>
 
+                </div>
+            </div>
+
+            <!-- Right Sidebar: Properties Panel (Sticky) -->
+            <div id="editorControls" class="w-80 bg-white border-l border-slate-200 shadow-sm flex flex-col flex-shrink-0 z-30 hidden overflow-y-auto custom-scrollbar">
+                <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                    <h3 class="font-black text-slate-800 text-sm uppercase tracking-widest">Pengaturan Objek</h3>
+                    <button onclick="window.activeCanvas.discardActiveObject(); window.activeCanvas.requestRenderAll();" class="text-slate-400 hover:text-red-500 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                
+                <div class="p-6 space-y-8">
+                    <!-- Text Properties -->
+                    <div id="textControls" class="hidden flex-col gap-6">
+                        <div class="space-y-3">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pilih Gaya Font</label>
+                            <select id="fontFamilyControl" class="w-full text-sm font-bold border-slate-200 rounded-xl py-3 pl-4 focus:ring-red-500 focus:border-red-500 bg-slate-50 cursor-pointer shadow-sm">
+                                <optgroup label="Standard">
+                                    <option value="Arial">Arial</option>
+                                    <option value="Roboto">Roboto</option>
+                                    <option value="Montserrat">Montserrat</option>
+                                </optgroup>
+                                <optgroup label="Display & Bold">
+                                    <option value="'Bebas Neue'">Bebas Neue</option>
+                                    <option value="Impact">Impact</option>
+                                    <option value="Oswald">Oswald</option>
+                                    <option value="Anton">Anton</option>
+                                </optgroup>
+                                <optgroup label="Script & Elegant">
+                                    <option value="Pacifico">Pacifico</option>
+                                    <option value="Lobster">Lobster</option>
+                                    <option value="'Dancing Script'">Dancing Script</option>
+                                    <option value="'Playfair Display'">Playfair Display</option>
+                                </optgroup>
+                            </select>
+                        </div>
+
+                        <div class="space-y-3">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Warna Teks</label>
+                            <div class="flex items-center gap-4">
+                                <input type="color" id="textColorControl" class="w-12 h-12 p-1 border border-slate-200 rounded-xl cursor-pointer bg-white shadow-sm" value="#000000">
+                                <div class="flex flex-col text-xs font-bold text-slate-400">
+                                    <span>HEX CODE</span>
+                                    <span class="text-slate-800" id="textColorVal">#000000</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4 pt-2 border-t border-slate-100">
+                             <div class="flex justify-between items-center">
+                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Outline (Stroke)</label>
+                                <input type="color" id="textStrokeColor" class="w-8 h-8 p-0.5 border border-slate-200 rounded-lg cursor-pointer bg-white shadow-sm" value="#ffffff">
+                             </div>
+                             <input type="range" id="textStrokeWidth" min="0" max="10" value="0" class="w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer accent-red-600">
+                        </div>
+
+                        <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Efek Bayangan</label>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="textShadowToggle" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Image Properties -->
+                    <div id="imageControls" class="hidden flex-col gap-4">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Opsi Gambar</p>
+                        <button id="removeBgBtn" class="w-full bg-sky-50 border border-sky-100 text-sky-600 text-xs font-black py-4 rounded-xl hover:bg-sky-100 transition flex items-center justify-center gap-2 shadow-sm shadow-sky-50 uppercase tracking-widest">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            <span>✨ Hapus Background</span>
+                        </button>
+                    </div>
+
+                    <!-- SVG Vector Properties -->
+                    <div id="svgControls" class="hidden flex-col gap-4">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Warna Vektor</label>
+                        <div class="flex items-center gap-4">
+                            <input type="color" id="svgColorControl" class="w-12 h-12 p-1 border border-slate-200 rounded-xl cursor-pointer bg-white shadow-sm" value="#000000">
+                            <div class="flex flex-col text-xs font-bold text-slate-400">
+                                <span>HEX CODE</span>
+                                <span class="text-slate-800" id="svgColorVal">#000000</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Common Layer Management -->
+                    <div class="pt-6 border-t border-slate-100">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 text-center">Urutan Lapisan</p>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button id="bringForwardBtn" class="flex items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold py-3 px-4 rounded-xl border border-slate-200 transition text-xs">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 11l7-7 7 7M5 19l7-7 7 7"></path></svg>
+                                Ke Depan
+                            </button>
+                            <button id="sendBackwardBtn" class="flex items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold py-3 px-4 rounded-xl border border-slate-200 transition text-xs">
+                                <svg class="w-3 h-3 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 11l7-7 7 7M5 19l7-7 7 7"></path></svg>
+                                Ke Belakang
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Danger Zone -->
+                    <div class="pt-8 mt-4 border-t-2 border-slate-50 border-dashed">
+                        <button id="deleteObjBtn" class="w-full bg-red-50 hover:bg-red-600 hover:text-white text-red-600 font-black py-4 rounded-2xl transition border border-red-100 flex items-center justify-center gap-2 shadow-inner uppercase tracking-widest text-[11px]">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            <span>Hapus Objek</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -313,19 +409,25 @@ iv>
                 selection: true
             });
             
-            let canvas = canvasFront; // pointer ke canvas yang aktif saat ini
+            window.activeCanvas = canvasFront;
 
             window.switchCanvasSide = function(side) {
-                if(canvas) {
-                    canvas.discardActiveObject();
-                    canvas.renderAll();
+                if(window.activeCanvas) {
+                    window.activeCanvas.discardActiveObject();
+                    window.activeCanvas.renderAll();
                 }
                 if (typeof hideControls === 'function') hideControls();
-                canvas = side === 'front' ? canvasFront : canvasBack;
+                window.activeCanvas = side === 'front' ? canvasFront : canvasBack;
+                canvas = window.activeCanvas; // sync local helper
             };
 
-            // Batasan Area Cetak (Canvas sekarang HANYA seukuran Print Area)
-            const printArea = { top: 0, left: 0, width: 220, height: 320 };
+            // Batasan Area Cetak (Dynamic berdasarkan PHP Match)
+            const printArea = { 
+                top: 0, 
+                left: 0, 
+                width: {{ $printArea['width'] }}, 
+                height: {{ $printArea['height'] }} 
+            };
 
             // Referensi Elemen DOM
             const editorControls = document.getElementById('editorControls');
@@ -602,7 +704,8 @@ iv>
             function showControls(e) {
                 editorControls.classList.remove('hidden');
                 editorControls.classList.add('flex');
-                const activeObj = e.selected[0];
+                const activeObj = (e && e.selected) ? e.selected[0] : canvas.getActiveObject();
+                if(!activeObj) return;
                 
                 // Hide All Contextual Controls first
                 textControls.classList.add('hidden'); textControls.classList.remove('flex');
@@ -614,6 +717,7 @@ iv>
                     textControls.classList.add('flex');
                     fontFamilyControl.value = activeObj.fontFamily.replace(/["']/g, "");
                     textColorControl.value = activeObj.fill;
+                    document.getElementById('textColorVal').textContent = activeObj.fill.toUpperCase();
                     textStrokeColor.value = activeObj.stroke || '#ffffff';
                     textStrokeWidth.value = activeObj.strokeWidth || 0;
                     textShadowToggle.checked = !!activeObj.shadow;
@@ -622,19 +726,25 @@ iv>
                     imageControls.classList.remove('hidden');
                     imageControls.classList.add('flex');
                 }
-                else if (activeObj && activeObj.type === 'group' && activeObj.customType === 'custom-svg') {
+                else if (activeObj && (activeObj.type === 'group' || activeObj.type === 'path') && activeObj.customType === 'custom-svg') {
                     svgControls.classList.remove('hidden');
                     svgControls.classList.add('flex');
-                    // Get initial color from the first path of SVG
-                    if(activeObj._objects && activeObj._objects.length > 0) {
-                        // Some SVGs use 'fill', some 'stroke'. Prefer fill.
-                        let initialColor = activeObj._objects[0].fill;
-                        if(initialColor && typeof initialColor === 'string' && initialColor.startsWith('#')) {
-                            svgColorControl.value = initialColor;
-                        }
+                    let targetColor = '#000000';
+                    if(activeObj.type === 'group' && activeObj._objects && activeObj._objects.length > 0) {
+                        targetColor = activeObj._objects[0].fill || '#000000';
+                    } else {
+                        targetColor = activeObj.fill || '#000000';
+                    }
+                    if(typeof targetColor === 'string' && targetColor.startsWith('#')) {
+                        svgColorControl.value = targetColor;
+                        document.getElementById('svgColorVal').textContent = targetColor.toUpperCase();
                     }
                 }
             }
+
+            // Sync color hex values
+            textColorControl.addEventListener('input', () => { document.getElementById('textColorVal').textContent = textColorControl.value.toUpperCase(); });
+            svgColorControl.addEventListener('input', () => { document.getElementById('svgColorVal').textContent = svgColorControl.value.toUpperCase(); });
 
             // Logic Remove Background (Magic Eraser) for Images
             removeBgBtn.addEventListener('click', function() {
@@ -725,7 +835,8 @@ iv>
                     file_desain: frontDataURL, 
                     lebar_cm: lebarCm,
                     tinggi_cm: tinggiCm,
-                    warna_baju: activeBaseColor
+                    warna_baju: activeBaseColor,
+                    tipe_proses: new URLSearchParams(window.location.search).get('technique') || 'sablon'
                 };
 
                 if (backDataURL !== '') {

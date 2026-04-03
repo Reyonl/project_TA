@@ -58,6 +58,7 @@
               x-data="{ 
                   selectedColor: 'White', 
                   selectedSize: 'L',
+                  selectedTechnique: 'sablon',
                   colorMap: {
                       'White': '#ffffff', 'Black': '#1e293b', 'Navy': '#1e3a8a', 
                       'Dark Grey': '#334155', 'Red': '#dc2626', 'Forest Green': '#14532d', 
@@ -72,7 +73,14 @@
                 <!-- Thumbnails (Vertical) -->
                 <div class="hidden md:flex flex-col gap-3 w-20 xl:w-24 shrink-0">
                     @php
-                        $baseImg = $produk->jenis_produk == 'kaos' ? 'kaos.png' : 'hoodie.png';
+                        $baseImg = match($produk->jenis_produk) {
+                            'kaos' => 'kaos.png',
+                            'hoodie' => 'hoodie.png',
+                            'topi' => 'topi.png',
+                            'polo' => 'polo.png',
+                            'seragam' => 'seragam.png',
+                            default => 'kaos.png'
+                        };
                     @endphp
                     <button class="w-full aspect-square border-2 border-slate-900 rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center relative">
                         <img src="{{ asset('images/mockups/'.$baseImg) }}" class="w-[85%] object-contain" alt="Front Vew">
@@ -168,14 +176,22 @@
                 <!-- Configurator -->
                 <div class="flex flex-col gap-6">
                     <!-- Technique -->
-                    <div>
+                    <div x-show="{{ $produk->tersedia_bordir ? 'true' : 'false' }}">
                         <div class="flex justify-between items-center mb-3">
-                            <span class="font-bold text-sm text-slate-800">Teknik Cetak</span>
-                            <a href="#" class="text-xs text-indigo-600 font-semibold">Panduan File</a>
+                            <span class="font-bold text-sm text-slate-800 uppercase tracking-widest">Pilih Teknik Cetak</span>
+                            <a href="#" class="text-[10px] text-red-600 font-black uppercase tracking-widest border-b border-red-200">Panduan Teknik</a>
                         </div>
                         <div class="grid grid-cols-2 gap-3">
-                            <button class="py-2.5 px-4 rounded-md border-2 border-slate-900 bg-slate-50 font-bold text-sm text-center">Sablon Digital (DTG)</button>
-                            <button class="py-2.5 px-4 rounded-md border border-slate-300 bg-white hover:bg-slate-50 font-medium text-sm text-slate-600 text-center transition">Bordir (Embroidery)</button>
+                            <button @click="selectedTechnique = 'sablon'" 
+                                    :class="selectedTechnique === 'sablon' ? 'border-red-600 bg-red-50 text-red-700' : 'border-slate-200 bg-white text-slate-500'"
+                                    class="py-3.5 px-4 rounded-xl border-2 font-black text-[10px] uppercase tracking-widest text-center transition-all">
+                                Sablon Digital (DTG)
+                            </button>
+                            <button @click="selectedTechnique = 'bordir'" 
+                                    :class="selectedTechnique === 'bordir' ? 'border-red-600 bg-red-50 text-red-700' : 'border-slate-200 bg-white text-slate-500'"
+                                    class="py-3.5 px-4 rounded-xl border-2 font-black text-[10px] uppercase tracking-widest text-center transition-all">
+                                Bordir (Embroidery)
+                            </button>
                         </div>
                     </div>
 
@@ -267,7 +283,7 @@
 
                 <!-- Call to Action -->
                 <div class="mt-auto">
-                    <a href="{{ route('customer.designs.editor', $produk->id_produk) }}" class="group relative block w-full text-center py-5 rounded-2xl bg-red-600 hover:bg-red-500 text-white font-black text-xl shadow-2xl shadow-red-200 transition-all duration-300 transform active:scale-[0.98] overflow-hidden">
+                    <a :href="`{{ route('customer.designs.editor', $produk->id_produk) }}?technique=${selectedTechnique}&color=${selectedColor}&size=${selectedSize}`" class="group relative block w-full text-center py-5 rounded-2xl bg-red-600 hover:bg-red-500 text-white font-black text-xl shadow-2xl shadow-red-200 transition-all duration-300 transform active:scale-[0.98] overflow-hidden">
                         <span class="relative z-10 flex items-center justify-center gap-3">
                             MULAI DESAIN SEKARANG
                             <svg class="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>

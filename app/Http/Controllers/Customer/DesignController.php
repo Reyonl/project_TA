@@ -40,6 +40,7 @@ class DesignController extends Controller
             'lebar_cm_belakang' => 'nullable|numeric',
             'tinggi_cm_belakang' => 'nullable|numeric',
             'warna_baju' => 'nullable|string',
+            'tipe_proses' => 'nullable|in:sablon,bordir',
         ]);
 
         $base64_image = $request->file_desain;
@@ -92,6 +93,7 @@ class DesignController extends Controller
             'id_produk' => $request->id_produk,
             'id_desain' => $desain->id_desain,
             'quantity' => 1,
+            'tipe_proses' => $request->tipe_proses ?? 'sablon',
         ]);
 
         return response()->json([

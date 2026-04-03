@@ -129,8 +129,17 @@
                         <div class="relative aspect-[4/5] bg-slate-100 rounded-[2.5rem] overflow-hidden mb-6 border border-slate-200 group-hover:border-red-300 transition-all duration-500 shadow-sm">
                             <div class="absolute inset-0 bg-gradient-to-t from-red-900/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                             
-                            @php $imgFile = $item->jenis_produk == 'kaos' ? 'kaos.png' : 'hoodie.png'; @endphp
-                            <img src="{{ asset('images/mockups/' . $imgFile) }}" alt="{{ $item->nama_produk }}" class="w-full h-full object-contain p-8 transform group-hover:scale-110 transition-transform duration-700 drop-shadow-xl">
+                            @php 
+                                $imgFile = match($item->jenis_produk) {
+                                    'kaos' => 'kaos.png',
+                                    'hoodie' => 'hoodie.png',
+                                    'topi' => 'topi.png',
+                                    'polo' => 'polo.png',
+                                    'seragam' => 'seragam.png',
+                                    default => 'kaos.png'
+                                };
+                            @endphp
+                            <img src="{{ asset('images/mockups/' . $imgFile) }}" alt="{{ $item->nama_produk }}" class="w-full h-full {{ $item->jenis_produk == 'topi' ? 'object-contain' : 'object-contain' }} p-8 transform group-hover:scale-110 transition-transform duration-700 drop-shadow-xl">
                             
                             <div class="absolute bottom-6 left-6 right-6 translate-y-10 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
                                 <a href="{{ route('katalog.show', $item->id_produk) }}" class="block w-full py-4 bg-white text-slate-900 font-black text-center rounded-2xl shadow-xl hover:bg-red-600 hover:text-white transition">
@@ -140,8 +149,13 @@
                         </div>
                         <div class="px-2">
                              <div class="flex justify-between items-start mb-2">
-                                <h3 class="text-xl font-black text-slate-900">{{ $item->nama_produk }}</h3>
-                                <span class="bg-red-100 text-red-700 text-[10px] font-black px-2 py-1 rounded-md uppercase">{{ $item->jenis_produk }}</span>
+                                <div>
+                                    <h3 class="text-xl font-black text-slate-900 leading-tight">{{ $item->nama_produk }}</h3>
+                                    @if($item->tersedia_bordir)
+                                        <span class="text-[9px] font-black text-red-500 uppercase tracking-widest bg-red-50 px-2 py-0.5 rounded-full border border-red-100 mt-1 inline-block">Support Bordir</span>
+                                    @endif
+                                </div>
+                                <span class="bg-slate-900 text-white text-[9px] font-black px-2 py-1 rounded-md uppercase tracking-widest shrink-0">{{ $item->jenis_produk }}</span>
                              </div>
                              <p class="text-red-600 font-black text-xl italic uppercase tracking-tighter">Rp {{ number_format($item->harga_dasar, 0, ',', '.') }}</p>
                         </div>
