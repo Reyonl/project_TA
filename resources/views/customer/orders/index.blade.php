@@ -49,31 +49,6 @@
                                 'dibatalkan' => ['label' => 'Dibatalkan',          'color' => 'bg-rose-100 text-rose-700 border-rose-200',       'icon' => '❌'],
                             ];
                             $status = $statusConfig[$order->status_order] ?? ['label' => ucfirst($order->status_order), 'color' => 'bg-slate-100 text-slate-700 border-slate-200', 'icon' => '📋'];
-                        @endphp
- 
-                        <a href="{{ route('customer.orders.show', $order->id_order) }}" class="group block bg-white rounded-[1.5rem] shadow-sm border border-slate-100 hover:border-sky-300 hover:shadow-2xl hover:shadow-sky-100 transition-all duration-300">
-                            <div class="p-6 flex items-center justify-between gap-4">
-                                <div class="flex items-center gap-6">
-                                    <div class="w-14 h-14 bg-sky-50 rounded-2xl flex items-center justify-center text-3xl shrink-0 group-hover:scale-110 transition-transform">
-                                        {{ $status['icon'] }}
-                                    </div>
-                                    <div>
-                                        <p class="font-black text-slate-800 text-lg font-outfit uppercase tracking-tight">Order #{{ str_pad($order->id_order, 5, '0', STR_PAD_LEFT) }}</p>
-                                        <p class="text-xs text-slate-400 font-bold mt-1 uppercase tracking-widest">{{ \Carbon\Carbon::parse($order->tanggal_order)->translatedFormat('d F Y, H:i') }} WIB</p>
-                                    </div>
-                                </div>
- 
-                                <div class="flex items-center gap-6 shrink-0">
-                                    <span class="hidden sm:inline-block text-lg font-black text-slate-900 font-outfit">
-                                        Rp {{ number_format($order->total_harga, 0, ',', '.') }}
-                                    </span>
-                                    <span class="inline-flex items-center gap-2 text-[10px] font-black px-4 py-2 rounded-xl border {{ $status['color'] }} uppercase tracking-widest shadow-sm">
-                                        {{ $status['label'] }}
-                                    </span>
-                                    <svg class="w-5 h-5 text-slate-300 group-hover:text-sky-500 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
-                                </div>
-                            </div>
-                        </a>
                     @endforeach
                 </div>
             @endif

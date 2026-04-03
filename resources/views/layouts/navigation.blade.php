@@ -26,18 +26,18 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ $dashboardRoute }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-indigo-600" />
+                    <a href="{{ $dashboardRoute }}" class="hover:opacity-80 transition duration-300">
+                        <img src="{{ asset('images/logo-dailyco.png') }}" class="h-12 w-auto drop-shadow-sm" alt="DAILY.CO Logo">
                     </a>
                 </div>
-
+ 
                 <!-- Desktop Navigation Links (sesuai role) -->
                 <div class="hidden space-x-1 sm:-my-px sm:ms-8 sm:flex items-center">
-
+ 
                     <x-nav-link :href="$dashboardRoute" :active="request()->routeIs('*.dashboard')">
                         🏠 Dashboard
                     </x-nav-link>
-
+ 
                     @if($role === 'admin')
                         <x-nav-link :href="route('admin.templates.index')" :active="request()->routeIs('admin.templates.*')">
                             🎨 Template
@@ -46,13 +46,13 @@
                             📦 Kelola Order
                         </x-nav-link>
                     @endif
-
+ 
                     @if($role === 'owner')
                         <x-nav-link :href="route('admin.report.index')" :active="request()->routeIs('admin.report.*')">
                             📊 Laporan
                         </x-nav-link>
                     @endif
-
+ 
                     @if($role === 'customer')
                         <x-nav-link :href="route('customer.orders.index')" :active="request()->routeIs('customer.orders.*')">
                             🛍️ Pesanan Saya
@@ -63,19 +63,19 @@
                     @endif
                 </div>
             </div>
-
+ 
             <!-- User Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="56">
                     <x-slot name="trigger">
-                        <button class="inline-flex items-center gap-2 px-3 py-2 border border-transparent text-sm leading-4 font-bold rounded-lg text-slate-600 bg-white hover:bg-slate-50 hover:text-indigo-600 focus:outline-none transition ease-in-out duration-150">
+                        <button class="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 border border-slate-100 text-sm leading-4 font-bold rounded-xl text-slate-600 hover:bg-red-50 hover:text-red-600 hover:border-red-100 focus:outline-none transition ease-in-out duration-150 shadow-sm hover:shadow-md">
                             <!-- Role badge -->
                             @if($role === 'admin')
-                                <span class="px-1.5 py-0.5 bg-indigo-100 text-indigo-700 text-[10px] font-bold rounded uppercase">Admin</span>
+                                <span class="px-1.5 py-0.5 bg-red-100 text-red-700 text-[10px] font-bold rounded uppercase">Admin</span>
                             @elseif($role === 'owner')
                                 <span class="px-1.5 py-0.5 bg-purple-100 text-purple-700 text-[10px] font-bold rounded uppercase">Owner</span>
                             @elseif($role === 'customer')
-                                <span class="px-1.5 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded uppercase">Customer</span>
+                                <span class="px-1.5 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded uppercase">Customer</span>
                             @endif
                             <div>{{ $name }}</div>
                             <svg class="fill-current h-4 w-4 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">

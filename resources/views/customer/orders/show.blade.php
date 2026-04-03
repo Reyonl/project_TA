@@ -1,71 +1,66 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-black text-2xl text-slate-800 leading-tight font-outfit uppercase tracking-tight">
-                Status Pesanan <span class="text-sky-600">#{{ str_pad($order->id_order, 5, '0', STR_PAD_LEFT) }}</span>
-            </h2>
-            <a href="{{ route('customer.orders.index') }}" class="text-xs font-black text-sky-600 hover:text-sky-800 uppercase tracking-widest flex items-center gap-2 transition-transform hover:-translate-x-1">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 19l-7-7 7-7"></path></svg>
-                Semua Pesanan
-            </a>
-        </div>
+        <h2 class="font-black text-2xl text-slate-800 leading-tight font-outfit uppercase tracking-tight">
+            Tracking Order <span class="text-red-600">#{{ str_pad($order->id_order, 5, '0', STR_PAD_LEFT) }}</span>
+        </h2>
     </x-slot>
 
     <div class="py-10">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             @php
-                $statusSteps = ['pending', 'diproses', 'dikirim', 'selesai'];
-                $statusLabels = [
-                    'pending'    => ['label' => 'Dikonfirmasi',  'icon' => '📋'],
-                    'diproses'   => ['label' => 'Diproses',      'icon' => '⚙️'],
-                    'dikirim'    => ['label' => 'Dikirim',       'icon' => '🚚'],
-                    'selesai'    => ['label' => 'Selesai',       'icon' => '✅'],
+                $statusOrder = ['pending', 'diproses', 'dikirim', 'selesai'];
+                $steps = [
+                    ['status' => 'pending', 'label' => 'Dikonfirmasi'],
+                    ['status' => 'diproses', 'label' => 'Diproses'],
+                    ['status' => 'dikirim', 'label' => 'Dikirim'],
+                    ['status' => 'selesai', 'label' => 'Selesai'],
                 ];
-                $currentStatus = $order->status_order;
-                $currentIndex  = array_search($currentStatus, $statusSteps);
-                $isCancelled   = $currentStatus === 'dibatalkan';
-                   {{-- ===== Progress Bar Status ===== --}}
-            <div class="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8 relative overflow-hidden">
-                <div class="absolute -top-10 -right-10 w-40 h-40 bg-sky-50 rounded-full blur-3xl opacity-50"></div>
-                <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-8 relative z-10">Lacak Status Realtime</h3>
+                $isCancelled = $order->status_order === 'dibatalkan';
+            @endphp
+
+            <div class="bg-white overflow-hidden shadow-[0_20px_50px_rgba(220,_38,_38,_0.05)] sm:rounded-[2.5rem] border border-slate-100 p-10 mb-8 relative overflow-hidden group">
+                <div class="absolute -top-10 -right-10 w-40 h-40 bg-red-50 rounded-full blur-3xl opacity-50 group-hover:scale-150 transition-transform duration-1000"></div>
  
-                @if($isCancelled)
-                    <div class="flex items-center gap-4 bg-rose-50 border border-rose-100 rounded-2xl p-6 text-rose-700 relative z-10 animate-pulse">
-                        <span class="text-3xl">❌</span>
+                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
+                    <div class="flex items-center gap-6">
+                        <div class="w-16 h-16 bg-red-600 rounded-2xl flex items-center justify-center text-3xl shadow-xl shadow-red-100 animate-pulse">📦</div>
                         <div>
-                            <p class="font-black font-outfit uppercase tracking-tight">Pesanan Dibatalkan</p>
-                            <p class="text-sm font-medium italic">Maaf, pesanan ini telah dibatalkan oleh sistem atau admin.</p>
+                            <h3 class="text-2xl font-black text-slate-900 font-outfit uppercase tracking-tight">Status: <span class="text-red-600 uppercase">{{ str_replace('_', ' ', $order->status_order) }}</span></h3>
+                            <p class="text-slate-500 font-medium italic mt-1">Terakhir diperbarui: {{ $order->updated_at->diffForHumans() }}</p>
                         </div>
                     </div>
-                @else
-                    <div class="flex items-center justify-between relative z-10">
-                        @foreach($statusSteps as $i => $step)
-                            @php
-                                $isDone   = $currentIndex !== false && $i <= $currentIndex;
-                                $isActive = $currentIndex !== false && $i === $currentIndex;
-                                $cfg      = $statusLabels[$step];
-                            @endphp
-                            <div class="flex flex-col items-center flex-1 relative">
-                                {{-- Connector line --}}
-                                @if($i < count($statusSteps) - 1)
-                                    <div class="absolute top-6 left-1/2 w-full h-[3px] {{ $isDone && $i < $currentIndex ? 'bg-sky-500' : 'bg-slate-100' }}"></div>
-                                @endif
- 
-                                {{-- Circle --}}
-                                <div class="relative z-10 w-12 h-12 rounded-2xl flex items-center justify-center text-xl font-bold transition-all duration-500
-                                    {{ $isActive ? 'bg-sky-600 text-white shadow-xl shadow-sky-200 scale-110 ring-4 ring-sky-50' : ($isDone ? 'bg-sky-500 text-white' : 'bg-slate-100 text-slate-300') }}">
-                                    {{ $isDone ? $cfg['icon'] : ($i + 1) }}
-                                </div>
-                                <span class="mt-4 text-[10px] font-black uppercase tracking-widest text-center transition-colors duration-500 {{ $isActive ? 'text-sky-600' : ($isDone ? 'text-slate-600' : 'text-slate-300') }}">
-                                    {{ $cfg['label'] }}
-                                </span>
-                            </div>
-                        @endforeach
+                    <div class="flex gap-4">
+                        <a href="{{ route('customer.orders.index') }}" class="px-6 py-3 bg-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-600 rounded-xl hover:bg-slate-200 transition shadow-sm">Kembali Ke List</a>
                     </div>
-                @endif
+                </div>
             </div>
-         </div>
+
+            @if(!$isCancelled)
+            <div class="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8 relative overflow-hidden">
+                <div class="flex items-center justify-between relative z-10">
+                    @foreach($steps as $step)
+                        @php 
+                            $isCompleted = array_search($order->status_order, $statusOrder) >= array_search($step['status'], $statusOrder);
+                            $isActive = $order->status_order === $step['status'];
+                        @endphp
+                        <div class="flex flex-col items-center relative z-10 w-full group/step">
+                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-4 transition-all duration-500 shadow-xl border-2 {{ $isActive ? 'bg-red-600 text-white border-red-200 scale-125' : ($isCompleted ? 'bg-red-100 text-red-600 border-red-200' : 'bg-slate-50 text-slate-300 border-slate-100 group-hover/step:border-red-100 hover:scale-110') }}">
+                                @if($isCompleted && !$isActive)
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                @else
+                                    <span class="text-lg font-black font-outfit">{{ $loop->iteration }}</span>
+                                @endif
+                            </div>
+                            <span class="text-[10px] font-black uppercase tracking-[0.2em] {{ $isActive ? 'text-red-600' : ($isCompleted ? 'text-slate-800' : 'text-slate-400') }}">{{ $step['label'] }}</span>
+                            @if(!$loop->last)
+                                <div class="absolute top-6 left-[60%] w-[80%] h-0.5 {{ $isCompleted ? 'bg-red-200' : 'bg-slate-100' }} -z-10 hidden md:block"></div>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
 
             {{-- ===== Info Order ===== --}}
             <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
@@ -81,7 +76,7 @@
                     </div>
                     <div>
                         <dt class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Pembayaran</dt>
-                        <dd class="font-black text-sky-600 text-2xl font-outfit italic tracking-tighter">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</dd>
+                        <dd class="font-black text-red-600 text-2xl font-outfit italic tracking-tighter">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</dd>
                     </div>
                     <div>
                         <dt class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Status Saat Ini</dt>
@@ -172,7 +167,7 @@
 
                             <div class="text-right shrink-0">
                                 <p class="text-xs text-slate-500">Subtotal</p>
-                                <p class="font-bold text-indigo-600 text-lg">Rp {{ number_format($detail->subtotal, 0, ',', '.') }}</p>
+                                <p class="font-bold text-red-600 text-lg">Rp {{ number_format($detail->subtotal, 0, ',', '.') }}</p>
                             </div>
                         </div>
 

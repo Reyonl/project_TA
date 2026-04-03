@@ -26,31 +26,26 @@
         <nav class="w-full py-4 px-4 sm:px-6 lg:px-8 border-b border-slate-200 sticky top-0 bg-white/80 backdrop-blur-md z-[100]">
             <div class="max-w-[1400px] mx-auto flex justify-between items-center">
                 <div class="flex items-center gap-12">
-                    <a href="{{ route('home') }}" class="flex items-center gap-2">
-                        <div class="w-8 h-8 bg-sky-600 rounded-lg flex items-center justify-center shadow-lg shadow-sky-100">
-                             <span class="text-white font-black text-sm font-outfit">D</span>
-                        </div>
-                        <span class="text-xl font-black font-outfit tracking-tighter text-slate-900">
-                            DAILY<span class="text-sky-600">.CO</span>
-                        </span>
+                    <a href="{{ route('home') }}" class="hover:opacity-80 transition duration-300">
+                        <img src="{{ asset('images/logo-dailyco.png') }}" class="h-12 w-auto" alt="DAILY.CO Logo">
                     </a>
                     <!-- Breadcrumbs -->
                     <div class="hidden md:flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
-                        <a href="{{ route('home') }}" class="hover:text-sky-600 transition">Katalog</a>
+                        <a href="{{ route('home') }}" class="hover:text-red-600 transition">Katalog</a>
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                         <span class="text-slate-600">{{ $produk->nama_produk }}</span>
                     </div>
                 </div>
                 <div class="flex gap-6 items-center">
                     @auth('customer')
-                        <a href="{{ route('customer.dashboard') }}" class="text-xs font-bold text-slate-600 hover:text-sky-600 transition uppercase tracking-widest">Dashboard</a>
+                        <a href="{{ route('customer.dashboard') }}" class="text-xs font-bold text-slate-600 hover:text-red-600 transition uppercase tracking-widest">Dashboard</a>
                     @else
                         @auth('admin')
-                            <a href="{{ route('admin.dashboard') }}" class="text-xs font-bold text-slate-600 hover:text-sky-600 transition uppercase tracking-widest">Admin Panel</a>
+                            <a href="{{ route('admin.dashboard') }}" class="text-xs font-bold text-slate-600 hover:text-red-600 transition uppercase tracking-widest">Admin Panel</a>
                         @else
-                            <a href="{{ route('login') }}" class="text-xs font-bold text-slate-600 hover:text-sky-600 transition uppercase tracking-widest">Masuk</a>
+                            <a href="{{ route('login') }}" class="text-xs font-bold text-slate-600 hover:text-red-600 transition uppercase tracking-widest">Masuk</a>
                             @if (Route::has('register'))
-                                <a href="{{ route('register') }}" class="text-xs font-black bg-sky-600 text-white px-5 py-2.5 rounded-xl hover:bg-sky-500 transition shadow-lg shadow-sky-100 uppercase tracking-widest">Mulai Desain</a>
+                                <a href="{{ route('register') }}" class="text-xs font-black bg-red-600 text-white px-5 py-2.5 rounded-xl hover:bg-red-500 transition shadow-lg shadow-red-100 uppercase tracking-widest">Mulai Desain</a>
                             @endif
                         @endauth
                     @endauth
@@ -59,7 +54,18 @@
         </nav>
 
         <!-- Product Detail Area -->
-        <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col lg:flex-row gap-12" x-data="{ selectedColor: 'White', selectedSize: 'L' }">
+        <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col lg:flex-row gap-12" 
+              x-data="{ 
+                  selectedColor: 'White', 
+                  selectedSize: 'L',
+                  colorMap: {
+                      'White': '#ffffff', 'Black': '#1e293b', 'Navy': '#1e3a8a', 
+                      'Dark Grey': '#334155', 'Red': '#dc2626', 'Forest Green': '#14532d', 
+                      'Maroon': '#7f1d1d', 'Military Green': '#4B5320', 'Sand': '#D2B48C',
+                      'Light Blue': '#93c5fd', 'Pink': '#f472b6', 'Purple': '#6d28d9',
+                      'Orange': '#f97316', 'Yellow': '#facc15', 'Teal': '#0d9488'
+                  }
+              }">
             
             <!-- Left Side: Gallery Viewer -->
             <div class="w-full lg:w-[60%] flex gap-4 xl:gap-6 sticky top-24 h-fit">
@@ -83,20 +89,44 @@
                 </div>
                 
                 <!-- Main Image -->
-                <div class="flex-1 bg-slate-100/80 rounded-xl overflow-hidden relative flex items-center justify-center p-8 lg:p-12 border border-slate-200 min-h-[400px] lg:min-h-[600px]">
-                    <img src="{{ asset('images/mockups/'.$baseImg) }}" alt="{{ $produk->nama_produk }}" class="w-full h-auto max-h-[600px] object-contain drop-shadow-2xl transition duration-500 hover:scale-105">
+                <div class="flex-1 bg-slate-50/50 rounded-[3rem] overflow-hidden relative flex items-center justify-center p-8 lg:p-12 border border-slate-100 min-h-[400px] lg:min-h-[600px] group shadow-sm">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-200/20 to-transparent"></div>
+                    
+                    @php $maskUrl = asset('images/mockups/'.$baseImg); @endphp
+                    <!-- Interactive Tinted Preview -->
+                    <div class="relative w-full h-full max-h-[500px] aspect-square flex items-center justify-center group-hover:scale-105 transition-transform duration-700">
+                        <!-- Shadow/Texture Layer (Transparent Overlay) -->
+                        <img src="{{ $maskUrl }}" class="absolute w-full h-full object-contain mix-blend-multiply opacity-30 z-20 pointer-events-none">
+                        
+                        <!-- Base Colored Layer with Mask -->
+                        <div class="absolute inset-0 transition-colors duration-500 z-10"
+                             :style="{ 
+                                 backgroundColor: colorMap[selectedColor],
+                                 WebkitMaskImage: 'url({{ $maskUrl }})',
+                                 maskImage: 'url({{ $maskUrl }})',
+                                 WebkitMaskSize: 'contain',
+                                 maskSize: 'contain',
+                                 WebkitMaskPosition: 'center',
+                                 maskPosition: 'center',
+                                 WebkitMaskRepeat: 'no-repeat',
+                                 maskRepeat: 'no-repeat'
+                             }">
+                        </div>
+                        
+                        <!-- Highlights Layer (Additive) -->
+                        <img src="{{ $maskUrl }}" class="absolute w-full h-full object-contain opacity-20 mix-blend-screen z-30 pointer-events-none">
+                    </div>
                     
                     <!-- Favorite Icon -->
-                    <button class="absolute top-6 right-6 p-2.5 bg-white/90 backdrop-blur rounded-full shadow-md text-slate-400 hover:text-red-500 transition border border-slate-200">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                    <button class="absolute top-8 right-8 p-3.5 bg-white/90 backdrop-blur rounded-2xl shadow-xl shadow-slate-200/50 text-slate-300 hover:text-red-500 transition border border-slate-100 group/fav">
+                        <svg class="w-6 h-6 transform group-hover/fav:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
                     </button>
-                    
+ 
                     <!-- Interactive Callout -->
-                    <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2">
-                        <button class="w-2.5 h-2.5 rounded-full bg-slate-800"></button>
-                        <button class="w-2.5 h-2.5 rounded-full bg-slate-300"></button>
-                        <button class="w-2.5 h-2.5 rounded-full bg-slate-300"></button>
-                        <button class="w-2.5 h-2.5 rounded-full bg-slate-300"></button>
+                    <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex gap-3">
+                        <template x-for="i in 4">
+                            <button class="w-2.5 h-2.5 rounded-full bg-slate-200 hover:bg-red-400 transition-colors"></button>
+                        </template>
                     </div>
                 </div>
             </div>
@@ -119,14 +149,14 @@
                 </div>
 
                 <!-- Info Box (Premium Style) -->
-                <div class="bg-sky-50 border border-sky-100 rounded-2xl p-6 mb-8 flex gap-4 shadow-sm relative overflow-hidden group">
-                    <div class="absolute -right-2 -bottom-2 text-sky-200/40 group-hover:scale-110 transition-transform duration-700">
+                <div class="bg-red-50 border border-red-100 rounded-2xl p-6 mb-8 flex gap-4 shadow-sm relative overflow-hidden group">
+                    <div class="absolute -right-2 -bottom-2 text-red-200/40 group-hover:scale-110 transition-transform duration-700">
                          <svg class="w-20 h-20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
                     </div>
                     <div>
-                        <h4 class="font-black text-sky-900 text-sm mb-1 uppercase tracking-tight">Panduan Bahan & Ukuran</h4>
-                        <p class="text-sm text-sky-700/80 mb-3 leading-relaxed font-medium italic">Pastikan brand Anda mendapatkan kualitas terbaik dengan panduan presisi kami.</p>
-                        <a href="#" class="text-xs font-black text-sky-600 hover:text-sky-800 flex items-center gap-1 uppercase tracking-widest">
+                        <h4 class="font-black text-red-900 text-sm mb-1 uppercase tracking-tight">Panduan Bahan & Ukuran</h4>
+                        <p class="text-sm text-red-700/80 mb-3 leading-relaxed font-medium italic">Pastikan brand Anda mendapatkan kualitas terbaik dengan panduan presisi kami.</p>
+                        <a href="#" class="text-xs font-black text-red-600 hover:text-red-800 flex items-center gap-1 uppercase tracking-widest">
                             LIHAT DETAIL
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
                         </a>
@@ -237,7 +267,7 @@
 
                 <!-- Call to Action -->
                 <div class="mt-auto">
-                    <a href="{{ route('customer.designs.editor', $produk->id_produk) }}" class="group relative block w-full text-center py-5 rounded-2xl bg-sky-600 hover:bg-sky-500 text-white font-black text-xl shadow-2xl shadow-sky-200 transition-all duration-300 transform active:scale-[0.98] overflow-hidden">
+                    <a href="{{ route('customer.designs.editor', $produk->id_produk) }}" class="group relative block w-full text-center py-5 rounded-2xl bg-red-600 hover:bg-red-500 text-white font-black text-xl shadow-2xl shadow-red-200 transition-all duration-300 transform active:scale-[0.98] overflow-hidden">
                         <span class="relative z-10 flex items-center justify-center gap-3">
                             MULAI DESAIN SEKARANG
                             <svg class="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>

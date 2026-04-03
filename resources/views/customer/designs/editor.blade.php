@@ -12,19 +12,19 @@
             
             <!-- Navbar Kiri Tepi (Icon Only) -->
             <div class="w-16 bg-white border-r border-slate-200 flex flex-col items-center py-4 gap-4 z-30 shadow-sm flex-shrink-0">
-                <button @click="activeTab = 'templates'; sidebarOpen = true" :class="activeTab === 'templates' && sidebarOpen ? 'text-sky-600 bg-sky-50' : 'text-slate-500 hover:text-sky-600 hover:bg-slate-50'" class="w-12 h-12 flex flex-col items-center justify-center rounded-xl transition">
+                <button @click="activeTab = 'templates'; sidebarOpen = true" :class="activeTab === 'templates' && sidebarOpen ? 'text-red-600 bg-red-50' : 'text-slate-500 hover:text-red-600 hover:bg-slate-50'" class="w-12 h-12 flex flex-col items-center justify-center rounded-xl transition">
                     <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path></svg>
                     <span class="text-[9px] font-bold uppercase tracking-tighter">Tools</span>
                 </button>
-                <button @click="activeTab = 'upload'; sidebarOpen = true" :class="activeTab === 'upload' && sidebarOpen ? 'text-sky-600 bg-sky-50' : 'text-slate-500 hover:text-sky-600 hover:bg-slate-50'" class="w-12 h-12 flex flex-col items-center justify-center rounded-xl transition">
+                <button @click="activeTab = 'upload'; sidebarOpen = true" :class="activeTab === 'upload' && sidebarOpen ? 'text-red-600 bg-red-50' : 'text-slate-500 hover:text-red-600 hover:bg-slate-50'" class="w-12 h-12 flex flex-col items-center justify-center rounded-xl transition">
                     <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                     <span class="text-[9px] font-bold uppercase tracking-tighter">Upload</span>
                 </button>
-                <button @click="activeTab = 'stickers'; sidebarOpen = true" :class="activeTab === 'stickers' && sidebarOpen ? 'text-sky-600 bg-sky-50' : 'text-slate-500 hover:text-sky-600 hover:bg-slate-50'" class="w-12 h-12 flex flex-col items-center justify-center rounded-xl transition">
+                <button @click="activeTab = 'stickers'; sidebarOpen = true" :class="activeTab === 'stickers' && sidebarOpen ? 'text-red-600 bg-red-50' : 'text-slate-500 hover:text-red-600 hover:bg-slate-50'" class="w-12 h-12 flex flex-col items-center justify-center rounded-xl transition">
                     <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     <span class="text-[9px] font-bold uppercase tracking-tighter">Stiker</span>
                 </button>
-                <button @click="activeTab = 'text'; sidebarOpen = true" :class="activeTab === 'text' && sidebarOpen ? 'text-sky-600 bg-sky-50' : 'text-slate-500 hover:text-sky-600 hover:bg-slate-50'" class="w-12 h-12 flex flex-col items-center justify-center rounded-xl transition">
+                <button @click="activeTab = 'text'; sidebarOpen = true" :class="activeTab === 'text' && sidebarOpen ? 'text-red-600 bg-red-50' : 'text-slate-500 hover:text-red-600 hover:bg-slate-50'" class="w-12 h-12 flex flex-col items-center justify-center rounded-xl transition">
                     <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
                     <span class="text-[9px] font-bold uppercase tracking-tighter">Teks</span>
                 </button>
@@ -56,7 +56,7 @@
                         <p class="text-[11px] font-bold text-slate-400 mb-2 uppercase tracking-tight">Katalog Aset Desain</p>
                         <div class="grid grid-cols-2 gap-3">
                             @forelse($templates as $template)
-                                <div class="bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-sky-500 hover:shadow-lg hover:shadow-sky-100 transition aspect-square flex items-center justify-center bg-slate-50 p-2 template-item group" data-url="{{ Storage::url($template->file_template) }}">
+                                <div class="bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-red-500 hover:shadow-lg hover:shadow-red-100 transition aspect-square flex items-center justify-center bg-slate-50 p-2 template-item group" data-url="{{ Storage::url($template->file_template) }}">
                                     <img src="{{ Storage::url($template->file_template) }}" alt="Template" class="w-full h-full object-contain pointer-events-none group-hover:scale-110 transition-transform">
                                 </div>
                             @empty
@@ -64,25 +64,25 @@
                             @endforelse
                         </div>
                     </div>
-
+ 
                     <!-- Tab: UPLOAD -->
                     <div x-show="activeTab === 'upload'" style="display: none;" class="space-y-4">
                         <p class="text-[11px] font-bold text-slate-400 mb-2 uppercase tracking-tight">Unggah Aset Anda</p>
-                        <label class="block w-full border-2 border-dashed border-sky-100 rounded-2xl p-8 text-center hover:bg-sky-50 hover:border-sky-300 cursor-pointer transition group">
+                        <label class="block w-full border-2 border-dashed border-red-100 rounded-2xl p-8 text-center hover:bg-red-50 hover:border-red-300 cursor-pointer transition group">
                             <input type="file" id="imageLoader" accept="image/png, image/jpeg, image/svg+xml" class="hidden"/>
-                            <div class="text-sky-500 mb-3 group-hover:scale-125 transition-transform duration-300">
+                            <div class="text-red-500 mb-3 group-hover:scale-125 transition-transform duration-300">
                                 <svg class="w-10 h-10 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
                             </div>
-                            <span class="text-sky-600 font-black block text-sm">KLIK UNTUK UNGGAH</span>
+                            <span class="text-red-600 font-black block text-sm">KLIK UNTUK UNGGAH</span>
                             <span class="text-slate-400 text-[10px] mt-1 block font-bold">PNG / JPG / SVG (Max 2MB)</span>
                         </label>
                     </div>
-
+ 
                     <!-- Tab: STIKER -->
                     <div x-show="activeTab === 'stickers'" style="display: none;" class="flex flex-col h-full bg-white">
                          <div class="flex mb-4 group">
-                            <input type="text" id="stickerSearchInput" placeholder="Cari ikon..." class="flex-1 border border-slate-200 rounded-l-xl px-3 py-2 text-sm focus:ring-sky-500 focus:border-sky-500 bg-slate-50">
-                            <button id="searchStickerBtn" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-r-xl text-sm font-bold transition-colors">
+                            <input type="text" id="stickerSearchInput" placeholder="Cari ikon..." class="flex-1 border border-slate-200 rounded-l-xl px-3 py-2 text-sm focus:ring-red-500 focus:border-red-500 bg-slate-50">
+                            <button id="searchStickerBtn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-r-xl text-sm font-bold transition-colors">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                             </button>
                         </div>
@@ -90,10 +90,10 @@
                             <div class="col-span-2 text-center text-xs text-slate-400 py-4 italic tracking-widest">Memuat library...</div>
                         </div>
                     </div>
-
+ 
                     <!-- Tab: TEKS -->
                     <div x-show="activeTab === 'text'" style="display: none;" class="space-y-4">
-                        <button id="addTextBtn" class="w-full bg-sky-600 text-white font-black py-4 px-4 rounded-2xl shadow-xl shadow-sky-100 hover:bg-sky-500 transition hover:-translate-y-1">
+                        <button id="addTextBtn" class="w-full bg-red-600 text-white font-black py-4 px-4 rounded-2xl shadow-xl shadow-red-100 hover:bg-red-500 transition hover:-translate-y-1">
                             + TAMBAH TEKS BARU
                         </button>
                         <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
@@ -111,37 +111,36 @@
                 <div class="h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-6 shadow-sm z-10 w-full flex-shrink-0">
                     <div class="flex items-center gap-4">
                         <div class="flex items-center gap-2">
-                            <div class="w-6 h-6 bg-sky-600 rounded flex items-center justify-center">
-                                <span class="text-white text-[10px] font-black">D</span>
-                            </div>
-                            <span class="font-black text-slate-800 text-sm tracking-tighter uppercase">{{ $produk->nama_produk }}</span>
+                            <a href="{{ route('home') }}" class="flex items-center gap-2 hover:opacity-80 transition">
+                                <img src="{{ asset('images/logo-dailyco.png') }}" class="h-10 w-auto" alt="Logo">
+                            </a>
                         </div>
                         
                         <!-- Toggle Sidebar for Mobile/Small Screens if hidden -->
-                        <button x-show="!sidebarOpen" @click="sidebarOpen = true" class="p-2 text-sky-600 hover:bg-sky-50 rounded-lg transition ml-2">
+                        <button x-show="!sidebarOpen" @click="sidebarOpen = true" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition ml-2">
                              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>
                         </button>
-
+ 
                         <!-- Sisi Baju Toggle -->
                         <div class="flex items-center bg-slate-100 rounded-xl p-1 border border-slate-200 ml-4 shadow-inner">
-                            <button @click="activeSide = 'front'; window.switchCanvasSide('front')" :class="activeSide === 'front' ? 'bg-white shadow-sm text-sky-700 font-extrabold' : 'text-slate-500 hover:text-slate-700'" class="px-5 py-1.5 text-xs rounded-lg transition-all">DEPAN</button>
-                            <button @click="activeSide = 'back'; window.switchCanvasSide('back')" :class="activeSide === 'back' ? 'bg-white shadow-sm text-sky-700 font-extrabold' : 'text-slate-500 hover:text-slate-700'" class="px-5 py-1.5 text-xs rounded-lg transition-all">BELAKANG</button>
+                            <button @click="activeSide = 'front'; window.switchCanvasSide('front')" :class="activeSide === 'front' ? 'bg-white shadow-sm text-red-700 font-extrabold' : 'text-slate-500 hover:text-slate-700'" class="px-5 py-1.5 text-xs rounded-lg transition-all">DEPAN</button>
+                            <button @click="activeSide = 'back'; window.switchCanvasSide('back')" :class="activeSide === 'back' ? 'bg-white shadow-sm text-red-700 font-extrabold' : 'text-slate-500 hover:text-slate-700'" class="px-5 py-1.5 text-xs rounded-lg transition-all">BELAKANG</button>
                         </div>
                         
                         <!-- Base Color Picker -->
                         <div class="flex items-center gap-3 border-l border-slate-200 pl-4">
                             <span class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Warna Dasar:</span>
                             <div class="flex gap-1.5">
-                                <button @click="baseColor = '#ffffff'; canvasBackgroundChange('#ffffff')" class="w-5 h-5 rounded-full bg-white border border-slate-300 shadow-sm hover:ring-2 hover:ring-sky-400 hover:ring-offset-2 transition" title="Putih"></button>
-                                <button @click="baseColor = '#1e293b'; canvasBackgroundChange('#1e293b')" class="w-5 h-5 rounded-full bg-slate-800 border border-transparent shadow-sm hover:ring-2 hover:ring-sky-400 hover:ring-offset-2 transition" title="Navy"></button>
-                                <button @click="baseColor = '#ef4444'; canvasBackgroundChange('#ef4444')" class="w-5 h-5 rounded-full bg-red-500 border border-transparent shadow-sm hover:ring-2 hover:ring-sky-400 hover:ring-offset-2 transition" title="Merah"></button>
-                                <button @click="baseColor = '#0284c7'; canvasBackgroundChange('#0284c7')" class="w-5 h-5 rounded-full bg-sky-600 border border-transparent shadow-sm hover:ring-2 hover:ring-sky-400 hover:ring-offset-2 transition" title="Sky Blue"></button>
-                                <button @click="baseColor = '#059669'; canvasBackgroundChange('#059669')" class="w-5 h-5 rounded-full bg-emerald-600 border border-transparent shadow-sm hover:ring-2 hover:ring-sky-400 hover:ring-offset-2 transition" title="Hijau"></button>
+                                <button @click="baseColor = '#ffffff'; canvasBackgroundChange('#ffffff')" class="w-5 h-5 rounded-full bg-white border border-slate-300 shadow-sm hover:ring-2 hover:ring-red-400 hover:ring-offset-2 transition" title="Putih"></button>
+                                <button @click="baseColor = '#1e293b'; canvasBackgroundChange('#1e293b')" class="w-5 h-5 rounded-full bg-slate-800 border border-transparent shadow-sm hover:ring-2 hover:ring-red-400 hover:ring-offset-2 transition" title="Navy"></button>
+                                <button @click="baseColor = '#ef4444'; canvasBackgroundChange('#ef4444')" class="w-5 h-5 rounded-full bg-red-600 border border-transparent shadow-sm hover:ring-2 hover:ring-red-400 hover:ring-offset-2 transition" title="Merah"></button>
+                                <button @click="baseColor = '#0284c7'; canvasBackgroundChange('#0284c7')" class="w-5 h-5 rounded-full bg-blue-600 border border-transparent shadow-sm hover:ring-2 hover:ring-red-400 hover:ring-offset-2 transition" title="Royal Blue"></button>
+                                <button @click="baseColor = '#059669'; canvasBackgroundChange('#059669')" class="w-5 h-5 rounded-full bg-emerald-600 border border-transparent shadow-sm hover:ring-2 hover:ring-red-400 hover:ring-offset-2 transition" title="Hijau"></button>
                             </div>
                         </div>
                     </div>
                     
-                    <button id="saveDesignBtn" class="bg-sky-600 text-white font-black py-2.5 px-8 rounded-xl shadow-xl shadow-sky-100 hover:bg-sky-500 transition hover:-translate-y-1 flex items-center gap-2 text-xs uppercase tracking-widest">
+                    <button id="saveDesignBtn" class="bg-red-600 text-white font-black py-2.5 px-8 rounded-xl shadow-xl shadow-red-100 hover:bg-red-500 transition hover:-translate-y-1 flex items-center gap-2 text-xs uppercase tracking-widest">
                         <span>{{ $desainRevisi ? 'SIMPAN REVISI' : 'KONFIRMASI DESAIN' }}</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
                     </button>
@@ -245,12 +244,12 @@ iv>
                         
                         <!-- Print Area Visualizer (Kotak Dashed) Transparan yang letaknya pas di dada -->
                         <div class="absolute z-10 border border-dashed border-slate-600/40 pointer-events-none rounded transition-colors group" id="printAreaBox" style="width: 220px; height: 320px; top: 120px; left: 130px;">
-                            <span class="absolute -top-7 left-1/2 transform -translate-x-1/2 text-[10px] text-slate-600 font-black uppercase tracking-widest bg-sky-50/80 px-3 py-1 rounded-full backdrop-blur border border-sky-200/50 shadow-sm ">Area Cetak</span>
+                            <span class="absolute -top-7 left-1/2 transform -translate-x-1/2 text-[10px] text-slate-600 font-black uppercase tracking-widest bg-red-50/80 px-3 py-1 rounded-full backdrop-blur border border-red-200/50 shadow-sm ">Area Cetak</span>
                             <!-- Glow Corners -->
-                            <div class="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-sky-400"></div>
-                            <div class="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-sky-400"></div>
-                            <div class="absolute -bottom-1 -left-1 w-3 h-3 border-b-2 border-l-2 border-sky-400"></div>
-                            <div class="absolute -bottom-1 -right-1 w-3 h-3 border-b-2 border-r-2 border-sky-400"></div>
+                            <div class="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-red-400"></div>
+                            <div class="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-red-400"></div>
+                            <div class="absolute -bottom-1 -left-1 w-3 h-3 border-b-2 border-l-2 border-red-400"></div>
+                            <div class="absolute -bottom-1 -right-1 w-3 h-3 border-b-2 border-r-2 border-red-400"></div>
                         </div>
 
                         <!-- Fabric.js Canvas hanya sebesar area cetak didada -->
