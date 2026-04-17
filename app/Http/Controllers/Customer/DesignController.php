@@ -39,6 +39,12 @@ class DesignController extends Controller
             'file_desain_belakang' => 'nullable|string',
             'lebar_cm_belakang' => 'nullable|numeric',
             'tinggi_cm_belakang' => 'nullable|numeric',
+            'file_desain_kiri' => 'nullable|string',
+            'lebar_cm_kiri' => 'nullable|numeric',
+            'tinggi_cm_kiri' => 'nullable|numeric',
+            'file_desain_kanan' => 'nullable|string',
+            'lebar_cm_kanan' => 'nullable|numeric',
+            'tinggi_cm_kanan' => 'nullable|numeric',
             'warna_baju' => 'nullable|string',
             'tipe_proses' => 'nullable|in:sablon,bordir',
         ]);
@@ -73,15 +79,51 @@ class DesignController extends Controller
             }
         }
 
+        // Memproses desain kiri jika ada
+        $fileNameKiri = null;
+        if ($request->filled('file_desain_kiri')) {
+            $base64_image_kiri = $request->file_desain_kiri;
+            if (preg_match('/^data:image\/(\w+);base64,/', $base64_image_kiri, $typeKiri)) {
+                $image_base64_k = substr($base64_image_kiri, strpos($base64_image_kiri, ',') + 1);
+                $extKiri = strtolower($typeKiri[1]);
+                $image_base64_k = str_replace(' ', '+', $image_base64_k);
+                $image_data_k = base64_decode($image_base64_k);
+                
+                $fileNameKiri = 'designs/' . Str::random(40) . '-left.' . $extKiri;
+                Storage::disk('public')->put($fileNameKiri, $image_data_k);
+            }
+        }
+
+        // Memproses desain kanan jika ada
+        $fileNameKanan = null;
+        if ($request->filled('file_desain_kanan')) {
+            $base64_image_kanan = $request->file_desain_kanan;
+            if (preg_match('/^data:image\/(\w+);base64,/', $base64_image_kanan, $typeKanan)) {
+                $image_base64_kn = substr($base64_image_kanan, strpos($base64_image_kanan, ',') + 1);
+                $extKanan = strtolower($typeKanan[1]);
+                $image_base64_kn = str_replace(' ', '+', $image_base64_kn);
+                $image_data_kn = base64_decode($image_base64_kn);
+                
+                $fileNameKanan = 'designs/' . Str::random(40) . '-right.' . $extKanan;
+                Storage::disk('public')->put($fileNameKanan, $image_data_kn);
+            }
+        }
+
         $desain = Desain::create([
             'id_customer' => auth()->guard('customer')->id(),
             'id_template' => $request->id_template, // Bisa null
             'file_desain' => $fileName,
             'file_desain_belakang' => $fileNameBelakang,
+            'file_desain_kiri' => $fileNameKiri,
+            'file_desain_kanan' => $fileNameKanan,
             'lebar_cm' => $request->lebar_cm,
             'lebar_cm_belakang' => $request->lebar_cm_belakang,
             'tinggi_cm' => $request->tinggi_cm,
             'tinggi_cm_belakang' => $request->tinggi_cm_belakang,
+            'lebar_cm_kiri' => $request->lebar_cm_kiri,
+            'tinggi_cm_kiri' => $request->tinggi_cm_kiri,
+            'lebar_cm_kanan' => $request->lebar_cm_kanan,
+            'tinggi_cm_kanan' => $request->tinggi_cm_kanan,
             'harga_desain' => 20000, // Misal tarif sablon custom 20.000
             'tanggal_upload' => now(),
             'warna_baju' => $request->warna_baju,
@@ -113,6 +155,12 @@ class DesignController extends Controller
             'file_desain_belakang' => 'nullable|string',
             'lebar_cm_belakang' => 'nullable|numeric',
             'tinggi_cm_belakang' => 'nullable|numeric',
+            'file_desain_kiri' => 'nullable|string',
+            'lebar_cm_kiri' => 'nullable|numeric',
+            'tinggi_cm_kiri' => 'nullable|numeric',
+            'file_desain_kanan' => 'nullable|string',
+            'lebar_cm_kanan' => 'nullable|numeric',
+            'tinggi_cm_kanan' => 'nullable|numeric',
             'warna_baju' => 'nullable|string',
         ]);
 
@@ -154,10 +202,50 @@ class DesignController extends Controller
             }
         }
 
+        if ($request->filled('file_desain_kiri')) {
+            $base64_image_kiri = $request->file_desain_kiri;
+            if (preg_match('/^data:image\/(\w+);base64,/', $base64_image_kiri, $typeKiri)) {
+                $image_base64_k = substr($base64_image_kiri, strpos($base64_image_kiri, ',') + 1);
+                $extKiri = strtolower($typeKiri[1]);
+                $image_base64_k = str_replace(' ', '+', $image_base64_k);
+                $image_data_k = base64_decode($image_base64_k);
+                $fileNameKiri = 'designs/' . Str::random(40) . '-revisi-left.' . $extKiri;
+                Storage::disk('public')->put($fileNameKiri, $image_data_k);
+                
+                // Delete old
+                if ($desain->file_desain_kiri) {
+                    Storage::disk('public')->delete($desain->file_desain_kiri);
+                }
+                $desain->file_desain_kiri = $fileNameKiri;
+            }
+        }
+
+        if ($request->filled('file_desain_kanan')) {
+            $base64_image_kanan = $request->file_desain_kanan;
+            if (preg_match('/^data:image\/(\w+);base64,/', $base64_image_kanan, $typeKanan)) {
+                $image_base64_kn = substr($base64_image_kanan, strpos($base64_image_kanan, ',') + 1);
+                $extKanan = strtolower($typeKanan[1]);
+                $image_base64_kn = str_replace(' ', '+', $image_base64_kn);
+                $image_data_kn = base64_decode($image_base64_kn);
+                $fileNameKanan = 'designs/' . Str::random(40) . '-revisi-right.' . $extKanan;
+                Storage::disk('public')->put($fileNameKanan, $image_data_kn);
+                
+                // Delete old
+                if ($desain->file_desain_kanan) {
+                    Storage::disk('public')->delete($desain->file_desain_kanan);
+                }
+                $desain->file_desain_kanan = $fileNameKanan;
+            }
+        }
+
         $desain->lebar_cm = $request->lebar_cm;
         $desain->tinggi_cm = $request->tinggi_cm;
         $desain->lebar_cm_belakang = $request->lebar_cm_belakang;
         $desain->tinggi_cm_belakang = $request->tinggi_cm_belakang;
+        $desain->lebar_cm_kiri = $request->lebar_cm_kiri;
+        $desain->tinggi_cm_kiri = $request->tinggi_cm_kiri;
+        $desain->lebar_cm_kanan = $request->lebar_cm_kanan;
+        $desain->tinggi_cm_kanan = $request->tinggi_cm_kanan;
         $desain->warna_baju = $request->warna_baju;
         $desain->save();
 

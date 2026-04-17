@@ -57,8 +57,14 @@
                                             <img src="{{ Str::startsWith($cart->desain->file_desain, 'data:image') ? $cart->desain->file_desain : Storage::url($cart->desain->file_desain) }}" class="w-full h-full object-contain">
                                         </div>
 
-                                        @if($cart->desain->file_desain_belakang)
-                                        <span class="absolute bottom-1 right-1 bg-indigo-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow shadow-indigo-200">2 Sisi</span>
+                                        @php 
+                                            $sisiCount = 1;
+                                            if($cart->desain->file_desain_belakang) $sisiCount++;
+                                            if($cart->desain->file_desain_kiri) $sisiCount++;
+                                            if($cart->desain->file_desain_kanan) $sisiCount++;
+                                        @endphp
+                                        @if($sisiCount > 1)
+                                        <span class="absolute bottom-1 right-1 bg-indigo-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow shadow-indigo-200">{{ $sisiCount }} Sisi</span>
                                         @endif
                                     </div>
 

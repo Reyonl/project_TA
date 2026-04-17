@@ -112,7 +112,7 @@
                                                         $bajuColor = $detail->desain->warna_baju ?: '#ffffff';
                                                         $mockupUrl = $mockupPath;
                                                     @endphp
-                                                    <button type="button" onclick="openDesignModal('{{ $desainUrl }}', '{{ $mockupUrl }}', '{{ $bajuColor }}', '{{ $bajuType }}', false)" class="mt-2 w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[11px] font-bold py-2 px-3 rounded-lg border border-indigo-200 transition duration-200 flex items-center justify-center gap-1.5 shadow-sm">
+                                                    <button type="button" onclick="openDesignModal('{{ $desainUrl }}', '{{ $mockupUrl }}', '{{ $bajuColor }}', '{{ $bajuType }}', 'front')" class="mt-2 w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[11px] font-bold py-2 px-3 rounded-lg border border-indigo-200 transition duration-200 flex items-center justify-center gap-1.5 shadow-sm">
                                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
                                                         Full Mockup Depan
                                                     </button>
@@ -144,14 +144,68 @@
                                                         $bajuColor = $detail->desain->warna_baju ?: '#ffffff';
                                                         $mockupUrlB = asset('images/mockups/' . $bajuType . '_belakang.png?v='.time());
                                                     @endphp
-                                                    <button type="button" onclick="openDesignModal('{{ $desainUrlB }}', '{{ $mockupUrlB }}', '{{ $bajuColor }}', '{{ $bajuType }}', true)" class="mt-2 w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold py-2 px-3 rounded-lg border border-slate-300 transition duration-200 flex items-center justify-center gap-1.5 shadow-sm">
+                                                    <button type="button" onclick="openDesignModal('{{ $desainUrlB }}', '{{ $mockupUrlB }}', '{{ $bajuColor }}', '{{ $bajuType }}', 'back')" class="mt-2 w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold py-2 px-3 rounded-lg border border-slate-300 transition duration-200 flex items-center justify-center gap-1.5 shadow-sm">
                                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
                                                         Full Mockup Belakang
                                                     </button>
                                                 </div>
                                             @endif
                                             
-                                            @if(!$detail->desain->file_desain && !$detail->desain->file_desain_belakang)
+                                            <!-- LEFT DESIGN -->
+                                            @if($detail->desain->file_desain_kiri)
+                                                <div class="flex flex-col items-center shrink-0 w-[280px] snap-center">
+                                                    <span class="text-[10px] font-bold text-slate-400 mb-1">KIRI</span>
+                                                    <div class="relative w-full h-[350px] rounded-lg overflow-hidden flex items-center justify-center shadow-inner bg-slate-50 border border-slate-200 group transition-all">
+                                                        @php $mockupPathL = asset('images/mockups/' . $mockupBase . '_kiri.png'); @endphp
+                                                        <img src="{{ $mockupPathL }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-95 z-0 transition-transform group-hover:scale-105" onerror="this.src='{{ $mockupPath }}'">
+                                                        <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10 transition-transform group-hover:scale-105"
+                                                             style="-webkit-mask-image: url('{{ $mockupPathL }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ $mockupPathL }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
+                                                            <div class="w-full h-full" style="background-color: {{ $detail->desain->warna_baju ?: '#ffffff' }};"></div>
+                                                        </div>
+
+                                                        <div class="absolute z-20 transition-transform group-hover:scale-105" style="{{ $overlayStyle ?? 'top: 20%; left: 27.08%; width: 45.83%; height: 53.33%;' }}">
+                                                            <img src="{{ Str::startsWith($detail->desain->file_desain_kiri, 'data:image') ? $detail->desain->file_desain_kiri : Storage::url($detail->desain->file_desain_kiri) }}" class="w-full h-full object-contain">
+                                                        </div>
+                                                    </div>
+                                                    @php
+                                                        $desainUrlL = Str::startsWith($detail->desain->file_desain_kiri, 'data:image') ? $detail->desain->file_desain_kiri : Storage::url($detail->desain->file_desain_kiri);
+                                                        $mockupUrlL = asset('images/mockups/' . $bajuType . '_kiri.png?v='.time());
+                                                    @endphp
+                                                    <button type="button" onclick="openDesignModal('{{ $desainUrlL }}', '{{ $mockupUrlL }}', '{{ $bajuColor }}', '{{ $bajuType }}', 'left')" class="mt-2 w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold py-2 px-3 rounded-lg border border-slate-300 transition duration-200 flex items-center justify-center gap-1.5 shadow-sm">
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
+                                                        Full Mockup Kiri
+                                                    </button>
+                                                </div>
+                                            @endif
+
+                                            <!-- RIGHT DESIGN -->
+                                            @if($detail->desain->file_desain_kanan)
+                                                <div class="flex flex-col items-center shrink-0 w-[280px] snap-center">
+                                                    <span class="text-[10px] font-bold text-slate-400 mb-1">KANAN</span>
+                                                    <div class="relative w-full h-[350px] rounded-lg overflow-hidden flex items-center justify-center shadow-inner bg-slate-50 border border-slate-200 group transition-all">
+                                                        @php $mockupPathR = asset('images/mockups/' . $mockupBase . '_kanan.png'); @endphp
+                                                        <img src="{{ $mockupPathR }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-95 z-0 transition-transform group-hover:scale-105" onerror="this.src='{{ $mockupPath }}'">
+                                                        <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10 transition-transform group-hover:scale-105"
+                                                             style="-webkit-mask-image: url('{{ $mockupPathR }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ $mockupPathR }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
+                                                            <div class="w-full h-full" style="background-color: {{ $detail->desain->warna_baju ?: '#ffffff' }};"></div>
+                                                        </div>
+
+                                                        <div class="absolute z-20 transition-transform group-hover:scale-105" style="{{ $overlayStyle ?? 'top: 20%; left: 27.08%; width: 45.83%; height: 53.33%;' }}">
+                                                            <img src="{{ Str::startsWith($detail->desain->file_desain_kanan, 'data:image') ? $detail->desain->file_desain_kanan : Storage::url($detail->desain->file_desain_kanan) }}" class="w-full h-full object-contain">
+                                                        </div>
+                                                    </div>
+                                                    @php
+                                                        $desainUrlR = Str::startsWith($detail->desain->file_desain_kanan, 'data:image') ? $detail->desain->file_desain_kanan : Storage::url($detail->desain->file_desain_kanan);
+                                                        $mockupUrlR = asset('images/mockups/' . $bajuType . '_kanan.png?v='.time());
+                                                    @endphp
+                                                    <button type="button" onclick="openDesignModal('{{ $desainUrlR }}', '{{ $mockupUrlR }}', '{{ $bajuColor }}', '{{ $bajuType }}', 'right')" class="mt-2 w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold py-2 px-3 rounded-lg border border-slate-300 transition duration-200 flex items-center justify-center gap-1.5 shadow-sm">
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
+                                                        Full Mockup Kanan
+                                                    </button>
+                                                </div>
+                                            @endif
+                                            
+                                            @if(!$detail->desain->file_desain && !$detail->desain->file_desain_belakang && !$detail->desain->file_desain_kiri && !$detail->desain->file_desain_kanan)
                                                  <span class="text-slate-400 text-sm py-8 w-full text-center">Tidak ada desain kustom</span>
                                             @endif
                                         </div>
@@ -306,10 +360,10 @@
         const modalJenis = document.getElementById('modalJenisProduk'); // Teks Jenis
         const downloadBtn = document.getElementById('downloadDesainBtn');
 
-        let isFlipped = false;
+        let currentSide = 'front';
 
-        function openDesignModal(desainUrl, mockupUrl, bajuColor, bajuType, flip = false) {
-            isFlipped = flip;
+        function openDesignModal(desainUrl, mockupUrl, bajuColor, bajuType, side = 'front') {
+            currentSide = side;
             // Pasang semua aset komposit
             modalImg.src = desainUrl;
             modalBase.src = mockupUrl;
@@ -329,7 +383,12 @@
             modalColor.style.backgroundColor = bajuColor;
             
             // Set Label
-            modalJenis.textContent = bajuType + (flip ? ' (Belakang)' : ' (Depan)');
+            let sideText = 'Depan';
+            if (side === 'back') sideText = 'Belakang';
+            else if (side === 'left') sideText = 'Kiri';
+            else if (side === 'right') sideText = 'Kanan';
+            
+            modalJenis.textContent = bajuType + ' (' + sideText + ')';
             
             // Atur posisi overlay mockup HD dinamis
             const overlayContainer = document.getElementById('modalOverlayContainer');
@@ -469,7 +528,10 @@
                 ctx.drawImage(designImgDOM, dX, dY, dW, dH);
 
                 // SUKSES. EKSPOR CANVAS MENJADI GAMBAR PNG!
-                const sideText = isFlipped ? 'Belakang' : 'Depan';
+                let sideText = 'Depan';
+                if (currentSide === 'back') sideText = 'Belakang';
+                else if (currentSide === 'left') sideText = 'Kiri';
+                else if (currentSide === 'right') sideText = 'Kanan';
                 const finalImgData = canvas.toDataURL("image/png");
                 const link = document.createElement('a');
                 link.download = `Mockup_Sablon_Order_${sideText}_${new Date().getTime()}.png`;

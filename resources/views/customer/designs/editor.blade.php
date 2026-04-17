@@ -1,6 +1,21 @@
 <x-app-layout>
-    <!-- Tambahkan library Fabric.js & Google Fonts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <!-- Tambahkan library Fabric.js & Google Fonts (Gunakan Lokal untuk kestabilan) -->
+    <script src="/js/fabric.min.js"></script>
+    <script>
+        // Alpine data binding bridge (Must be defined before x-data evaluates)
+        window.activeBaseColorLocal = '#ffffff'; 
+        window.canvasBackgroundChange = function(color) {
+            window.activeBaseColorLocal = color;
+            const printbox = document.getElementById('printAreaBox');
+            if(printbox) {
+                if(color === '#1e293b') {
+                    printbox.classList.replace('border-slate-800/20', 'border-white/30');
+                } else {
+                    printbox.classList.replace('border-white/30', 'border-slate-800/20');
+                }
+            }
+        };
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Dancing+Script:wght@700&family=Lobster&family=Montserrat:wght@400;700&family=Pacifico&family=Playfair+Display:wght@700&family=Roboto:wght@400;700&family=Oswald:wght@500&family=Anton&display=swap" rel="stylesheet">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-slate-800 leading-tight">
@@ -21,7 +36,7 @@
              activeSide: 'front', 
              sidebarOpen: true,
              technique: new URLSearchParams(window.location.search).get('technique') || 'sablon'
-         }" x-init="window.canvasBackgroundChange(baseColor)">
+         }" x-init="$nextTick(() => { if(typeof window.canvasBackgroundChange === 'function') window.canvasBackgroundChange(baseColor) })">
         <div class="flex h-full bg-slate-50">
             
             <!-- Navbar Kiri Tepi (Icon Only) -->
@@ -139,21 +154,42 @@
                         <div class="flex items-center bg-slate-100 rounded-xl p-1 border border-slate-200 ml-4 shadow-inner">
                             <button @click="activeSide = 'front'; window.switchCanvasSide('front')" :class="activeSide === 'front' ? 'bg-white shadow-sm text-red-700 font-extrabold' : 'text-slate-500 hover:text-slate-700'" class="px-5 py-1.5 text-xs rounded-lg transition-all">DEPAN</button>
                             <button @click="activeSide = 'back'; window.switchCanvasSide('back')" :class="activeSide === 'back' ? 'bg-white shadow-sm text-red-700 font-extrabold' : 'text-slate-500 hover:text-slate-700'" class="px-5 py-1.5 text-xs rounded-lg transition-all">BELAKANG</button>
+                            @if($produk->jenis_produk == 'topi')
+                            <button @click="activeSide = 'left'; window.switchCanvasSide('left')" :class="activeSide === 'left' ? 'bg-white shadow-sm text-red-700 font-extrabold' : 'text-slate-500 hover:text-slate-700'" class="px-5 py-1.5 text-xs rounded-lg transition-all">KIRI</button>
+                            <button @click="activeSide = 'right'; window.switchCanvasSide('right')" :class="activeSide === 'right' ? 'bg-white shadow-sm text-red-700 font-extrabold' : 'text-slate-500 hover:text-slate-700'" class="px-5 py-1.5 text-xs rounded-lg transition-all">KANAN</button>
+                            @endif
                         </div>
                         
                         <!-- Base Color Picker -->
-                        <div class="flex items-center gap-3 border-l border-slate-200 pl-4">
+                        <div class="flex items-center gap-2 border-l border-slate-200 pl-4 py-2">
                             <span class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Warna Dasar:</span>
-                            <div class="flex gap-1.5">
-                                <button @click="baseColor = '#ffffff'; canvasBackgroundChange('#ffffff')" class="w-5 h-5 rounded-full bg-white border border-slate-300 shadow-sm hover:ring-2 hover:ring-red-400 hover:ring-offset-2 transition" title="Putih"></button>
-                                <button @click="baseColor = '#1e293b'; canvasBackgroundChange('#1e293b')" class="w-5 h-5 rounded-full bg-slate-800 border border-transparent shadow-sm hover:ring-2 hover:ring-red-400 hover:ring-offset-2 transition" title="Navy"></button>
-                                <button @click="baseColor = '#ef4444'; canvasBackgroundChange('#ef4444')" class="w-5 h-5 rounded-full bg-red-600 border border-transparent shadow-sm hover:ring-2 hover:ring-red-400 hover:ring-offset-2 transition" title="Merah"></button>
-                                <button @click="baseColor = '#0284c7'; canvasBackgroundChange('#0284c7')" class="w-5 h-5 rounded-full bg-blue-600 border border-transparent shadow-sm hover:ring-2 hover:ring-red-400 hover:ring-offset-2 transition" title="Royal Blue"></button>
-                                <button @click="baseColor = '#059669'; canvasBackgroundChange('#059669')" class="w-5 h-5 rounded-full bg-emerald-600 border border-transparent shadow-sm hover:ring-2 hover:ring-red-400 hover:ring-offset-2 transition" title="Hijau"></button>
+                            <div class="flex flex-wrap gap-1.5 w-40 max-h-12 overflow-y-auto px-1 custom-scrollbar items-center">
+                                <button @click="baseColor = '#ffffff'; canvasBackgroundChange('#ffffff')" class="shrink-0 w-5 h-5 rounded-full bg-[#ffffff] border border-slate-300 shadow-sm hover:ring-2 hover:ring-red-400 hover:ring-offset-1 transition" title="White"></button>
+                                <button @click="baseColor = '#1e293b'; canvasBackgroundChange('#1e293b')" class="shrink-0 w-5 h-5 rounded-full bg-[#1e293b] border border-transparent shadow-sm hover:ring-2 hover:ring-red-400 hover:ring-offset-1 transition" title="Black"></button>
+                                <button @click="baseColor = '#1e3a8a'; canvasBackgroundChange('#1e3a8a')" class="shrink-0 w-5 h-5 rounded-full bg-[#1e3a8a] border border-transparent shadow-sm hover:ring-2 hover:ring-red-400 hover:ring-offset-1 transition" title="Navy"></button>
+                                <button @click="baseColor = '#334155'; canvasBackgroundChange('#334155')" class="shrink-0 w-5 h-5 rounded-full bg-[#334155] border border-transparent shadow-sm hover:ring-2 hover:ring-red-400 hover:ring-offset-1 transition" title="Dark Grey"></button>
+                                <button @click="baseColor = '#dc2626'; canvasBackgroundChange('#dc2626')" class="shrink-0 w-5 h-5 rounded-full bg-[#dc2626] border border-transparent shadow-sm hover:ring-2 hover:ring-red-400 hover:ring-offset-1 transition" title="Red"></button>
+                                <button @click="baseColor = '#14532d'; canvasBackgroundChange('#14532d')" class="shrink-0 w-5 h-5 rounded-full bg-[#14532d] border border-transparent shadow-sm hover:ring-2 hover:ring-red-400 hover:ring-offset-1 transition" title="Forest Green"></button>
+                                <button @click="baseColor = '#7f1d1d'; canvasBackgroundChange('#7f1d1d')" class="shrink-0 w-5 h-5 rounded-full bg-[#7f1d1d] border border-transparent shadow-sm hover:ring-2 hover:ring-red-400 hover:ring-offset-1 transition" title="Maroon"></button>
+                                <button @click="baseColor = '#4B5320'; canvasBackgroundChange('#4B5320')" class="shrink-0 w-5 h-5 rounded-full bg-[#4B5320] border border-transparent shadow-sm hover:ring-2 hover:ring-red-400 hover:ring-offset-1 transition" title="Military Green"></button>
+                                <button @click="baseColor = '#D2B48C'; canvasBackgroundChange('#D2B48C')" class="shrink-0 w-5 h-5 rounded-full bg-[#D2B48C] border border-transparent shadow-sm hover:ring-2 hover:ring-red-400 hover:ring-offset-1 transition" title="Sand"></button>
+                                <button @click="baseColor = '#93c5fd'; canvasBackgroundChange('#93c5fd')" class="shrink-0 w-5 h-5 rounded-full bg-[#93c5fd] border border-transparent shadow-sm hover:ring-2 hover:ring-red-400 hover:ring-offset-1 transition" title="Light Blue"></button>
+                                <button @click="baseColor = '#f472b6'; canvasBackgroundChange('#f472b6')" class="shrink-0 w-5 h-5 rounded-full bg-[#f472b6] border border-transparent shadow-sm hover:ring-2 hover:ring-red-400 hover:ring-offset-1 transition" title="Pink"></button>
+                                <button @click="baseColor = '#6d28d9'; canvasBackgroundChange('#6d28d9')" class="shrink-0 w-5 h-5 rounded-full bg-[#6d28d9] border border-transparent shadow-sm hover:ring-2 hover:ring-red-400 hover:ring-offset-1 transition" title="Purple"></button>
+                                <button @click="baseColor = '#f97316'; canvasBackgroundChange('#f97316')" class="shrink-0 w-5 h-5 rounded-full bg-[#f97316] border border-transparent shadow-sm hover:ring-2 hover:ring-red-400 hover:ring-offset-1 transition" title="Orange"></button>
+                                <button @click="baseColor = '#facc15'; canvasBackgroundChange('#facc15')" class="shrink-0 w-5 h-5 rounded-full bg-[#facc15] border border-transparent shadow-sm hover:ring-2 hover:ring-red-400 hover:ring-offset-1 transition" title="Yellow"></button>
+                                <button @click="baseColor = '#0d9488'; canvasBackgroundChange('#0d9488')" class="shrink-0 w-5 h-5 rounded-full bg-[#0d9488] border border-transparent shadow-sm hover:ring-2 hover:ring-red-400 hover:ring-offset-1 transition" title="Teal"></button>
                             </div>
                         </div>
                     </div>
-                    
+
+                    <!-- Tombol Simpan Desain -->
+                    <div class="flex items-center gap-3 ml-auto">
+                        <button id="saveDesignBtn" class="flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-black py-2.5 px-6 rounded-xl shadow-lg shadow-red-100 hover:shadow-red-200 transition-all text-sm hover:-translate-y-0.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+                            <span>SIMPAN DESAIN</span>
+                        </button>
+                    </div>
                 </div>
 
                 @if($desainRevisi)
@@ -195,39 +231,83 @@
                                     };
                                 @endphp
 
-                                <!-- Base Mockup Texture -->
-                                <img :src="activeSide === 'front' ? '{{ asset('images/mockups/'.$mockupBase.'.png?v='.time()) }}' : '{{ asset('images/mockups/'.$mockupBase.'_belakang.png?v='.time()) }}'" 
-                                     class="absolute object-contain drop-shadow-2xl opacity-90 transition-all duration-500"
-                                     :class="technique === 'bordir' || '{{ $produk->jenis_produk }}' === 'topi' ? 'w-[100%] h-[100%] scale-150 translate-y-10' : 'w-[85%] h-[85%]'"
-                                     onerror="this.src='{{ asset('images/mockups/'.$mockupBase.'.png') }}'">
-                                
-                                <!-- Color Tint Layer -->
-                                <div class="absolute mix-blend-multiply transition-all duration-500"
-                                     :class="technique === 'bordir' || '{{ $produk->jenis_produk }}' === 'topi' ? 'w-[100%] h-[100%] scale-150 translate-y-10' : 'w-[85%] h-[85%]'"
-                                     :style="`-webkit-mask-image: url('${activeSide === 'front' ? '{{ asset('images/mockups/'.$mockupBase.'.png?v='.time()) }}' : '{{ asset('images/mockups/'.$mockupBase.'_belakang.png?v='.time()) }}'}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('${activeSide === 'front' ? '{{ asset('images/mockups/'.$mockupBase.'.png?v='.time()) }}' : '{{ asset('images/mockups/'.$mockupBase.'_belakang.png?v='.time()) }}'}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;`"
-                                     x-effect="if($el.style.maskImage.includes('_belakang.png') && !'{{ $hasBack }}') $el.style.maskImage = $el.style.maskImage.replace('_belakang.png', '.png')">
-                                    <div class="w-full h-full transition-colors duration-300" :style="`background-color: ${baseColor};`"></div>
+                                <!-- Hitung URL Gambar Sisi -->
+                                <div x-data="{
+                                    getMockupUrl() {
+                                        if(activeSide === 'front') return '{{ asset('images/mockups/'.$mockupBase.'.png?v='.time()) }}';
+                                        if(activeSide === 'left') return '{{ asset('images/mockups/'.$mockupBase.'_kiri.png?v='.time()) }}';
+                                        if(activeSide === 'right') return '{{ asset('images/mockups/'.$mockupBase.'_kanan.png?v='.time()) }}';
+                                        return '{{ asset('images/mockups/'.$mockupBase.'_belakang.png?v='.time()) }}';
+                                    }
+                                }" class="w-full h-full flex items-center justify-center">
+
+                                    <!-- Base Mockup Texture -->
+                                    <img :src="getMockupUrl()" 
+                                         class="absolute object-contain drop-shadow-2xl opacity-90 transition-all duration-500"
+                                         :class="technique === 'bordir' ? 'w-[100%] h-[100%]' : 'w-[85%] h-[85%]'"
+                                         onerror="this.src='{{ asset('images/mockups/'.$mockupBase.'.png') }}'">
+                                    
+                                    <!-- Color Tint Layer -->
+                                    <div class="absolute mix-blend-multiply transition-all duration-500"
+                                         :class="technique === 'bordir' ? 'w-[100%] h-[100%]' : 'w-[85%] h-[85%]'"
+                                         :style="{ 
+                                            '-webkit-mask-image': `url(${getMockupUrl()})`, 
+                                            '-webkit-mask-size': 'contain', 
+                                            '-webkit-mask-position': 'center', 
+                                            '-webkit-mask-repeat': 'no-repeat', 
+                                            'mask-image': `url(${getMockupUrl()})`, 
+                                            'mask-size': 'contain', 
+                                            'mask-position': 'center', 
+                                            'mask-repeat': 'no-repeat' 
+                                         }"
+                                         x-effect="if(getMockupUrl().includes('_belakang') && !'{{ $hasBack }}' && '{{ $produk->jenis_produk }}' !== 'topi') { $el.style.webkitMaskImage = `url({{ asset('images/mockups/'.$mockupBase.'.png') }})`; $el.style.maskImage = `url({{ asset('images/mockups/'.$mockupBase.'.png') }})`; }">
+                                        <div class="w-full h-full transition-colors duration-300" :style="`background-color: ${baseColor};`"></div>
+                                    </div>
+
                                 </div>
                              </div>
                         </div>
                         
                         @php
-                            // Dynamic Print Area Logic
-                            $printArea = match($produk->jenis_produk) {
-                                'topi' => ['width' => 120, 'height' => 85, 'top' => 210, 'left' => 180, 'label' => 'Bordir'],
-                                'polo' => ['width' => 90, 'height' => 90, 'top' => 180, 'left' => 140, 'label' => 'Pocket'],
-                                'seragam' => ['width' => 100, 'height' => 100, 'top' => 180, 'left' => 135, 'label' => 'Dada'],
-                                default => ['width' => 220, 'height' => 320, 'top' => 120, 'left' => 130, 'label' => 'Area Cetak']
+                            // Dynamic Print Area Logic based on side
+                            $getPrintArea = function($side) use ($produk) {
+                                $jenis = strtolower($produk->jenis_produk);
+                                if ($jenis === 'topi') {
+                                    // Coordinat disesuaikan dengan posisi bidang gambar baru untuk setiap sisi topi
+                                    if ($side === 'front') return ['width' => 120, 'height' => 85, 'top' => 280, 'left' => 180, 'label' => 'Bordir Depan'];
+                                    if ($side === 'back')  return ['width' => 100, 'height' => 60, 'top' => 210, 'left' => 190, 'label' => 'Bordir Belakang'];
+                                    if ($side === 'left')  return ['width' => 110, 'height' => 75, 'top' => 285, 'left' => 140, 'label' => 'Bordir Kiri'];
+                                    if ($side === 'right') return ['width' => 110, 'height' => 75, 'top' => 285, 'left' => 230, 'label' => 'Bordir Kanan'];
+                                }
+                                if ($jenis === 'polo') return ['width' => 90, 'height' => 90, 'top' => 180, 'left' => 140, 'label' => 'Pocket'];
+                                if ($jenis === 'seragam') return ['width' => 100, 'height' => 100, 'top' => 180, 'left' => 135, 'label' => 'Dada'];
+                                
+                                return ['width' => 220, 'height' => 320, 'top' => 120, 'left' => 130, 'label' => 'Area Cetak'];
                             };
                         @endphp
+                        <script>
+                            window.printAreaDims = {
+                                'front': {!! json_encode($getPrintArea('front')) !!},
+                                'back': {!! json_encode($getPrintArea('back')) !!},
+                                'left': {!! json_encode($getPrintArea('left')) !!},
+                                'right': {!! json_encode($getPrintArea('right')) !!}
+                            };
+                        </script>
 
                         <!-- Print Area Visualizer -->
-                        <div class="absolute z-10 border border-dashed border-slate-600/40 pointer-events-none rounded transition-colors group" 
+                        <div class="absolute z-10 border border-dashed border-slate-600/40 pointer-events-none rounded transition-all duration-300 group" 
                              id="printAreaBox" 
-                             style="width: {{ $printArea['width'] }}px; height: {{ $printArea['height'] }}px; top: {{ $printArea['top'] }}px; left: {{ $printArea['left'] }}px;">
-                            <span class="absolute -top-7 left-1/2 transform -translate-x-1/2 text-[10px] text-slate-600 font-black uppercase tracking-widest bg-red-50/80 px-3 py-1 rounded-full backdrop-blur border border-red-200/50 shadow-sm ">
-                                <span x-text="technique === 'bordir' ? 'Bordir Box' : '{{ $printArea['label'] }}'"></span>
-                            </span>
+                             x-effect="
+                                const dims = window.printAreaDims ? (window.printAreaDims[activeSide] || window.printAreaDims['front']) : {width: 220, height: 320, top: 120, left: 130, label: 'Area Cetak'};
+                                $el.style.width = dims.width + 'px';
+                                $el.style.height = dims.height + 'px';
+                                $el.style.top = dims.top + 'px';
+                                $el.style.left = dims.left + 'px';
+                                document.getElementById('printAreaLabelText').innerText = technique === 'bordir' ? 'Bordir Box' : dims.label;
+                             ">
+                             <span class="absolute -top-7 left-1/2 transform -translate-x-1/2 text-[10px] text-slate-600 font-black uppercase tracking-widest bg-red-50/80 px-3 py-1 rounded-full backdrop-blur border border-red-200/50 shadow-sm ">
+                                 <span id="printAreaLabelText">Area</span>
+                             </span>
                              <!-- Glow Corners -->
                              <div class="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-red-400"></div>
                              <div class="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-red-400"></div>
@@ -236,17 +316,38 @@
                         </div>
 
                         <!-- Fabric.js Canvas -->
+                        @php $paFront = $getPrintArea('front'); @endphp
                         <div class="absolute z-20" 
-                             style="top: {{ $printArea['top'] }}px; left: {{ $printArea['left'] }}px; width: {{ $printArea['width'] }}px; height: {{ $printArea['height'] }}px;" 
+                             style="top: {{ $paFront['top'] }}px; left: {{ $paFront['left'] }}px; width: {{ $paFront['width'] }}px; height: {{ $paFront['height'] }}px;" 
                              x-show="activeSide === 'front'">
-                            <canvas id="tshirt-canvas-front" width="{{ $printArea['width'] }}" height="{{ $printArea['height'] }}"></canvas>
+                            <canvas id="tshirt-canvas-front" width="{{ $paFront['width'] }}" height="{{ $paFront['height'] }}"></canvas>
                         </div>
+                        
+                        @php $paBack = $getPrintArea('back'); @endphp
                         <div class="absolute z-20" 
-                             style="top: 120px; left: 130px; width: 220px; height: 320px;" 
+                             style="top: {{ $paBack['top'] }}px; left: {{ $paBack['left'] }}px; width: {{ $paBack['width'] }}px; height: {{ $paBack['height'] }}px;" 
                              x-show="activeSide === 'back'" 
                              x-cloak>
-                            <canvas id="tshirt-canvas-back" width="220" height="320"></canvas>
+                            <canvas id="tshirt-canvas-back" width="{{ $paBack['width'] }}" height="{{ $paBack['height'] }}"></canvas>
                         </div>
+                        
+                        @if(strtolower($produk->jenis_produk) == 'topi')
+                        @php $paLeft = $getPrintArea('left'); @endphp
+                        <div class="absolute z-20" 
+                             style="top: {{ $paLeft['top'] }}px; left: {{ $paLeft['left'] }}px; width: {{ $paLeft['width'] }}px; height: {{ $paLeft['height'] }}px;" 
+                             x-show="activeSide === 'left'" 
+                             x-cloak>
+                            <canvas id="tshirt-canvas-left" width="{{ $paLeft['width'] }}" height="{{ $paLeft['height'] }}"></canvas>
+                        </div>
+                        
+                        @php $paRight = $getPrintArea('right'); @endphp
+                        <div class="absolute z-20" 
+                             style="top: {{ $paRight['top'] }}px; left: {{ $paRight['left'] }}px; width: {{ $paRight['width'] }}px; height: {{ $paRight['height'] }}px;" 
+                             x-show="activeSide === 'right'" 
+                             x-cloak>
+                            <canvas id="tshirt-canvas-right" width="{{ $paRight['width'] }}" height="{{ $paRight['height'] }}"></canvas>
+                        </div>
+                        @endif
                     </div>
 
                 </div>
@@ -385,20 +486,10 @@
 
     <!-- Script Logika Fabric.js & Kontrol Editor -->
     <script>
-        // Alpine data binding bridge
-        window.activeBaseColorLocal = '#ffffff'; // Default putih
-        window.canvasBackgroundChange = function(color) {
-            window.activeBaseColorLocal = color;
-            // Kita render warna base via html agar tidak mengotori DataURL save format png
-            const printbox = document.getElementById('printAreaBox');
-            if(color === '#1e293b') {
-                printbox.classList.replace('border-slate-800/20', 'border-white/30');
-            } else {
-                printbox.classList.replace('border-white/30', 'border-slate-800/20');
-            }
-        };
 
-        document.addEventListener('DOMContentLoaded', function() {
+
+        function initFabricEditor() {
+          try {
             // Inisialisasi Canvas Fabric (Ukuran baru: 480x600)
             const canvasFront = new fabric.Canvas('tshirt-canvas-front', {
                 preserveObjectStacking: true,
@@ -408,6 +499,13 @@
                 preserveObjectStacking: true,
                 selection: true
             });
+            let canvasLeft = null;
+            let canvasRight = null;
+            
+            if (document.getElementById('tshirt-canvas-left')) {
+                canvasLeft = new fabric.Canvas('tshirt-canvas-left', { preserveObjectStacking: true, selection: true });
+                canvasRight = new fabric.Canvas('tshirt-canvas-right', { preserveObjectStacking: true, selection: true });
+            }
             
             window.activeCanvas = canvasFront;
 
@@ -417,16 +515,21 @@
                     window.activeCanvas.renderAll();
                 }
                 if (typeof hideControls === 'function') hideControls();
-                window.activeCanvas = side === 'front' ? canvasFront : canvasBack;
+                if(side === 'front') window.activeCanvas = canvasFront;
+                else if(side === 'back') window.activeCanvas = canvasBack;
+                else if(side === 'left') window.activeCanvas = canvasLeft;
+                else if(side === 'right') window.activeCanvas = canvasRight;
+                
                 canvas = window.activeCanvas; // sync local helper
             };
 
             // Batasan Area Cetak (Dynamic berdasarkan PHP Match)
+            @php $paDefault = $getPrintArea('front'); @endphp
             const printArea = { 
-                top: 0, 
-                left: 0, 
-                width: {{ $printArea['width'] }}, 
-                height: {{ $printArea['height'] }} 
+                top: {{ $paDefault['top'] }}, 
+                left: {{ $paDefault['left'] }}, 
+                width: {{ $paDefault['width'] }}, 
+                height: {{ $paDefault['height'] }} 
             };
 
             // Referensi Elemen DOM
@@ -459,125 +562,77 @@
             fabric.Object.prototype.padding = 10;
             fabric.Object.prototype.borderDashArray = [4, 4];
 
-            // Setup Custom Icons SVG
-            const deleteIconSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23ef4444' stroke-width='3'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16'/%3E%3C/svg%3E";
-            const scaleIconSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%230284c7' stroke-width='3'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4'/%3E%3C/svg%3E";
-            const rotateIconSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%230284c7' stroke-width='3'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15'/%3E%3C/svg%3E";
-
-            const delImg = document.createElement('img'); delImg.src = deleteIconSvg;
-            const sclImg = document.createElement('img'); sclImg.src = scaleIconSvg;
-            const rotImg = document.createElement('img'); rotImg.src = rotateIconSvg;
-
-            function renderCustomIcon(ctx, left, top, styleOverride, fabricObject) {
-                const size = this.cornerSize;
-                ctx.save();
-                ctx.translate(left, top);
-                // Background bulat shadow
-                ctx.fillStyle = '#ffffff';
-                ctx.shadowColor = 'rgba(0,0,0,0.15)';
-                ctx.shadowBlur = 4;
-                ctx.beginPath();
-                ctx.arc(0, 0, size/2 + 4, 0, Math.PI * 2);
-                ctx.fill();
-                // Gambar ikon
-                ctx.drawImage(this.iconImg, -size/2, -size/2, size, size);
-                ctx.restore();
+            // Cukup gunakan default resize & rotate milik FabricJS. 
+            // Control custom dihapus untuk stabilitas plugin pada teks dan stiker.
+            if(fabric.Object.prototype.setControlsVisibility) {
+                fabric.Object.prototype.setControlsVisibility({
+                    mt: false, mb: false, ml: false, mr: false
+                });
             }
 
-            // Hapus action dasar corner yang tidak dipakai agar tidak mengganggu
-            fabric.Object.prototype.controls.tr = new fabric.Control({
-                x: 0.5, y: -0.5,
-                offsetX: 12, offsetY: -12,
-                cursorStyle: 'pointer',
-                actionHandler: fabric.controlsUtils.deleteObject || function(eventData, transform) {
-                    var target = transform.target;
-                    target.canvas.remove(target); target.canvas.requestRenderAll();
-                    return true;
-                },
-                render: renderCustomIcon,
-                cornerSize: 18
-            });
-            fabric.Object.prototype.controls.tr.iconImg = delImg;
-
-            fabric.Object.prototype.controls.br = new fabric.Control({
-                x: 0.5, y: 0.5,
-                offsetX: 12, offsetY: 12,
-                cursorStyle: 'se-resize',
-                actionHandler: fabric.controlsUtils.scalingEqually,
-                render: renderCustomIcon,
-                cornerSize: 18
-            });
-            fabric.Object.prototype.controls.br.iconImg = sclImg;
-
-            fabric.Object.prototype.controls.bl = new fabric.Control({
-                x: -0.5, y: 0.5,
-                offsetX: -12, offsetY: 12,
-                cursorStyle: 'alias',
-                actionHandler: fabric.controlsUtils.rotationWithSnapping,
-                render: renderCustomIcon,
-                cornerSize: 18
-            });
-            fabric.Object.prototype.controls.bl.iconImg = rotImg;
-
-            // Sembunyikan titik corner lainnya (mt, mb, ml, mr, tl) agar UI bersih
-            fabric.Object.prototype.controls.mt.visible = false;
-            fabric.Object.prototype.controls.mb.visible = false;
-            fabric.Object.prototype.controls.ml.visible = false;
-            fabric.Object.prototype.controls.mr.visible = false;
-            fabric.Object.prototype.controls.tl.visible = false;
-
             // Fungsi tambah TEXT
-            document.getElementById('addTextBtn').addEventListener('click', function() {
-                const text = new fabric.IText('Teks Anda', {
-                    left: 20,
-                    top: 20,
-                    fontFamily: 'Arial',
-                    fill: '#000000',
-                    fontSize: 40,
-                    fontWeight: 'bold',
+            const addTextBtn = document.getElementById('addTextBtn');
+            if (addTextBtn) {
+                addTextBtn.addEventListener('click', function() {
+                    const text = new fabric.IText('Teks Anda', {
+                        left: 20,
+                        top: 20,
+                        fontFamily: 'Arial',
+                        fill: '#000000',
+                        fontSize: 40,
+                        fontWeight: 'bold',
+                    });
+                    window.activeCanvas.add(text);
+                    window.activeCanvas.setActiveObject(text);
+                    window.activeCanvas.requestRenderAll();
                 });
-                canvas.add(text);
-                canvas.setActiveObject(text);
-                activeMode('text');
-            });
+            }
 
             // Ganti Font
-            fontFamilyControl.addEventListener('change', function() {
-                const activeObj = canvas.getActiveObject();
-                if(activeObj && activeObj.type === 'i-text') {
-                    activeObj.set('fontFamily', this.value);
-                    canvas.renderAll();
-                }
-            });
+            if(fontFamilyControl) {
+                fontFamilyControl.addEventListener('change', function() {
+                    const activeObj = window.activeCanvas.getActiveObject();
+                    if(activeObj && activeObj.type === 'i-text') {
+                        activeObj.set('fontFamily', this.value);
+                        window.activeCanvas.renderAll();
+                    }
+                });
+            }
 
             // Ganti Warna Font
-            textColorControl.addEventListener('input', function() {
-                const activeObj = canvas.getActiveObject();
-                if(activeObj && activeObj.type === 'i-text') {
-                    activeObj.set('fill', this.value);
-                    canvas.renderAll();
-                }
-            });
+            if(textColorControl) {
+                textColorControl.addEventListener('input', function() {
+                    const activeObj = window.activeCanvas.getActiveObject();
+                    if(activeObj && activeObj.type === 'i-text') {
+                        activeObj.set('fill', this.value);
+                        window.activeCanvas.renderAll();
+                    }
+                });
+            }
 
             // Stroke (Outline) Teks
-            textStrokeColor.addEventListener('input', function() {
-                const activeObj = canvas.getActiveObject();
-                if(activeObj && activeObj.type === 'i-text') {
-                    activeObj.set({ stroke: this.value, strokeWidth: parseInt(textStrokeWidth.value) });
-                    canvas.renderAll();
-                }
-            });
-            textStrokeWidth.addEventListener('input', function() {
-                const activeObj = canvas.getActiveObject();
-                if(activeObj && activeObj.type === 'i-text') {
-                    activeObj.set({ stroke: textStrokeColor.value, strokeWidth: parseInt(this.value) });
-                    canvas.renderAll();
-                }
-            });
+            if(textStrokeColor) {
+                textStrokeColor.addEventListener('input', function() {
+                    const activeObj = window.activeCanvas.getActiveObject();
+                    if(activeObj && activeObj.type === 'i-text') {
+                        activeObj.set({ stroke: this.value, strokeWidth: parseInt(textStrokeWidth.value) });
+                        window.activeCanvas.renderAll();
+                    }
+                });
+            }
+            if(textStrokeWidth) {
+                textStrokeWidth.addEventListener('input', function() {
+                    const activeObj = window.activeCanvas.getActiveObject();
+                    if(activeObj && activeObj.type === 'i-text') {
+                        activeObj.set({ stroke: textStrokeColor.value, strokeWidth: parseInt(this.value) });
+                        window.activeCanvas.renderAll();
+                    }
+                });
+            }
 
             // Shadow Teks
             textShadowToggle.addEventListener('change', function() {
-                const activeObj = canvas.getActiveObject();
+                const activeObj = window.activeCanvas.getActiveObject();
                 if(activeObj && activeObj.type === 'i-text') {
                     if(this.checked) {
                         activeObj.set('shadow', new fabric.Shadow({
@@ -589,52 +644,86 @@
                     } else {
                         activeObj.set('shadow', null);
                     }
-                    canvas.renderAll();
+                    window.activeCanvas.renderAll();
                 }
             });
 
             // Setup Layer Management
             bringForwardBtn.addEventListener('click', function() {
-                const activeObj = canvas.getActiveObject();
-                if(activeObj) { canvas.bringForward(activeObj); }
+                const activeObj = window.activeCanvas.getActiveObject();
+                if(activeObj) { window.activeCanvas.bringForward(activeObj); }
             });
 
             sendBackwardBtn.addEventListener('click', function() {
-                const activeObj = canvas.getActiveObject();
-                if(activeObj) { canvas.sendBackwards(activeObj); }
+                const activeObj = window.activeCanvas.getActiveObject();
+                if(activeObj) { window.activeCanvas.sendBackwards(activeObj); }
             });
 
             // Fungsi tambah STICKER/IMAGE ke canvas
             function addImageToCanvas(url) {
+                // Ambil sisi aktif via Alpine.js v3
+                let sideName = 'front';
+                try {
+                    const el = document.querySelector('[x-data]');
+                    if (el && window.Alpine && window.Alpine.$data) {
+                        sideName = window.Alpine.$data(el).activeSide || 'front';
+                    }
+                } catch(e) { /* fallback to front */ }
+                
+                const dims = window.printAreaDims[sideName] || window.printAreaDims['front']; 
+                const pa_width = dims ? dims.width : window.activeCanvas.width;
+                
                 const imgEl = new Image();
+                imgEl.crossOrigin = 'anonymous'; // Penting untuk avoid canvas taint saat export
                 imgEl.onload = function() {
                     const img = new fabric.Image(imgEl);
-                    if(img.width > printArea.width) img.scaleToWidth(printArea.width - 20);
+                    if(img.width > pa_width) img.scaleToWidth(pa_width - 20);
                     else if(img.width < 40) img.scaleToWidth(80);
                     
-                    img.set({ left: 20, top: 20 });
-                    img.customType = 'custom-image'; // Penanda image statis
-                    canvas.add(img);
-                    canvas.setActiveObject(img);
+                    img.set({ left: 10, top: 10 });
+                    img.customType = 'custom-image';
+                    window.activeCanvas.add(img);
+                    window.activeCanvas.setActiveObject(img);
+                    window.activeCanvas.requestRenderAll();
                 };
-                imgEl.onerror = function() { alert('Gagal memuat elemen desain.'); };
+                imgEl.onerror = function() {
+                    // Coba tanpa crossOrigin jika gagal (untuk local assets)
+                    const imgEl2 = new Image();
+                    imgEl2.onload = function() {
+                        const img = new fabric.Image(imgEl2);
+                        if(img.width > pa_width) img.scaleToWidth(pa_width - 20);
+                        else if(img.width < 40) img.scaleToWidth(80);
+                        img.set({ left: 10, top: 10 });
+                        img.customType = 'custom-image';
+                        window.activeCanvas.add(img);
+                        window.activeCanvas.setActiveObject(img);
+                        window.activeCanvas.requestRenderAll();
+                    };
+                    imgEl2.onerror = function() { console.warn('Gagal memuat elemen desain:', url); };
+                    imgEl2.src = url;
+                };
                 imgEl.src = url;
             }
 
             function addSVGToCanvas(url) {
+                // Coba load SVG sebagai vektor parseable terlebih dahulu
                 fabric.loadSVGFromURL(url, function(objects, options) {
-                    if (!objects || objects.length === 0) return;
-                    const group = fabric.util.groupSVGElements(objects, options);
-                    
-                    const targetSize = 80;
-                    const maxDim = Math.max(group.width, group.height);
-                    if (maxDim > 0) group.scale(targetSize / maxDim);
-                    
-                    group.set({ left: 20, top: 20 });
-                    group.customType = 'custom-svg'; // Penanda object adalah SVG Vector
-                    canvas.add(group);
-                    canvas.setActiveObject(group);
-                });
+                    if (objects && objects.length > 0) {
+                        // Berhasil parse SVG sebagai vektor
+                        const group = fabric.util.groupSVGElements(objects, options);
+                        const targetSize = Math.min(60, window.activeCanvas.width - 20);
+                        const maxDim = Math.max(group.width || 1, group.height || 1);
+                        group.scale(targetSize / maxDim);
+                        group.set({ left: 10, top: 10 });
+                        group.customType = 'custom-svg';
+                        window.activeCanvas.add(group);
+                        window.activeCanvas.setActiveObject(group);
+                        window.activeCanvas.requestRenderAll();
+                    } else {
+                        // Fallback: load sebagai Image biasa (untuk SVG dari CDN eksternal)
+                        addImageToCanvas(url);
+                    }
+                }, null, { crossOrigin: 'anonymous' });
             }
 
             // --- TAB UPLOAD ---
@@ -645,11 +734,12 @@
                     imgObj.src = event.target.result;
                     imgObj.onload = function() {
                         var img = new fabric.Image(imgObj);
-                        if(img.width > printArea.width) img.scaleToWidth(printArea.width - 20);
+                        const pa_width = window.activeCanvas.width;
+                        if(img.width > pa_width) img.scaleToWidth(pa_width - 20);
                         img.set({ left: 10, top: 10 });
                         img.customType = 'custom-image';
-                        canvas.add(img);
-                        canvas.setActiveObject(img);
+                        window.activeCanvas.add(img);
+                        window.activeCanvas.setActiveObject(img);
                     }
                 }
                 reader.readAsDataURL(e.target.files[0]);
@@ -661,41 +751,102 @@
                 item.addEventListener('click', function() { addImageToCanvas(this.getAttribute('data-url')); });
             });
 
-            // --- TAB STIKER ---
+            // --- TAB STIKER (Iconify CDN Langsung - Tanpa Proxy Server) ---
             const stickerSearchInput = document.getElementById('stickerSearchInput');
             const searchStickerBtn   = document.getElementById('searchStickerBtn');
             const stickersContainer  = document.getElementById('stickersContainer');
 
-            function loadStickers(query = 'cool') {
-                stickersContainer.innerHTML = '<div class="col-span-2 text-center py-5"><svg class="animate-spin h-5 w-5 text-sky-500 mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg></div>';
+            function loadStickers(query = 'heart') {
+                if(!stickersContainer) return;
+                stickersContainer.innerHTML = '<div class="col-span-2 text-center py-5"><svg class="animate-spin h-5 w-5 text-red-500 mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg><span class="text-xs text-red-600 block font-bold mt-1">Memuat ikon...</span></div>';
                 
-                fetch(`{{ route('customer.api.stickers') }}?q=${encodeURIComponent(query)}`)
-                    .then(res => res.json())
+                // Gunakan Proxy Server Backend (Mendukung Iconify + Dicebear) via relative path to avoid port mismatch
+                fetch(`/customer/api/stickers?q=${encodeURIComponent(query)}`)
+                    .then(res => {
+                        if (!res.ok) throw new Error('Proxy API error: ' + res.status);
+                        return res.json();
+                    })
                     .then(json => {
                         stickersContainer.innerHTML = '';
-                        if(json.success && json.data.length > 0) {
-                            json.data.forEach(sticker => {
+                        const icons = json.data || [];
+                        if(icons.length > 0) {
+                            icons.forEach(icon => {
                                 const btn = document.createElement('div');
-                                btn.className = 'relative bg-slate-50 border border-slate-200 rounded-lg cursor-pointer hover:border-indigo-500 transition duration-200 flex items-center justify-center p-2 aspect-square group';
-                                
-                                const isSVG = sticker.source === 'Iconify';
-                                btn.innerHTML = `<img src="${sticker.url}" loading="lazy" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-200 max-h-16">
-                                                <span class="absolute bottom-1 right-1 bg-slate-800/50 text-white text-[9px] px-1 rounded shadow">${isSVG ? 'Vector' : 'Art'}</span>`;
-                                btn.addEventListener('click', function() { isSVG ? addSVGToCanvas(sticker.url) : addImageToCanvas(sticker.url); });
+                                btn.className = 'relative bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:border-red-400 hover:shadow-md hover:shadow-red-50 transition-all duration-200 flex items-center justify-center w-full h-24 group overflow-hidden';
+                                btn.title = icon.name;
+                                btn.innerHTML = `<img src="${icon.url}" loading="lazy" 
+                                    class="w-14 h-14 object-contain group-hover:scale-110 transition-transform duration-200"
+                                    onerror="this.parentElement.style.display='none'">`;
+                                btn.addEventListener('click', function() {
+                                    if(icon.source === 'Iconify') {
+                                        addSVGToCanvas(icon.url);
+                                    } else {
+                                        addImageToCanvas(icon.url);
+                                    }
+                                });
                                 stickersContainer.appendChild(btn);
                             });
                         } else {
-                            stickersContainer.innerHTML = '<div class="col-span-2 text-center text-xs text-slate-500 py-4">Ikon tidak ditemukan.</div>';
+                            stickersContainer.innerHTML = '<div class="col-span-2 text-center text-xs text-slate-500 py-6"><div class="text-2xl mb-2">🔍</div>Ikon tidak ditemukan untuk kata kunci tersebut.</div>';
                         }
-                    }).catch(() => stickersContainer.innerHTML = '<div class="col-span-2 text-center text-xs text-red-400 py-4">Gagal menghubungkan.</div>');
+                    }).catch((e) => {
+                        console.error("Sticker Fetch Error:", e);
+                        // Fallback: tampilkan emoji/ikon bawaan jika API gagal
+                        showFallbackStickers();
+                    });
             }
-            // Auto search default
-            loadStickers('cool');
-            searchStickerBtn.addEventListener('click', () => { if(stickerSearchInput.value.trim()) loadStickers(stickerSearchInput.value.trim()); });
-            stickerSearchInput.addEventListener('keypress', (e) => { if(e.key === 'Enter' && stickerSearchInput.value.trim()) loadStickers(stickerSearchInput.value.trim()); });
+
+            // Stiker fallback bawaan jika API tidak dapat diakses
+            function showFallbackStickers() {
+                if(!stickersContainer) return;
+                const fallbackIcons = [
+                    { name: 'bintang', url: 'https://api.iconify.design/twemoji/star.svg' },
+                    { name: 'hati', url: 'https://api.iconify.design/twemoji/red-heart.svg' },
+                    { name: 'api', url: 'https://api.iconify.design/twemoji/fire.svg' },
+                    { name: 'mahkota', url: 'https://api.iconify.design/twemoji/crown.svg' },
+                    { name: 'petir', url: 'https://api.iconify.design/twemoji/high-voltage.svg' },
+                    { name: 'berlian', url: 'https://api.iconify.design/twemoji/gem-stone.svg' },
+                    { name: 'bulseye', url: 'https://api.iconify.design/twemoji/bullseye.svg' },
+                    { name: 'roket', url: 'https://api.iconify.design/twemoji/rocket.svg' },
+                    { name: 'musik', url: 'https://api.iconify.design/twemoji/musical-notes.svg' },
+                    { name: 'senyum', url: 'https://api.iconify.design/twemoji/smiling-face.svg' },
+                ];
+                stickersContainer.innerHTML = '<div class="col-span-2 text-[10px] text-slate-400 text-center mb-2 font-bold">Ikon Default</div>';
+                fallbackIcons.forEach(ic => {
+                    const btn = document.createElement('div');
+                    btn.className = 'relative bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:border-red-400 hover:shadow-md transition-all duration-200 flex items-center justify-center w-full h-24 group overflow-hidden';
+                    btn.title = ic.name;
+                    btn.innerHTML = `<img src="${ic.url}" loading="lazy" class="w-14 h-14 object-contain group-hover:scale-110 transition-transform duration-200" onerror="this.parentElement.style.display='none'">`;
+                    btn.addEventListener('click', () => addSVGToCanvas(ic.url));
+                    stickersContainer.appendChild(btn);
+                });
+            }
+            
+            // Bungkus inisialisasi stiker agar error dari luar tidak membatasinya
+            try {
+                // Auto load default stickers (twemoji-based populer)
+                loadStickers('star');
+                if(searchStickerBtn) {
+                    searchStickerBtn.addEventListener('click', () => {
+                        const q = stickerSearchInput ? stickerSearchInput.value.trim() : '';
+                        loadStickers(q || 'star');
+                    });
+                }
+                if(stickerSearchInput) {
+                    stickerSearchInput.addEventListener('keypress', (e) => {
+                        if(e.key === 'Enter') loadStickers(stickerSearchInput.value.trim() || 'star');
+                    });
+                }
+            } catch(e) {
+                console.error("Error at Sticker Init:", e);
+            }
 
             // --- EDITOR CONTROLS LOGIC ---
-            [canvasFront, canvasBack].forEach(c => {
+            const canvasesToHandle = [canvasFront, canvasBack];
+            if (canvasLeft) canvasesToHandle.push(canvasLeft);
+            if (canvasRight) canvasesToHandle.push(canvasRight);
+
+            canvasesToHandle.forEach(c => {
                 c.on('selection:created', showControls);
                 c.on('selection:updated', showControls);
                 c.on('selection:cleared', hideControls);
@@ -704,7 +855,7 @@
             function showControls(e) {
                 editorControls.classList.remove('hidden');
                 editorControls.classList.add('flex');
-                const activeObj = (e && e.selected) ? e.selected[0] : canvas.getActiveObject();
+                const activeObj = (e && e.selected) ? e.selected[0] : window.activeCanvas.getActiveObject();
                 if(!activeObj) return;
                 
                 // Hide All Contextual Controls first
@@ -743,12 +894,12 @@
             }
 
             // Sync color hex values
-            textColorControl.addEventListener('input', () => { document.getElementById('textColorVal').textContent = textColorControl.value.toUpperCase(); });
-            svgColorControl.addEventListener('input', () => { document.getElementById('svgColorVal').textContent = svgColorControl.value.toUpperCase(); });
+            if(textColorControl) { textColorControl.addEventListener('input', () => { document.getElementById('textColorVal').textContent = textColorControl.value.toUpperCase(); }); }
+            if(svgColorControl) { svgColorControl.addEventListener('input', () => { document.getElementById('svgColorVal').textContent = svgColorControl.value.toUpperCase(); }); }
 
             // Logic Remove Background (Magic Eraser) for Images
             removeBgBtn.addEventListener('click', function() {
-                const activeObj = canvas.getActiveObject();
+                const activeObj = window.activeCanvas.getActiveObject();
                 if(activeObj && activeObj.type === 'image') {
                     // Cek jika filter RemoveColor sudah ada
                     const hasFilter = activeObj.filters.some(f => f.type === 'RemoveColor');
@@ -770,7 +921,7 @@
 
                     activeObj.filters.push(filter);
                     activeObj.applyFilters();
-                    canvas.renderAll();
+                    window.activeCanvas.renderAll();
 
                     setTimeout(() => {
                         this.innerHTML = oldHtml;
@@ -781,20 +932,22 @@
 
             // Logic Merubah Warna Dynamic pada SVG
             svgColorControl.addEventListener('input', function() {
-                const activeObj = canvas.getActiveObject();
+                const activeObj = window.activeCanvas.getActiveObject();
                 if(activeObj && activeObj.type === 'group' && activeObj.customType === 'custom-svg') {
                     const newColor = this.value;
-                    // Loop setiap elemen di dalam grup vektor SVG
-                    activeObj._objects.forEach(pathObj => {
-                        // Jangan warnai elemen yang tidak punya fill atau transparan
-                        if(pathObj.fill && pathObj.fill !== 'none' && pathObj.fill !== 'transparent') {
-                            pathObj.set('fill', newColor);
+                    
+                    function applyDeepColor(obj, col) {
+                        if(obj._objects) {
+                            obj._objects.forEach(child => applyDeepColor(child, col));
+                        } else {
+                            if(obj.fill && obj.fill !== 'none' && obj.fill !== 'transparent') obj.set('fill', col);
+                            if(obj.stroke && obj.stroke !== 'none' && obj.stroke !== 'transparent') obj.set('stroke', col);
                         }
-                        if(pathObj.stroke && pathObj.stroke !== 'none' && pathObj.stroke !== 'transparent') {
-                             pathObj.set('stroke', newColor);
-                        }
-                    });
-                    canvas.renderAll();
+                    }
+                    
+                    // Loop setiap elemen di dalam grup vektor SVG secara rekursif
+                    applyDeepColor(activeObj, newColor);
+                    window.activeCanvas.renderAll();
                 }
             });
 
@@ -804,8 +957,8 @@
             }
 
             deleteObjBtn.addEventListener('click', function() {
-                const activeObj = canvas.getActiveObject();
-                if(activeObj) { canvas.remove(activeObj); hideControls(); }
+                const activeObj = window.activeCanvas.getActiveObject();
+                if(activeObj) { window.activeCanvas.remove(activeObj); hideControls(); }
             });
 
             // --- SUBMIT SAVE TO SERVER ---
@@ -814,6 +967,14 @@
                 canvasFront.renderAll();
                 canvasBack.discardActiveObject(); 
                 canvasBack.renderAll();
+                if (canvasLeft) {
+                    canvasLeft.discardActiveObject();
+                    canvasLeft.renderAll();
+                }
+                if (canvasRight) {
+                    canvasRight.discardActiveObject();
+                    canvasRight.renderAll();
+                }
 
                 const activeBaseColor = window.activeBaseColorLocal || '#ffffff';
                 const lebarCm = 30; // Proporsi standar A3 sablon
@@ -821,18 +982,29 @@
 
                 let frontDataURL = '';
                 let backDataURL = '';
+                let leftDataURL = '';
+                let rightDataURL = '';
 
                 // Ambil data jika ada objek (atau jika canvas kosong, kita kirimkan blank untuk depan sebagai mandatory)
                 frontDataURL = canvasFront.toDataURL({ format: 'png', quality: 1, multiplier: 4 });
                 
-                if (canvasBack.getObjects().length > 0) {
+                if (canvasBack && canvasBack.getObjects().length > 0) {
                     backDataURL = canvasBack.toDataURL({ format: 'png', quality: 1, multiplier: 4 });
+                }
+                if (canvasLeft && canvasLeft.getObjects().length > 0) {
+                    leftDataURL = canvasLeft.toDataURL({ format: 'png', quality: 1, multiplier: 4 });
+                }
+                if (canvasRight && canvasRight.getObjects().length > 0) {
+                    rightDataURL = canvasRight.toDataURL({ format: 'png', quality: 1, multiplier: 4 });
                 }
 
                 const payload = {
                     _token: '{{ csrf_token() }}',
                     id_produk: '{{ $produk->id_produk }}',
                     file_desain: frontDataURL, 
+                    file_desain_belakang: backDataURL,
+                    file_desain_kiri: leftDataURL,
+                    file_desain_kanan: rightDataURL,
                     lebar_cm: lebarCm,
                     tinggi_cm: tinggiCm,
                     warna_baju: activeBaseColor,
@@ -844,16 +1016,26 @@
                     payload.lebar_cm_belakang = lebarCm;
                     payload.tinggi_cm_belakang = tinggiCm;
                 }
+                if (leftDataURL !== '') {
+                    payload.file_desain_kiri = leftDataURL;
+                    payload.lebar_cm_kiri = lebarCm;
+                    payload.tinggi_cm_kiri = tinggiCm;
+                }
+                if (rightDataURL !== '') {
+                    payload.file_desain_kanan = rightDataURL;
+                    payload.lebar_cm_kanan = lebarCm;
+                    payload.tinggi_cm_kanan = tinggiCm;
+                }
 
                 const oldText = this.innerHTML;
                 this.innerHTML = 'Memproses... ⏳';
                 this.disabled = true;
 
-                let submitUrl = '{{ route('customer.designs.store') }}';
+                let submitUrl = '/customer/design';
                 let httpMethod = 'POST';
                 
                 @if($desainRevisi)
-                    submitUrl = '{{ route('customer.designs.update', $desainRevisi->id_desain) }}';
+                    submitUrl = '/customer/design/{{ $desainRevisi->id_desain }}';
                     payload._method = 'PATCH';
                 @endif
 
@@ -876,6 +1058,20 @@
                     this.disabled = false;
                 });
             });
-        });
+          } catch(err) {
+             console.error("FATAL ERROR IN EDITOR JS:", err);
+             const errorDiv = document.createElement('div');
+             errorDiv.style.cssText = 'position:fixed; top:0; left:0; right:0; background:red; color:white; z-index:9999; padding:20px;';
+             errorDiv.innerHTML = "Error in JS initializing: " + err.message + "<br><pre>" + err.stack + "</pre>";
+             document.body.appendChild(errorDiv);
+             alert("Error in JS initializing: " + err.message);
+          }
+        }
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initFabricEditor);
+        } else {
+            initFabricEditor();
+        }
     </script>
 </x-app-layout>

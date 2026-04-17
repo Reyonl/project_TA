@@ -162,6 +162,38 @@
                                 </div>
                                 @endif
 
+                                <!-- DESAIN KIRI -->
+                                @if($detail->desain && $detail->desain->file_desain_kiri)
+                                <div class="w-[80px] h-[100px] rounded-lg overflow-hidden bg-slate-50 border border-slate-200 shrink-0 flex items-center justify-center relative shadow-inner">
+                                    <span class="absolute top-0.5 left-0.5 z-30 bg-white/80 text-[8px] font-bold px-1 rounded shadow-sm">Kiri</span>
+                                    @php $mockupPathL = asset('images/mockups/' . $mockupBase . '_kiri.png'); @endphp
+                                    <img src="{{ $mockupPathL }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-90 z-0" onerror="this.src='{{ $mockupPath }}'">
+                                    <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10"
+                                         style="-webkit-mask-image: url('{{ $mockupPathL }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ $mockupPathL }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
+                                        <div class="w-full h-full" style="background-color: {{ $detail->desain->warna_baju ?: '#ffffff' }};"></div>
+                                    </div>
+                                    <div class="absolute z-20" style="{{ $overlayStyle ?? 'top: 20%; left: 27.08%; width: 45.83%; height: 53.33%;' }}">
+                                        <img src="{{ Str::startsWith($detail->desain->file_desain_kiri, 'data:image') ? $detail->desain->file_desain_kiri : asset('storage/' . $detail->desain->file_desain_kiri) }}" class="w-full h-full object-contain">
+                                    </div>
+                                </div>
+                                @endif
+
+                                <!-- DESAIN KANAN -->
+                                @if($detail->desain && $detail->desain->file_desain_kanan)
+                                <div class="w-[80px] h-[100px] rounded-lg overflow-hidden bg-slate-50 border border-slate-200 shrink-0 flex items-center justify-center relative shadow-inner">
+                                    <span class="absolute top-0.5 left-0.5 z-30 bg-white/80 text-[8px] font-bold px-1 rounded shadow-sm">Kanan</span>
+                                    @php $mockupPathR = asset('images/mockups/' . $mockupBase . '_kanan.png'); @endphp
+                                    <img src="{{ $mockupPathR }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-90 z-0" onerror="this.src='{{ $mockupPath }}'">
+                                    <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10"
+                                         style="-webkit-mask-image: url('{{ $mockupPathR }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ $mockupPathR }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
+                                        <div class="w-full h-full" style="background-color: {{ $detail->desain->warna_baju ?: '#ffffff' }};"></div>
+                                    </div>
+                                    <div class="absolute z-20" style="{{ $overlayStyle ?? 'top: 20%; left: 27.08%; width: 45.83%; height: 53.33%;' }}">
+                                        <img src="{{ Str::startsWith($detail->desain->file_desain_kanan, 'data:image') ? $detail->desain->file_desain_kanan : asset('storage/' . $detail->desain->file_desain_kanan) }}" class="w-full h-full object-contain">
+                                    </div>
+                                </div>
+                                @endif
+
                             <div class="flex-1">
                                 <p class="font-bold text-slate-800">{{ $detail->produk->nama_produk ?? 'Produk' }}</p>
                                 <div class="flex items-center gap-2 mt-1">

@@ -49,6 +49,29 @@
                                 'dibatalkan' => ['label' => 'Dibatalkan',          'color' => 'bg-rose-100 text-rose-700 border-rose-200',       'icon' => '❌'],
                             ];
                             $status = $statusConfig[$order->status_order] ?? ['label' => ucfirst($order->status_order), 'color' => 'bg-slate-100 text-slate-700 border-slate-200', 'icon' => '📋'];
+                        @endphp
+                        
+                        <a href="{{ route('customer.orders.show', $order->id_order) }}" class="block p-6 bg-white rounded-[2rem] border border-slate-200 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-100 transition-all duration-300 transform hover:-translate-y-1">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                <div>
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <span class="text-xs font-black text-slate-400 uppercase tracking-widest">Order ID</span>
+                                        <h3 class="text-xl font-bold text-slate-900">#{{ str_pad($order->id_order, 5, '0', STR_PAD_LEFT) }}</h3>
+                                    </div>
+                                    <p class="text-sm text-slate-500 flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        {{ \Carbon\Carbon::parse($order->tanggal_order)->isoFormat('D MMMM YYYY, HH:mm') }}
+                                    </p>
+                                </div>
+                                <div class="flex flex-col md:items-end gap-2">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-sm font-bold border {{ $status['color'] }}">
+                                        <span>{{ $status['icon'] }}</span>
+                                        {{ $status['label'] }}
+                                    </span>
+                                    <span class="text-lg font-black text-indigo-700">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</span>
+                                </div>
+                            </div>
+                        </a>
                     @endforeach
                 </div>
             @endif
