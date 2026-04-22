@@ -3,13 +3,53 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <x-slot name="header">
-        <h2 class="font-black text-2xl text-slate-800 leading-tight font-outfit uppercase tracking-tight">
-            Analytics & Performance <span class="text-red-600">(Owner)</span>
-        </h2>
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+            <h2 class="font-black text-2xl text-slate-800 leading-tight font-outfit uppercase tracking-tight">
+                Analytics & Performance <span class="text-red-600">(Owner)</span>
+            </h2>
+
+            <!-- FItur Print -->
+            <button onclick="window.print()" class="print:hidden bg-slate-900 text-white px-6 py-2 rounded-full font-bold shadow-lg hover:bg-slate-800 hover:-translate-y-1 transition flex items-center gap-2">
+                🖨️ Cetak PDF
+            </button>
+        </div>
     </x-slot>
+
+    <!-- CSS khusus Cetak -->
+    <style>
+        @media print {
+            body { background: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .print\:hidden { display: none !important; }
+            .shadow-sm, .shadow-xl { box-shadow: none !important; border: 1px solid #e2e8f0; }
+            canvas { max-width: 100% !important; height: auto !important; }
+            nav, header { display: none !important; }
+            .py-12 { padding: 0 !important; }
+        }
+    </style>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+
+            <!-- Filter Tanggal -->
+            <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm print:hidden">
+                <form method="GET" action="{{ route('admin.report.index') }}" class="flex flex-col md:flex-row items-end gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Mulai Tanggal</label>
+                        <input type="date" name="start_date" value="{{ $startDate->format('Y-m-d') }}" class="border-slate-200 rounded-xl px-4 py-2 text-sm focus:ring-red-500 focus:border-red-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Sampai Tanggal</label>
+                        <input type="date" name="end_date" value="{{ $endDate->format('Y-m-d') }}" class="border-slate-200 rounded-xl px-4 py-2 text-sm focus:ring-red-500 focus:border-red-500">
+                    </div>
+                    <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded-xl font-bold shadow-md shadow-red-200 hover:bg-red-700 transition">Filter Data</button>
+                    
+                    @if(request()->has('start_date'))
+                        <a href="{{ route('admin.report.index') }}" class="text-sm font-semibold text-slate-500 hover:text-slate-800 underline">Reset</a>
+                    @endif
+                </form>
+                <p class="text-xs text-slate-400 mt-3 font-semibold">Menampilkan data periode: <span class="text-red-600">{{ $startDate->format('d M Y') }}</span> s/d <span class="text-red-600">{{ $endDate->format('d M Y') }}</span></p>
+            </div>
+
             <!-- Summary KPI Cards -->
             <div class="bg-white overflow-hidden shadow-[0_20px_50px_rgba(220,_38,_38,_0.05)] sm:rounded-[2.5rem] border border-slate-100 p-10 relative overflow-hidden group">
                 <div class="absolute -top-10 -right-10 w-40 h-40 bg-red-50 rounded-full blur-3xl opacity-50 group-hover:scale-150 transition-transform duration-1000"></div>
@@ -93,6 +133,51 @@
                             <p class="text-slate-500 text-sm italic text-center py-4">Belum ada data warna baju.</p>
                         @endforelse
                     </ul>
+                </div>
+            </div>
+
+            <!-- Tabel Transaksi Terbaru -->
+            <div class="bg-white shadow-xl shadow-slate-100/50 sm:rounded-[2rem] border border-slate-100 p-8 overflow-hidden relative">
+                <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">📝 Riwayat Transaksi Terbaru</h4>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-500 text-xs uppercase tracking-widest border-y border-slate-100">
+                                <th class="py-4 px-4 font-black">Tgl Order</th>
+                                <th class="py-4 px-4 font-black">Customer</th>
+                                <th class="py-4 px-4 font-black">Total Rp</th>
+                                <th class="py-4 px-4 font-black">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm divide-y divide-slate-100">
+                            @forelse($recentOrders as $order)
+                                <tr class="hover:bg-slate-50/50 transition">
+                                    <td class="py-4 px-4 font-medium text-slate-600">{{ \Carbon\Carbon::parse($order->tanggal_order)->format('d M Y H:i') }}</td>
+                                    <td class="py-4 px-4 font-bold text-slate-800">{{ $order->customer->nama_customer ?? 'Umum' }}</td>
+                                    <td class="py-4 px-4 font-black text-slate-900 border-l border-slate-100">Rp {{ number_format($order->total_harga, 0, ',', '.') }}</td>
+                                    <td class="py-4 px-4">
+                                        @php
+                                            $badgeColor = match($order->status_order) {
+                                                'menunggu_konfirmasi' => 'bg-amber-100 text-amber-700',
+                                                'diproses' => 'bg-blue-100 text-blue-700',
+                                                'dikirim' => 'bg-indigo-100 text-indigo-700',
+                                                'selesai' => 'bg-emerald-100 text-emerald-700',
+                                                'dibatalkan' => 'bg-red-100 text-red-700',
+                                                default => 'bg-slate-100 text-slate-700'
+                                            };
+                                        @endphp
+                                        <span class="px-3 py-1 text-xs font-black uppercase tracking-wider rounded-lg {{ $badgeColor }}">
+                                            {{ str_replace('_', ' ', $order->status_order) }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center py-8 text-slate-400 font-medium italic">Tidak ada transaksi di rentang waktu ini.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
