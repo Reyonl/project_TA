@@ -154,7 +154,7 @@
                         <div class="flex items-center bg-slate-100 rounded-xl p-1 border border-slate-200 ml-4 shadow-inner">
                             <button @click="activeSide = 'front'; window.switchCanvasSide('front')" :class="activeSide === 'front' ? 'bg-white shadow-sm text-red-700 font-extrabold' : 'text-slate-500 hover:text-slate-700'" class="px-5 py-1.5 text-xs rounded-lg transition-all">DEPAN</button>
                             <button @click="activeSide = 'back'; window.switchCanvasSide('back')" :class="activeSide === 'back' ? 'bg-white shadow-sm text-red-700 font-extrabold' : 'text-slate-500 hover:text-slate-700'" class="px-5 py-1.5 text-xs rounded-lg transition-all">BELAKANG</button>
-                            @if($produk->jenis_produk == 'topi')
+                            @if(strtolower($produk->jenis_produk) == 'topi')
                             <button @click="activeSide = 'left'; window.switchCanvasSide('left')" :class="activeSide === 'left' ? 'bg-white shadow-sm text-red-700 font-extrabold' : 'text-slate-500 hover:text-slate-700'" class="px-5 py-1.5 text-xs rounded-lg transition-all">KIRI</button>
                             <button @click="activeSide = 'right'; window.switchCanvasSide('right')" :class="activeSide === 'right' ? 'bg-white shadow-sm text-red-700 font-extrabold' : 'text-slate-500 hover:text-slate-700'" class="px-5 py-1.5 text-xs rounded-lg transition-all">KANAN</button>
                             @endif
@@ -220,7 +220,7 @@
                         <div class="absolute inset-0 z-0 pointer-events-none" id="baseColorContainer">
                              <div class="w-full h-full flex items-center justify-center relative overflow-hidden">
                                 @php
-                                    $hasBack = in_array($produk->jenis_produk, ['kaos', 'hoodie', 'polo', 'seragam']);
+                                    $hasBack = in_array($produk->jenis_produk, ['kaos', 'hoodie', 'polo', 'seragam', 'topi']);
                                     $mockupBase = match($produk->jenis_produk) {
                                         'kaos' => 'kaos',
                                         'hoodie' => 'hoodie',
@@ -241,16 +241,13 @@
                                     }
                                 }" class="w-full h-full flex items-center justify-center">
 
-                                    <!-- Base Mockup Texture -->
-                                    <img :src="getMockupUrl()" 
-                                         class="absolute object-contain drop-shadow-2xl opacity-90 transition-all duration-500"
-                                         :class="technique === 'bordir' ? 'w-[100%] h-[100%]' : 'w-[85%] h-[85%]'"
-                                         onerror="this.src='{{ asset('images/mockups/'.$mockupBase.'.png') }}'">
-                                    
-                                    <!-- Color Tint Layer -->
-                                    <div class="absolute mix-blend-multiply transition-all duration-500"
+                                    <!-- Base Mockup Texture & Color Tint Combined -->
+                                    <div class="absolute inset-0 m-auto transition-all duration-500 drop-shadow-2xl bg-contain bg-center bg-no-repeat opacity-90"
                                          :class="technique === 'bordir' ? 'w-[100%] h-[100%]' : 'w-[85%] h-[85%]'"
                                          :style="{ 
+                                            'background-color': baseColor,
+                                            'background-image': `url(${getMockupUrl()})`,
+                                            'background-blend-mode': 'multiply',
                                             '-webkit-mask-image': `url(${getMockupUrl()})`, 
                                             '-webkit-mask-size': 'contain', 
                                             '-webkit-mask-position': 'center', 
@@ -261,7 +258,6 @@
                                             'mask-repeat': 'no-repeat' 
                                          }"
                                          x-effect="if(getMockupUrl().includes('_belakang') && !'{{ $hasBack }}' && '{{ $produk->jenis_produk }}' !== 'topi') { $el.style.webkitMaskImage = `url({{ asset('images/mockups/'.$mockupBase.'.png') }})`; $el.style.maskImage = `url({{ asset('images/mockups/'.$mockupBase.'.png') }})`; }">
-                                        <div class="w-full h-full transition-colors duration-300" :style="`background-color: ${baseColor};`"></div>
                                     </div>
 
                                 </div>
@@ -418,11 +414,28 @@
 
                     <!-- Image Properties -->
                     <div id="imageControls" class="hidden flex-col gap-4">
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Opsi Gambar</p>
-                        <button id="removeBgBtn" class="w-full bg-sky-50 border border-sky-100 text-sky-600 text-xs font-black py-4 rounded-xl hover:bg-sky-100 transition flex items-center justify-center gap-2 shadow-sm shadow-sky-50 uppercase tracking-widest">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                            <span>✨ Hapus Background</span>
-                        </button>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Hapus Latar/Warna Dasar</p>
+                        
+                        <div class="flex items-center gap-4">
+                            <div class="flex-1">
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Warna Target</label>
+                                <input type="color" id="removeColorTarget" class="w-full h-8 p-0.5 border border-slate-200 rounded-lg cursor-pointer bg-white" value="#ffffff">
+                            </div>
+                            <div class="flex-1">
+                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Toleransi (<span id="tolValue">15</span>%)</label>
+                                <input type="range" id="removeColorTolerance" min="0" max="50" value="15" class="w-full h-1.5 bg-slate-200 rounded-full appearance-none accent-sky-500 cursor-pointer">
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2">
+                             <button id="detectBgColorBtn" class="flex-1 bg-slate-100 text-slate-600 text-xs font-bold py-3 rounded-xl hover:bg-slate-200 transition border border-slate-200 shadow-sm" title="Deteksi otomatis warna pojok ujung gambar">
+                                🔍 Auto Detect
+                             </button>
+                             <button id="removeBgBtn" class="flex-1 bg-sky-50 border border-sky-100 text-sky-600 text-xs font-black py-3 rounded-xl hover:bg-sky-100 transition flex items-center justify-center gap-1 shadow-sm uppercase tracking-widest">
+                                ✨ EKSEKUSI
+                             </button>
+                        </div>
+                        <button id="resetBgBtn" class="w-full text-[10px] uppercase font-bold text-slate-400 hover:text-red-500 transition py-2 underline mt-1">Undo Hapus Latar</button>
                     </div>
 
                     <!-- SVG Vector Properties -->
@@ -484,20 +497,28 @@
         .pattern-isometric { background-image: linear-gradient(30deg, #e2e8f0 12%, transparent 12.5%, transparent 87%, #e2e8f0 87.5%, #e2e8f0), linear-gradient(150deg, #e2e8f0 12%, transparent 12.5%, transparent 87%, #e2e8f0 87.5%, #e2e8f0), linear-gradient(30deg, #e2e8f0 12%, transparent 12.5%, transparent 87%, #e2e8f0 87.5%, #e2e8f0), linear-gradient(150deg, #e2e8f0 12%, transparent 12.5%, transparent 87%, #e2e8f0 87.5%, #e2e8f0), linear-gradient(60deg, #cbd5e1 25%, transparent 25.5%, transparent 75%, #cbd5e1 75%, #cbd5e1), linear-gradient(60deg, #cbd5e1 25%, transparent 25.5%, transparent 75%, #cbd5e1 75%, #cbd5e1); background-size: 40px 70px; background-position: 0 0, 0 0, 20px 35px, 20px 35px, 0 0, 20px 35px; }
     </style>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Script Logika Fabric.js & Kontrol Editor -->
     <script>
 
 
         function initFabricEditor() {
           try {
+            // Paksa Fabric.js merender kanvas 3x lebih tajam (High Definition) meski layar pengguna bukan Retina
+            fabric.devicePixelRatio = (window.devicePixelRatio && window.devicePixelRatio > 2) ? window.devicePixelRatio : 3;
+
             // Inisialisasi Canvas Fabric (Ukuran baru: 480x600)
             const canvasFront = new fabric.Canvas('tshirt-canvas-front', {
                 preserveObjectStacking: true,
-                selection: true
+                selection: true,
+                enableRetinaScaling: true,
+                imageSmoothingEnabled: true
             });
             const canvasBack = new fabric.Canvas('tshirt-canvas-back', {
                 preserveObjectStacking: true,
-                selection: true
+                selection: true,
+                enableRetinaScaling: true,
+                imageSmoothingEnabled: true
             });
             let canvasLeft = null;
             let canvasRight = null;
@@ -547,6 +568,10 @@
 
             const imageControls = document.getElementById('imageControls');
             const removeBgBtn = document.getElementById('removeBgBtn');
+            const removeColorTarget = document.getElementById('removeColorTarget');
+            const removeColorTolerance = document.getElementById('removeColorTolerance');
+            const detectBgColorBtn = document.getElementById('detectBgColorBtn');
+            const resetBgBtn = document.getElementById('resetBgBtn');
 
             const svgControls = document.getElementById('svgControls');
             const svgColorControl = document.getElementById('svgColorControl');
@@ -561,6 +586,9 @@
             fabric.Object.prototype.cornerSize = 14;
             fabric.Object.prototype.padding = 10;
             fabric.Object.prototype.borderDashArray = [4, 4];
+            fabric.Object.prototype.objectCaching = false; // Mencegah gambar menjadi blur saat di-resize (HD resolution maintained)
+            fabric.Image.prototype.objectCaching = false;
+            fabric.Image.prototype.noScaleCache = false;
 
             // Cukup gunakan default resize & rotate milik FabricJS. 
             // Control custom dihapus untuk stabilitas plugin pada teks dan stiker.
@@ -680,7 +708,7 @@
                     if(img.width > pa_width) img.scaleToWidth(pa_width - 20);
                     else if(img.width < 40) img.scaleToWidth(80);
                     
-                    img.set({ left: 10, top: 10 });
+                    img.set({ left: 10, top: 10, objectCaching: false });
                     img.customType = 'custom-image';
                     window.activeCanvas.add(img);
                     window.activeCanvas.setActiveObject(img);
@@ -693,7 +721,7 @@
                         const img = new fabric.Image(imgEl2);
                         if(img.width > pa_width) img.scaleToWidth(pa_width - 20);
                         else if(img.width < 40) img.scaleToWidth(80);
-                        img.set({ left: 10, top: 10 });
+                        img.set({ left: 10, top: 10, objectCaching: false });
                         img.customType = 'custom-image';
                         window.activeCanvas.add(img);
                         window.activeCanvas.setActiveObject(img);
@@ -736,10 +764,11 @@
                         var img = new fabric.Image(imgObj);
                         const pa_width = window.activeCanvas.width;
                         if(img.width > pa_width) img.scaleToWidth(pa_width - 20);
-                        img.set({ left: 10, top: 10 });
+                        img.set({ left: 10, top: 10, objectCaching: false });
                         img.customType = 'custom-image';
                         window.activeCanvas.add(img);
                         window.activeCanvas.setActiveObject(img);
+                        window.activeCanvas.requestRenderAll();
                     }
                 }
                 reader.readAsDataURL(e.target.files[0]);
@@ -897,26 +926,82 @@
             if(textColorControl) { textColorControl.addEventListener('input', () => { document.getElementById('textColorVal').textContent = textColorControl.value.toUpperCase(); }); }
             if(svgColorControl) { svgColorControl.addEventListener('input', () => { document.getElementById('svgColorVal').textContent = svgColorControl.value.toUpperCase(); }); }
 
+            // Control Tolerance UI
+            if(removeColorTolerance) {
+                removeColorTolerance.addEventListener('input', function() {
+                    document.getElementById('tolValue').textContent = this.value;
+                });
+            }
+
+            // Auto-detect corner pixel color for background removal
+            if(detectBgColorBtn) {
+                detectBgColorBtn.addEventListener('click', function() {
+                    const activeObj = window.activeCanvas.getActiveObject();
+                    if(activeObj && activeObj.type === 'image' && activeObj.getElement()) {
+                        try {
+                            const originalImgElement = activeObj.getElement();
+                            const tempCanvas = document.createElement('canvas');
+                            const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
+                            
+                            // Ambil ukuran asli gambar (100x100 sudah mumpuni untuk deteksi bg color)
+                            tempCanvas.width = originalImgElement.naturalWidth || originalImgElement.width || 100;
+                            tempCanvas.height = originalImgElement.naturalHeight || originalImgElement.height || 100;
+                            
+                            // Skala objek/resolusi
+                            tempCtx.drawImage(originalImgElement, 0, 0, tempCanvas.width, tempCanvas.height);
+                            // Cek pixel 0,0 (pojok kiri atas)
+                            const pixelData = tempCtx.getImageData(0, 0, 1, 1).data;
+                            
+                            // Jika alpha 0, berarti transparan, fallback ke pixel 10,10 atau abaikan
+                            if(pixelData[3] < 10) {
+                                Swal.fire({
+                                    icon: 'info',
+                                    title: 'Transparan',
+                                    text: 'Sudut gambar sudah transparan, sistem tidak mendeteksi warna dasar.',
+                                    confirmButtonColor: '#3085d6'
+                                });
+                                return;
+                            }
+                            
+                            const hex = '#' + ((1 << 24) + (pixelData[0] << 16) + (pixelData[1] << 8) + pixelData[2]).toString(16).slice(1);
+                            removeColorTarget.value = hex;
+                            
+                        } catch(e) {
+                            console.warn('Deteksi warna terhalang proteksi CORS gambar. Silakan pilih warna manual.', e);
+                        }
+                    }
+                });
+            }
+
+            // Reset (Undo) Hapus Latar
+            if(resetBgBtn) {
+                resetBgBtn.addEventListener('click', function() {
+                    const activeObj = window.activeCanvas.getActiveObject();
+                    if(activeObj && activeObj.type === 'image') {
+                        activeObj.filters = activeObj.filters.filter(f => f.type !== 'RemoveColor');
+                        activeObj.applyFilters();
+                        window.activeCanvas.renderAll();
+                    }
+                });
+            }
+
             // Logic Remove Background (Magic Eraser) for Images
             removeBgBtn.addEventListener('click', function() {
                 const activeObj = window.activeCanvas.getActiveObject();
                 if(activeObj && activeObj.type === 'image') {
-                    // Cek jika filter RemoveColor sudah ada
-                    const hasFilter = activeObj.filters.some(f => f.type === 'RemoveColor');
-                    if(hasFilter) {
-                        alert('Background sudah dihancurkan pada gambar ini.');
-                        return;
-                    }
-
                     const oldHtml = this.innerHTML;
                     this.innerHTML = 'Memproses...';
                     this.disabled = true;
 
-                    // Apply Fabric.js RemoveColor filter untuk membuang warna putih/polos
-                    // distance adalah tingkat sensitivitas toleransi warna putih (mirip magic wand tolerance)
+                    // Remove old instance of RemoveColor filter to prevent stacking
+                    activeObj.filters = activeObj.filters.filter(f => f.type !== 'RemoveColor');
+
+                    // Distance set via slider (slider is 0-50 percentage, we convert to 0.0 - 0.5)
+                    const dist = (parseInt(removeColorTolerance.value) || 15) / 100;
+
                     const filter = new fabric.Image.filters.RemoveColor({
-                        color: '#FFFFFF',
-                        distance: 0.12 
+                        color: removeColorTarget.value,
+                        distance: dist 
                     });
 
                     activeObj.filters.push(filter);
@@ -926,7 +1011,7 @@
                     setTimeout(() => {
                         this.innerHTML = oldHtml;
                         this.disabled = false;
-                    }, 500);
+                    }, 300);
                 }
             });
 
@@ -976,6 +1061,21 @@
                     canvasRight.renderAll();
                 }
 
+                // Validasi: Cek apakah seluruh sisi kanvas kosong
+                let totalObjects = canvasFront.getObjects().length + canvasBack.getObjects().length;
+                if (canvasLeft) totalObjects += canvasLeft.getObjects().length;
+                if (canvasRight) totalObjects += canvasRight.getObjects().length;
+
+                if (totalObjects === 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Kanvas Kosong!',
+                        text: 'Silakan tambahkan objek desain (teks/gambar/stiker) terlebih dahulu sebelum menyimpan.',
+                        confirmButtonColor: '#ef4444' // red-500
+                    });
+                    return; // Batalkan proses simpan
+                }
+
                 const activeBaseColor = window.activeBaseColorLocal || '#ffffff';
                 const lebarCm = 30; // Proporsi standar A3 sablon
                 const tinggiCm = 45;
@@ -998,6 +1098,19 @@
                     rightDataURL = canvasRight.toDataURL({ format: 'png', quality: 1, multiplier: 4 });
                 }
 
+                // Ekstrak Raw Assets (Gambar Mentah yang diupload customer)
+                let rawAssets = [];
+                [canvasFront, canvasBack, canvasLeft, canvasRight].forEach(canvas => {
+                    if (canvas) {
+                        canvas.getObjects().forEach(obj => {
+                            // Hanya ambil gambar yang diupload user (custom-image)
+                            if (obj.customType === 'custom-image' && obj.getSrc) {
+                                rawAssets.push(obj.getSrc());
+                            }
+                        });
+                    }
+                });
+
                 const payload = {
                     _token: '{{ csrf_token() }}',
                     id_produk: '{{ $produk->id_produk }}',
@@ -1008,6 +1121,7 @@
                     lebar_cm: lebarCm,
                     tinggi_cm: tinggiCm,
                     warna_baju: activeBaseColor,
+                    raw_assets: rawAssets,
                     tipe_proses: new URLSearchParams(window.location.search).get('technique') || 'sablon'
                 };
 
@@ -1048,11 +1162,21 @@
                 .then(data => {
                     if(data.success) {
                         window.location.href = data.redirect_url;
-                    } else { alert('Gagal menyimpan desain!'); }
+                    } else { 
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Gagal menyimpan desain!',
+                        }); 
+                    }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('Terjadi kesalahan koneksi.');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Kesalahan Koneksi',
+                        text: 'Terjadi kesalahan saat menghubungi server.',
+                    });
                 }).finally(() => {
                     this.innerHTML = oldText;
                     this.disabled = false;

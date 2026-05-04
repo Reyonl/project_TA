@@ -57,6 +57,22 @@
                             {{ $order->customer->alamat ?? 'Alamat belum dilengkapi' }}
                         </li>
                     </ul>
+                    
+                    <h4 class="font-bold text-slate-800 border-b pb-2 mb-4 mt-6">Bukti Pembayaran</h4>
+                    @if($order->bukti_pembayaran)
+                        <div class="mt-2 text-center">
+                            <a href="{{ Storage::url($order->bukti_pembayaran) }}" target="_blank" class="block rounded-lg overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition">
+                                <img src="{{ Storage::url($order->bukti_pembayaran) }}" alt="Bukti Pembayaran" class="w-full max-h-64 object-contain bg-slate-50">
+                            </a>
+                            <a href="{{ Storage::url($order->bukti_pembayaran) }}" download="Bukti_Tf_{{ $order->id_order }}.jpg" class="mt-3 inline-block bg-slate-800 text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-slate-700 transition">
+                                Unduh Bukti
+                            </a>
+                        </div>
+                    @else
+                        <div class="mt-2 p-4 bg-yellow-50 text-yellow-700 text-sm font-semibold rounded-lg border border-yellow-200 text-center">
+                            Belum Ada / Belum Diunggah
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Info Order -->
@@ -116,6 +132,10 @@
                                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
                                                         Full Mockup Depan
                                                     </button>
+                                                    <a href="{{ $desainUrl }}" download="Cetak_Depan_Ord-{{ $order->id_order }}.png" class="mt-1 w-full bg-slate-800 hover:bg-slate-700 text-white text-[11px] font-bold py-2 px-3 rounded-lg border border-slate-700 transition duration-200 flex items-center justify-center gap-1.5 shadow-sm">
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4-4m0 0L8 12m4-4v12"></path></svg>
+                                                        File Cetak Depan (PNG)
+                                                    </a>
                                                 </div>
                                             @endif
 
@@ -124,7 +144,7 @@
                                                 <div class="flex flex-col items-center shrink-0 w-[280px] snap-center">
                                                     <span class="text-[10px] font-bold text-slate-400 mb-1">BELAKANG</span>
                                                     <div class="relative w-full h-[350px] rounded-lg overflow-hidden flex items-center justify-center shadow-inner bg-slate-50 border border-slate-200 group transition-all">
-                                                    @php $hasBack = in_array($detail->produk->jenis_produk, ['kaos', 'hoodie', 'polo', 'seragam']); @endphp
+                                                    @php $hasBack = in_array($detail->produk->jenis_produk, ['kaos', 'hoodie', 'polo', 'seragam', 'topi']); @endphp
                                                     @if($hasBack)
                                                         @php $mockupPathB = asset('images/mockups/' . $mockupBase . '_belakang.png'); @endphp
                                                         <img src="{{ $mockupPathB }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-95 z-0 transition-transform group-hover:scale-105" onerror="this.src='{{ $mockupPath }}'">
@@ -148,6 +168,10 @@
                                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
                                                         Full Mockup Belakang
                                                     </button>
+                                                    <a href="{{ $desainUrlB }}" download="Cetak_Belakang_Ord-{{ $order->id_order }}.png" class="mt-1 w-full bg-slate-800 hover:bg-slate-700 text-white text-[11px] font-bold py-2 px-3 rounded-lg border border-slate-700 transition duration-200 flex items-center justify-center gap-1.5 shadow-sm">
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4-4m0 0L8 12m4-4v12"></path></svg>
+                                                        File Cetak Belakang (PNG)
+                                                    </a>
                                                 </div>
                                             @endif
                                             
@@ -175,6 +199,10 @@
                                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
                                                         Full Mockup Kiri
                                                     </button>
+                                                    <a href="{{ $desainUrlL }}" download="Cetak_Kiri_Ord-{{ $order->id_order }}.png" class="mt-1 w-full bg-slate-800 hover:bg-slate-700 text-white text-[11px] font-bold py-2 px-3 rounded-lg border border-slate-700 transition duration-200 flex items-center justify-center gap-1.5 shadow-sm">
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4-4m0 0L8 12m4-4v12"></path></svg>
+                                                        File Cetak Kiri (PNG)
+                                                    </a>
                                                 </div>
                                             @endif
 
@@ -202,6 +230,10 @@
                                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
                                                         Full Mockup Kanan
                                                     </button>
+                                                    <a href="{{ $desainUrlR }}" download="Cetak_Kanan_Ord-{{ $order->id_order }}.png" class="mt-1 w-full bg-slate-800 hover:bg-slate-700 text-white text-[11px] font-bold py-2 px-3 rounded-lg border border-slate-700 transition duration-200 flex items-center justify-center gap-1.5 shadow-sm">
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4-4m0 0L8 12m4-4v12"></path></svg>
+                                                        File Cetak Kanan (PNG)
+                                                    </a>
                                                 </div>
                                             @endif
                                             
@@ -210,7 +242,14 @@
                                             @endif
                                         </div>
                                     @else
-                                        <span class="text-slate-400 text-sm py-8">Tidak ada desain kustom</span>
+                                        @if($detail->produk->gambar_produk)
+                                            <div class="flex flex-col items-center shrink-0 w-full py-4">
+                                                <img src="{{ Storage::url($detail->produk->gambar_produk) }}" class="w-full max-h-[300px] object-cover rounded-lg border border-slate-200 shadow-sm">
+                                                <p class="text-xs font-semibold text-emerald-600 mt-3 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100 uppercase tracking-wider">Produk Jadi</p>
+                                            </div>
+                                        @else
+                                            <span class="text-slate-400 text-sm py-8">Beli Langsung (Tanpa Desain)</span>
+                                        @endif
                                     @endif
                                 </div>
 
@@ -223,15 +262,33 @@
                                         <span class="px-2 py-0.5 {{ $detail->tipe_proses == 'bordir' ? 'bg-red-600' : 'bg-sky-500' }} text-white text-[9px] font-black uppercase tracking-widest rounded">{{ $detail->tipe_proses }}</span>
                                     </div>
                                     <div class="flex items-center gap-2 mb-2">
-                                        <p class="text-sm text-slate-500">Desain: {{ $detail->desain->nama_desain ?? 'Desain Kustom' }}</p>
-                                        @if($detail->desain && $detail->desain->warna_baju)
-                                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
-                                            Warna Baju:
-                                            <span class="w-3 h-3 rounded-full border border-slate-300 shadow-sm" style="background-color: {{ $detail->desain->warna_baju }}"></span>
-                                            {{ strtoupper($detail->desain->warna_baju) }}
-                                        </span>
+                                        @if($detail->desain)
+                                            <p class="text-sm text-slate-500">Desain: {{ $detail->desain->nama_desain ?? 'Desain Kustom' }}</p>
+                                            @if($detail->desain->warna_baju)
+                                            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                                                Warna Baju:
+                                                <span class="w-3 h-3 rounded-full border border-slate-300 shadow-sm" style="background-color: {{ $detail->desain->warna_baju }}"></span>
+                                                {{ strtoupper($detail->desain->warna_baju) }}
+                                            </span>
+                                            @endif
+                                        @else
+                                            <p class="text-sm font-semibold text-slate-600 bg-slate-100 px-2 rounded-md">Beli Langsung</p>
                                         @endif
                                     </div>
+
+                                    @if($detail->desain && $detail->desain->raw_assets && is_array($detail->desain->raw_assets) && count($detail->desain->raw_assets) > 0)
+                                    <div class="mb-3 p-3 bg-white border border-slate-200 rounded-lg">
+                                        <p class="text-xs font-bold text-slate-500 uppercase mb-2">Aset Mentah (Resolusi Asli)</p>
+                                        <div class="flex flex-wrap gap-2">
+                                            @foreach($detail->desain->raw_assets as $idx => $asset)
+                                                <a href="{{ Storage::url($asset) }}" download="Aset_Mentah_{{ $idx + 1 }}_Ord-{{ $order->id_order }}.png" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white text-[10px] font-bold rounded shadow-sm transition">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4-4m0 0L8 12m4-4v12"></path></svg>
+                                                    Aset Asli {{ $idx + 1 }}
+                                                </a>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                    @endif
                                     
                                     <div class="grid grid-cols-2 gap-4 mt-2 mb-3">
                                         <div class="bg-white p-2 rounded border border-slate-100">
@@ -254,9 +311,9 @@
                                             <p class="text-xs font-bold text-red-600 uppercase mb-1">Status: Menunggu Revisi Customer</p>
                                             <p class="text-sm text-red-700 italic">"{{ $detail->catatan_admin }}"</p>
                                         </div>
-                                    @elseif($detail->status_desain == 'disetujui')
+                                    @elseif($detail->status_desain == 'disetujui' || $detail->status_desain == 'approved')
                                         <div class="mt-3 p-2 bg-emerald-50 border border-emerald-200 rounded-lg text-center">
-                                            <p class="text-xs font-bold text-emerald-600 uppercase">Status: Desain Disetujui</p>
+                                            <p class="text-xs font-bold text-emerald-600 uppercase">Status: {{ $detail->desain ? 'Desain Disetujui' : 'Produk Jadi (Siap Proses)' }}</p>
                                         </div>
                                     @else
                                         <div class="mt-4 flex gap-2">

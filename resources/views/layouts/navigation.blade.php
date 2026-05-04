@@ -39,6 +39,9 @@
                     </x-nav-link>
  
                     @if($role === 'admin')
+                        <x-nav-link :href="route('admin.products.index')" :active="request()->routeIs('admin.products.*')">
+                            🛍️ Kelola Produk
+                        </x-nav-link>
                         <x-nav-link :href="route('admin.templates.index')" :active="request()->routeIs('admin.templates.*')">
                             🎨 Template
                         </x-nav-link>
@@ -47,7 +50,7 @@
                         </x-nav-link>
                     @endif
  
-                    @if($role === 'owner')
+                    @if($role === 'owner' || $role === 'admin')
                         <x-nav-link :href="route('admin.report.index')" :active="request()->routeIs('admin.report.*')">
                             📊 Laporan
                         </x-nav-link>
@@ -99,11 +102,17 @@
                             <x-dropdown-link :href="route('admin.dashboard')">
                                 🏠 Dashboard Admin
                             </x-dropdown-link>
+                            <x-dropdown-link :href="route('admin.products.index')">
+                                🛍️ Kelola Produk
+                            </x-dropdown-link>
                             <x-dropdown-link :href="route('admin.templates.index')">
                                 🎨 Kelola Template
                             </x-dropdown-link>
                             <x-dropdown-link :href="route('admin.orders.index')">
                                 📦 Kelola Pesanan
+                            </x-dropdown-link>
+                            <x-dropdown-link :href="route('admin.report.index')">
+                                📊 Laporan Penjualan
                             </x-dropdown-link>
                         @endif
 
@@ -165,11 +174,17 @@
             </x-responsive-nav-link>
 
             @if($role === 'admin')
+                <x-responsive-nav-link :href="route('admin.products.index')" :active="request()->routeIs('admin.products.*')">
+                    🛍️ Kelola Produk
+                </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('admin.templates.index')" :active="request()->routeIs('admin.templates.*')">
                     🎨 Kelola Template
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('admin.orders.index')" :active="request()->routeIs('admin.orders.*')">
                     📦 Kelola Pesanan
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.report.index')" :active="request()->routeIs('admin.report.*')">
+                    📊 Laporan Penjualan
                 </x-responsive-nav-link>
             @endif
 

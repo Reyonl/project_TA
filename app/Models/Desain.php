@@ -21,6 +21,11 @@ class Desain extends Model
         'harga_desain',
         'tanggal_upload',
         'warna_baju',
+        'raw_assets',
+    ];
+
+    protected $casts = [
+        'raw_assets' => 'array',
     ];
 
     public function customer()

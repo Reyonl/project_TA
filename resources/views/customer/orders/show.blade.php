@@ -107,7 +107,9 @@
                         <div class="flex items-start gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100">
                                 <!-- DESAIN DEPAN -->
                                 <div class="w-[80px] h-[100px] rounded-lg overflow-hidden bg-slate-50 border border-slate-200 shrink-0 flex items-center justify-center relative shadow-inner">
+                                    @if($detail->desain && $detail->desain->file_desain)
                                     <span class="absolute top-0.5 left-0.5 z-30 bg-white/80 text-[8px] font-bold px-1 rounded shadow-sm">Depan</span>
+                                    @endif
                                     @php
                                         $mockupBase = match($detail->produk->jenis_produk) {
                                             'kaos' => 'kaos',
@@ -140,6 +142,8 @@
                                         <div class="absolute z-20" style="{{ $overlayStyle }}">
                                             <img src="{{ Str::startsWith($detail->desain->file_desain, 'data:image') ? $detail->desain->file_desain : asset('storage/' . $detail->desain->file_desain) }}" class="w-full h-full object-contain">
                                         </div>
+                                    @elseif($detail->produk && $detail->produk->gambar_produk)
+                                        <img src="{{ asset('storage/' . $detail->produk->gambar_produk) }}" class="w-full h-full object-cover">
                                     @else
                                         <span class="text-3xl">🎨</span>
                                     @endif

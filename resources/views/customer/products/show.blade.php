@@ -70,73 +70,85 @@
             
             <!-- Left Side: Gallery Viewer -->
             <div class="w-full lg:w-[60%] flex gap-4 xl:gap-6 sticky top-24 h-fit">
-                <!-- Thumbnails (Vertical) -->
-                <div class="hidden md:flex flex-col gap-3 w-20 xl:w-24 shrink-0">
-                    @php
-                        $baseImg = match($produk->jenis_produk) {
-                            'kaos' => 'kaos.png',
-                            'hoodie' => 'hoodie.png',
-                            'topi' => 'topi.png',
-                            'polo' => 'polo.png',
-                            'seragam' => 'seragam.png',
-                            default => 'kaos.png'
-                        };
-                    @endphp
-                    <button class="w-full aspect-square border-2 border-slate-900 rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center relative">
-                        <img src="{{ asset('images/mockups/'.$baseImg) }}" class="w-[85%] object-contain" alt="Front Vew">
-                    </button>
-                    <button class="w-full aspect-square border border-slate-200 rounded-lg overflow-hidden bg-slate-100 hover:border-slate-400 transition flex items-center justify-center opacity-70 hover:opacity-100">
-                        <img src="{{ asset('images/mockups/'.$baseImg) }}" class="w-[85%] object-contain" alt="Pattern" style="filter: hue-rotate(90deg);">
-                    </button>
-                    <button class="w-full aspect-square border border-slate-200 rounded-lg overflow-hidden bg-slate-100 hover:border-slate-400 transition flex items-center justify-center opacity-70 hover:opacity-100">
-                        <img src="{{ asset('images/mockups/'.$baseImg) }}" class="w-[85%] object-contain" alt="Detail" style="transform: scale(1.5);">
-                    </button>
-                    <button class="w-full aspect-square border border-slate-200 rounded-lg overflow-hidden bg-slate-50 hover:border-slate-400 transition flex items-center justify-center opacity-70 hover:opacity-100 text-slate-400">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    </button>
-                </div>
-                
-                <!-- Main Image -->
-                <div class="flex-1 bg-slate-50/50 rounded-[3rem] overflow-hidden relative flex items-center justify-center p-8 lg:p-12 border border-slate-100 min-h-[400px] lg:min-h-[600px] group shadow-sm">
-                    <div class="absolute inset-0 bg-gradient-to-t from-slate-200/20 to-transparent"></div>
-                    
-                    @php $maskUrl = asset('images/mockups/'.$baseImg); @endphp
-                    <!-- Interactive Tinted Preview -->
-                    <div class="relative w-full h-full max-h-[500px] aspect-square flex items-center justify-center group-hover:scale-105 transition-transform duration-700">
-                        <!-- Shadow/Texture Layer (Transparent Overlay) -->
-                        <img src="{{ $maskUrl }}" class="absolute w-full h-full object-contain mix-blend-multiply opacity-30 z-20 pointer-events-none">
+                @if($produk->tipe_produk == 'jadi' && $produk->gambar_produk)
+                    <!-- Single Main Image for Ready-Made Products -->
+                    <div class="flex-1 bg-white rounded-[3rem] overflow-hidden relative flex items-center justify-center p-4 border border-slate-200 min-h-[400px] lg:min-h-[600px] group shadow-sm">
+                        <img src="{{ Storage::url($produk->gambar_produk) }}" class="w-full h-full object-cover rounded-2xl" alt="{{ $produk->nama_produk }}">
                         
-                        <!-- Base Colored Layer with Mask -->
-                        <div class="absolute inset-0 transition-colors duration-500 z-10"
-                             :style="{ 
-                                 backgroundColor: colorMap[selectedColor],
-                                 WebkitMaskImage: 'url({{ $maskUrl }})',
-                                 maskImage: 'url({{ $maskUrl }})',
-                                 WebkitMaskSize: 'contain',
-                                 maskSize: 'contain',
-                                 WebkitMaskPosition: 'center',
-                                 maskPosition: 'center',
-                                 WebkitMaskRepeat: 'no-repeat',
-                                 maskRepeat: 'no-repeat'
-                             }">
+                        <!-- Favorite Icon -->
+                        <button class="absolute top-8 right-8 p-3.5 bg-white/90 backdrop-blur rounded-2xl shadow-xl shadow-slate-200/50 text-slate-300 hover:text-red-500 transition border border-slate-100 group/fav">
+                            <svg class="w-6 h-6 transform group-hover/fav:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                        </button>
+                    </div>
+                @else
+                    <!-- Thumbnails (Vertical) -->
+                    <div class="hidden md:flex flex-col gap-3 w-20 xl:w-24 shrink-0">
+                        @php
+                            $baseImg = match($produk->jenis_produk) {
+                                'kaos' => 'kaos.png',
+                                'hoodie' => 'hoodie.png',
+                                'topi' => 'topi.png',
+                                'polo' => 'polo.png',
+                                'seragam' => 'seragam.png',
+                                default => 'kaos.png'
+                            };
+                        @endphp
+                        <button class="w-full aspect-square border-2 border-slate-900 rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center relative">
+                            <img src="{{ asset('images/mockups/'.$baseImg) }}" class="w-[85%] object-contain" alt="Front Vew">
+                        </button>
+                        <button class="w-full aspect-square border border-slate-200 rounded-lg overflow-hidden bg-slate-100 hover:border-slate-400 transition flex items-center justify-center opacity-70 hover:opacity-100">
+                            <img src="{{ asset('images/mockups/'.$baseImg) }}" class="w-[85%] object-contain" alt="Pattern" style="filter: hue-rotate(90deg);">
+                        </button>
+                        <button class="w-full aspect-square border border-slate-200 rounded-lg overflow-hidden bg-slate-100 hover:border-slate-400 transition flex items-center justify-center opacity-70 hover:opacity-100">
+                            <img src="{{ asset('images/mockups/'.$baseImg) }}" class="w-[85%] object-contain" alt="Detail" style="transform: scale(1.5);">
+                        </button>
+                        <button class="w-full aspect-square border border-slate-200 rounded-lg overflow-hidden bg-slate-50 hover:border-slate-400 transition flex items-center justify-center opacity-70 hover:opacity-100 text-slate-400">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </button>
+                    </div>
+                    
+                    <!-- Main Image -->
+                    <div class="flex-1 bg-slate-50/50 rounded-[3rem] overflow-hidden relative flex items-center justify-center p-8 lg:p-12 border border-slate-100 min-h-[400px] lg:min-h-[600px] group shadow-sm">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-200/20 to-transparent"></div>
+                        
+                        @php $maskUrl = asset('images/mockups/'.$baseImg); @endphp
+                        <!-- Interactive Tinted Preview -->
+                        <div class="relative w-full h-full max-h-[500px] aspect-square flex items-center justify-center group-hover:scale-105 transition-transform duration-700">
+                            <!-- Shadow/Texture Layer (Transparent Overlay) -->
+                            <img src="{{ $maskUrl }}" class="absolute w-full h-full object-contain mix-blend-multiply opacity-30 z-20 pointer-events-none">
+                            
+                            <!-- Base Colored Layer with Mask -->
+                            <div class="absolute inset-0 transition-colors duration-500 z-10"
+                                 :style="{ 
+                                     backgroundColor: colorMap[selectedColor],
+                                     WebkitMaskImage: 'url({{ $maskUrl }})',
+                                     maskImage: 'url({{ $maskUrl }})',
+                                     WebkitMaskSize: 'contain',
+                                     maskSize: 'contain',
+                                     WebkitMaskPosition: 'center',
+                                     maskPosition: 'center',
+                                     WebkitMaskRepeat: 'no-repeat',
+                                     maskRepeat: 'no-repeat'
+                                 }">
+                            </div>
+                            
+                            <!-- Highlights Layer (Additive) -->
+                            <img src="{{ $maskUrl }}" class="absolute w-full h-full object-contain opacity-20 mix-blend-screen z-30 pointer-events-none">
                         </div>
                         
-                        <!-- Highlights Layer (Additive) -->
-                        <img src="{{ $maskUrl }}" class="absolute w-full h-full object-contain opacity-20 mix-blend-screen z-30 pointer-events-none">
+                        <!-- Favorite Icon -->
+                        <button class="absolute top-8 right-8 p-3.5 bg-white/90 backdrop-blur rounded-2xl shadow-xl shadow-slate-200/50 text-slate-300 hover:text-red-500 transition border border-slate-100 group/fav">
+                            <svg class="w-6 h-6 transform group-hover/fav:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                        </button>
+     
+                        <!-- Interactive Callout -->
+                        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex gap-3">
+                            <template x-for="i in 4">
+                                <button class="w-2.5 h-2.5 rounded-full bg-slate-200 hover:bg-red-400 transition-colors"></button>
+                            </template>
+                        </div>
                     </div>
-                    
-                    <!-- Favorite Icon -->
-                    <button class="absolute top-8 right-8 p-3.5 bg-white/90 backdrop-blur rounded-2xl shadow-xl shadow-slate-200/50 text-slate-300 hover:text-red-500 transition border border-slate-100 group/fav">
-                        <svg class="w-6 h-6 transform group-hover/fav:scale-110 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                    </button>
- 
-                    <!-- Interactive Callout -->
-                    <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex gap-3">
-                        <template x-for="i in 4">
-                            <button class="w-2.5 h-2.5 rounded-full bg-slate-200 hover:bg-red-400 transition-colors"></button>
-                        </template>
-                    </div>
-                </div>
+                @endif
             </div>
 
             <!-- Right Side: Product Details & Configurator -->
@@ -283,16 +295,39 @@
 
                 <!-- Call to Action -->
                 <div class="mt-auto">
-                    <a :href="`{{ route('customer.designs.editor', $produk->id_produk) }}?technique=${selectedTechnique}&color=${selectedColor}&size=${selectedSize}`" class="group relative block w-full text-center py-5 rounded-2xl bg-red-600 hover:bg-red-500 text-white font-black text-xl shadow-2xl shadow-red-200 transition-all duration-300 transform active:scale-[0.98] overflow-hidden">
-                        <span class="relative z-10 flex items-center justify-center gap-3">
-                            MULAI DESAIN SEKARANG
-                            <svg class="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
-                        </span>
-                    </a>
-                    
-                    <p class="text-[10px] text-center text-slate-400 font-bold mt-4 uppercase tracking-widest leading-relaxed">
-                        *Estimasi biaya akhir akan dikalkulasi secara otomatis saat checkout.
-                    </p>
+                    @if($produk->tipe_produk == 'jadi')
+                        <form action="{{ route('customer.cart.storeDirect', $produk->id_produk) }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="technique" x-bind:value="selectedTechnique">
+                            <input type="hidden" name="color" x-bind:value="selectedColor">
+                            <input type="hidden" name="size" x-bind:value="selectedSize">
+                            <div class="mb-4 flex items-center justify-between bg-slate-50 border border-slate-200 p-4 rounded-xl shadow-sm">
+                                <span class="font-bold text-sm text-slate-800 uppercase tracking-widest">Jumlah Pesanan</span>
+                                <div class="flex items-center gap-3">
+                                    <button type="button" onclick="document.getElementById('qty').stepDown()" class="w-8 h-8 rounded-lg bg-white border border-slate-300 flex items-center justify-center text-slate-600 font-bold hover:bg-slate-100 transition">-</button>
+                                    <input type="number" id="qty" name="quantity" value="1" min="1" class="w-12 text-center border-none bg-transparent font-black text-xl p-0 focus:ring-0">
+                                    <button type="button" onclick="document.getElementById('qty').stepUp()" class="w-8 h-8 rounded-lg bg-white border border-slate-300 flex items-center justify-center text-slate-600 font-bold hover:bg-slate-100 transition">+</button>
+                                </div>
+                            </div>
+                            <button type="submit" class="group relative block w-full text-center py-5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xl shadow-2xl shadow-indigo-200 transition-all duration-300 transform active:scale-[0.98] overflow-hidden">
+                                <span class="relative z-10 flex items-center justify-center gap-3">
+                                    TAMBAH KE KERANJANG
+                                    <svg class="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                                </span>
+                            </button>
+                        </form>
+                    @else
+                        <a :href="`{{ route('customer.designs.editor', $produk->id_produk) }}?technique=${selectedTechnique}&color=${selectedColor}&size=${selectedSize}`" class="group relative block w-full text-center py-5 rounded-2xl bg-red-600 hover:bg-red-500 text-white font-black text-xl shadow-2xl shadow-red-200 transition-all duration-300 transform active:scale-[0.98] overflow-hidden">
+                            <span class="relative z-10 flex items-center justify-center gap-3">
+                                MULAI DESAIN SEKARANG
+                                <svg class="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                            </span>
+                        </a>
+                        
+                        <p class="text-[10px] text-center text-slate-400 font-bold mt-4 uppercase tracking-widest leading-relaxed">
+                            *Estimasi biaya akhir akan dikalkulasi secara otomatis saat checkout.
+                        </p>
+                    @endif
                 </div>
 
                 <div class="mt-6 border border-slate-200 rounded-lg p-4 bg-white shadow-sm flex items-center justify-between">

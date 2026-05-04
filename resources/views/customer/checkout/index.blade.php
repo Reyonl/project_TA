@@ -20,15 +20,28 @@
                             <div class="flex items-center gap-4 p-4 border border-slate-100 rounded-xl bg-slate-50">
                                 <!-- Mini Thumbnail -->
                                 <div class="w-16 h-16 bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden flex-shrink-0 relative flex items-center justify-center p-1">
-                                    <img src="{{ Str::startsWith($cart->desain->file_desain, 'data:image') ? $cart->desain->file_desain : Storage::url($cart->desain->file_desain) }}" class="w-full h-full object-contain">
+                                    @if($cart->desain)
+                                        <img src="{{ Str::startsWith($cart->desain->file_desain, 'data:image') ? $cart->desain->file_desain : Storage::url($cart->desain->file_desain) }}" class="w-full h-full object-contain">
+                                    @else
+                                        @if($cart->produk->gambar_produk)
+                                            <img src="{{ Storage::url($cart->produk->gambar_produk) }}" class="w-full h-full object-cover">
+                                        @else
+                                            <span class="text-2xl">👕</span>
+                                        @endif
+                                    @endif
                                 </div>
                                 <div class="flex-1">
                                     <h4 class="font-bold text-slate-800">{{ $cart->produk->nama_produk }}</h4>
-                                    <p class="text-xs text-slate-500">Tipe: {{ ucfirst($cart->produk->jenis_produk) }} | Warna: <span class="inline-block w-3 h-3 rounded-full border border-slate-300 translate-y-0.5 ml-1" style="background-color: {{ $cart->desain->warna_baju ?: '#ffffff' }}"></span></p>
-                                    <p class="text-sm font-semibold text-indigo-600 mt-1">Rp {{ number_format($cart->produk->harga_dasar + $cart->desain->harga_desain, 0, ',', '.') }} <span class="text-xs text-slate-400">x {{ $cart->quantity }}</span></p>
+                                    <p class="text-xs text-slate-500">Tipe: {{ ucfirst($cart->produk->jenis_produk) }} 
+                                        @if($cart->desain)
+                                            | Warna: <span class="inline-block w-3 h-3 rounded-full border border-slate-300 translate-y-0.5 ml-1" style="background-color: {{ $cart->desain->warna_baju ?: '#ffffff' }}"></span>
+                                        @endif
+                                    </p>
+                                    @php $hargaDesain = $cart->desain ? $cart->desain->harga_desain : 0; @endphp
+                                    <p class="text-sm font-semibold text-indigo-600 mt-1">Rp {{ number_format($cart->produk->harga_dasar + $hargaDesain, 0, ',', '.') }} <span class="text-xs text-slate-400">x {{ $cart->quantity }}</span></p>
                                 </div>
                                 <div class="text-right font-bold text-slate-700">
-                                    Rp {{ number_format(($cart->produk->harga_dasar + $cart->desain->harga_desain) * $cart->quantity, 0, ',', '.') }}
+                                    Rp {{ number_format(($cart->produk->harga_dasar + $hargaDesain) * $cart->quantity, 0, ',', '.') }}
                                 </div>
                             </div>
                         @endforeach

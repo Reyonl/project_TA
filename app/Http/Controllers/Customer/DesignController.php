@@ -109,6 +109,23 @@ class DesignController extends Controller
             }
         }
 
+        // Memproses Raw Assets (Gambar Mentah)
+        $rawAssetsPaths = [];
+        if ($request->has('raw_assets') && is_array($request->raw_assets)) {
+            foreach ($request->raw_assets as $rawBase64) {
+                if (preg_match('/^data:image\/(\w+);base64,/', $rawBase64, $typeRaw)) {
+                    $rawImgData = substr($rawBase64, strpos($rawBase64, ',') + 1);
+                    $extRaw = strtolower($typeRaw[1]);
+                    $rawImgData = str_replace(' ', '+', $rawImgData);
+                    $decodedRaw = base64_decode($rawImgData);
+                    
+                    $rawFileName = 'designs/assets/' . Str::random(40) . '-raw.' . $extRaw;
+                    Storage::disk('public')->put($rawFileName, $decodedRaw);
+                    $rawAssetsPaths[] = $rawFileName;
+                }
+            }
+        }
+
         $desain = Desain::create([
             'id_customer' => auth()->guard('customer')->id(),
             'id_template' => $request->id_template, // Bisa null
@@ -127,6 +144,7 @@ class DesignController extends Controller
             'harga_desain' => 20000, // Misal tarif sablon custom 20.000
             'tanggal_upload' => now(),
             'warna_baju' => $request->warna_baju,
+            'raw_assets' => !empty($rawAssetsPaths) ? $rawAssetsPaths : null,
         ]);
 
         // Simpan langsung ke keranjang belanja
@@ -236,6 +254,30 @@ class DesignController extends Controller
                 }
                 $desain->file_desain_kanan = $fileNameKanan;
             }
+        }
+
+        // Delete old raw assets if new ones are uploaded
+        if ($request->has('raw_assets') && is_array($request->raw_assets)) {
+            if ($desain->raw_assets && is_array($desain->raw_assets)) {
+                foreach ($desain->raw_assets as $oldAsset) {
+                    Storage::disk('public')->delete($oldAsset);
+                }
+            }
+            
+            $rawAssetsPaths = [];
+            foreach ($request->raw_assets as $rawBase64) {
+                if (preg_match('/^data:image\/(\w+);base64,/', $rawBase64, $typeRaw)) {
+                    $rawImgData = substr($rawBase64, strpos($rawBase64, ',') + 1);
+                    $extRaw = strtolower($typeRaw[1]);
+                    $rawImgData = str_replace(' ', '+', $rawImgData);
+                    $decodedRaw = base64_decode($rawImgData);
+                    
+                    $rawFileName = 'designs/assets/' . Str::random(40) . '-revisi-raw.' . $extRaw;
+                    Storage::disk('public')->put($rawFileName, $decodedRaw);
+                    $rawAssetsPaths[] = $rawFileName;
+                }
+            }
+            $desain->raw_assets = !empty($rawAssetsPaths) ? $rawAssetsPaths : null;
         }
 
         $desain->lebar_cm = $request->lebar_cm;

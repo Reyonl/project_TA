@@ -27,44 +27,55 @@
                                     
                                     <!-- Thumbnail Desain -->
                                     <div class="w-full sm:w-32 aspect-[3/4] bg-white rounded-lg shadow-inner overflow-hidden flex items-center justify-center relative flex-shrink-0">
-                                        @php
-                                            $bajuType = $cart->produk->jenis_produk;
-                                            $bajuColor = $cart->desain->warna_baju ?: '#ffffff';
-                                            $mockupBase = match($bajuType) {
-                                                'kaos' => 'kaos',
-                                                'hoodie' => 'hoodie',
-                                                'topi' => 'topi',
-                                                'polo' => 'polo',
-                                                'seragam' => 'seragam',
-                                                default => 'kaos'
-                                            };
-                                            $mockupUrl = asset('images/mockups/' . $mockupBase . '.png');
-                                        @endphp
-                                        
-                                        <!-- Mini Composite -->
-                                        <div class="absolute inset-0 z-0">
-                                            <div class="w-full h-full flex items-center justify-center relative overflow-hidden">
-                                                <img src="{{ $mockupUrl }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-90 z-0">
-                                                <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10"
-                                                     style="-webkit-mask-image: url('{{ $mockupUrl }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ $mockupUrl }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
-                                                    <div class="w-full h-full" style="background-color: {{ $bajuColor }};"></div>
+                                        @if($cart->desain)
+                                            @php
+                                                $bajuType = $cart->produk->jenis_produk;
+                                                $bajuColor = $cart->desain->warna_baju ?: '#ffffff';
+                                                $mockupBase = match($bajuType) {
+                                                    'kaos' => 'kaos',
+                                                    'hoodie' => 'hoodie',
+                                                    'topi' => 'topi',
+                                                    'polo' => 'polo',
+                                                    'seragam' => 'seragam',
+                                                    default => 'kaos'
+                                                };
+                                                $mockupUrl = asset('images/mockups/' . $mockupBase . '.png');
+                                            @endphp
+                                            
+                                            <!-- Mini Composite -->
+                                            <div class="absolute inset-0 z-0">
+                                                <div class="w-full h-full flex items-center justify-center relative overflow-hidden">
+                                                    <img src="{{ $mockupUrl }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-90 z-0">
+                                                    <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10"
+                                                         style="-webkit-mask-image: url('{{ $mockupUrl }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ $mockupUrl }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
+                                                        <div class="w-full h-full" style="background-color: {{ $bajuColor }};"></div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        
-                                        <!-- Desain Overlay -->
-                                        <div class="absolute z-20" style="top: 20%; left: 27.08%; width: 45.83%; height: 53.33%;">
-                                            <img src="{{ Str::startsWith($cart->desain->file_desain, 'data:image') ? $cart->desain->file_desain : Storage::url($cart->desain->file_desain) }}" class="w-full h-full object-contain">
-                                        </div>
+                                            
+                                            <!-- Desain Overlay -->
+                                            <div class="absolute z-20" style="top: 20%; left: 27.08%; width: 45.83%; height: 53.33%;">
+                                                <img src="{{ Str::startsWith($cart->desain->file_desain, 'data:image') ? $cart->desain->file_desain : Storage::url($cart->desain->file_desain) }}" class="w-full h-full object-contain">
+                                            </div>
 
-                                        @php 
-                                            $sisiCount = 1;
-                                            if($cart->desain->file_desain_belakang) $sisiCount++;
-                                            if($cart->desain->file_desain_kiri) $sisiCount++;
-                                            if($cart->desain->file_desain_kanan) $sisiCount++;
-                                        @endphp
-                                        @if($sisiCount > 1)
-                                        <span class="absolute bottom-1 right-1 bg-indigo-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow shadow-indigo-200">{{ $sisiCount }} Sisi</span>
+                                            @php 
+                                                $sisiCount = 1;
+                                                if($cart->desain->file_desain_belakang) $sisiCount++;
+                                                if($cart->desain->file_desain_kiri) $sisiCount++;
+                                                if($cart->desain->file_desain_kanan) $sisiCount++;
+                                            @endphp
+                                            @if($sisiCount > 1)
+                                            <span class="absolute bottom-1 right-1 bg-indigo-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow shadow-indigo-200">{{ $sisiCount }} Sisi</span>
+                                            @endif
+                                        @else
+                                            <!-- Produk Jadi -->
+                                            <div class="absolute inset-0 z-0 flex items-center justify-center bg-slate-50">
+                                                @if($cart->produk->gambar_produk)
+                                                    <img src="{{ Storage::url($cart->produk->gambar_produk) }}" class="w-full h-full object-cover">
+                                                @else
+                                                    <span class="text-4xl">👕</span>
+                                                @endif
+                                            </div>
                                         @endif
                                     </div>
 
@@ -79,16 +90,22 @@
                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest {{ $cart->tipe_proses == 'bordir' ? 'bg-red-600 text-white' : 'bg-sky-500 text-white' }}">
                                                     {{ $cart->tipe_proses }}
                                                 </span>
-                                                <div class="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
-                                                    Warna: 
-                                                    <span class="w-4 h-4 rounded-full border border-slate-300 shadow-sm" style="background-color: {{ $bajuColor }}"></span>
-                                                </div>
+                                                @if($cart->desain)
+                                                    <div class="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
+                                                        Warna: 
+                                                        <span class="w-4 h-4 rounded-full border border-slate-300 shadow-sm" style="background-color: {{ $cart->desain->warna_baju ?: '#ffffff' }}"></span>
+                                                    </div>
+                                                @endif
                                             </div>
                                             
                                             <div class="mt-4 grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
                                                 <p class="text-slate-500">Harga Dasar: <span class="font-semibold text-slate-700">Rp {{ number_format($cart->produk->harga_dasar, 0, ',', '.') }}</span></p>
-                                                <p class="text-slate-500">Biaya Sablon: <span class="font-semibold text-slate-700">Rp {{ number_format($cart->desain->harga_desain, 0, ',', '.') }}</span></p>
-                                                <p class="col-span-2 text-indigo-600 font-bold mt-1">Subtotal per item: Rp {{ number_format($cart->produk->harga_dasar + $cart->desain->harga_desain, 0, ',', '.') }}</p>
+                                                @if($cart->desain)
+                                                    <p class="text-slate-500">Biaya Sablon: <span class="font-semibold text-slate-700">Rp {{ number_format($cart->desain->harga_desain, 0, ',', '.') }}</span></p>
+                                                    <p class="col-span-2 text-indigo-600 font-bold mt-1">Subtotal per item: Rp {{ number_format($cart->produk->harga_dasar + $cart->desain->harga_desain, 0, ',', '.') }}</p>
+                                                @else
+                                                    <p class="col-span-2 text-indigo-600 font-bold mt-1">Subtotal per item: Rp {{ number_format($cart->produk->harga_dasar, 0, ',', '.') }}</p>
+                                                @endif
                                             </div>
                                         </div>
 
@@ -135,7 +152,8 @@
                             @php $netTotal = 0; @endphp
                             @foreach($carts as $c)
                                 @php 
-                                    $itemTotal = ($c->produk->harga_dasar + $c->desain->harga_desain) * $c->quantity;
+                                    $hargaDesain = $c->desain ? $c->desain->harga_desain : 0;
+                                    $itemTotal = ($c->produk->harga_dasar + $hargaDesain) * $c->quantity;
                                     $netTotal += $itemTotal;
                                 @endphp
                                 <div class="flex justify-between items-start text-sm">

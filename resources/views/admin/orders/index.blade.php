@@ -40,7 +40,7 @@
                                         <div class="text-xs text-slate-400">{{ $order->customer->email }}</div>
                                     </td>
                                     <td class="px-6 py-4">
-                                        {{ $order->orderDetails->sum('jumlah') }} pcs
+                                        {{ $order->orderDetails->sum('quantity') }} pcs
                                     </td>
                                     <td class="px-6 py-4 font-bold text-indigo-600 text-right">
                                         Rp {{ number_format($order->total_harga, 0, ',', '.') }}

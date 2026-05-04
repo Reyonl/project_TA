@@ -10,6 +10,7 @@ use App\Models\OrderDetail;
 use App\Models\Cart;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class CheckoutController extends Controller
 {
@@ -24,7 +25,8 @@ class CheckoutController extends Controller
 
         $totalHarga = 0;
         foreach ($carts as $cart) {
-            $totalHarga += ($cart->produk->harga_dasar + $cart->desain->harga_desain) * $cart->quantity;
+            $hargaDesain = $cart->desain ? $cart->desain->harga_desain : 0;
+            $totalHarga += ($cart->produk->harga_dasar + $hargaDesain) * $cart->quantity;
         }
 
         return view('customer.checkout.index', compact('carts', 'totalHarga'));
@@ -46,7 +48,8 @@ class CheckoutController extends Controller
         // Hitung total harga
         $totalHarga = 0;
         foreach ($carts as $cart) {
-            $totalHarga += ($cart->produk->harga_dasar + $cart->desain->harga_desain) * $cart->quantity;
+            $hargaDesain = $cart->desain ? $cart->desain->harga_desain : 0;
+            $totalHarga += ($cart->produk->harga_dasar + $hargaDesain) * $cart->quantity;
         }
 
         // Upload bukti pembayaran
@@ -54,38 +57,44 @@ class CheckoutController extends Controller
         if ($request->hasFile('bukti_pembayaran')) {
             $file = $request->file('bukti_pembayaran');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $file->storeAs('public/bukti_pembayaran', $filename);
+            $file->storeAs('bukti_pembayaran', $filename, 'public');
             $buktiPath = 'bukti_pembayaran/' . $filename;
         }
 
-        // Buat Order Induk
-        $order = Order::create([
-            'id_customer' => $id_customer,
-            'tanggal_order' => now(),
-            'status_order' => 'pending',
-            'total_harga' => $totalHarga,
-            'bukti_pembayaran' => $buktiPath,
-        ]);
-
-        // Buat Order Details
-        foreach ($carts as $cart) {
-            $subtotalDetail = ($cart->produk->harga_dasar + $cart->desain->harga_desain) * $cart->quantity;
-            
-            OrderDetail::create([
-                'id_order' => $order->id_order,
-                'id_produk' => $cart->id_produk,
-                'id_desain' => $cart->id_desain,
-                'quantity' => $cart->quantity,
-                'harga_produk' => $cart->produk->harga_dasar,
-                'harga_desain' => $cart->desain->harga_desain,
-                'subtotal' => $subtotalDetail,
-                'status_desain' => 'pending',
-                'tipe_proses' => $cart->tipe_proses,
+        // Gunakan transaction agar order & detail atomik
+        $order = DB::transaction(function () use ($id_customer, $totalHarga, $buktiPath, $carts) {
+            // Buat Order Induk
+            $order = Order::create([
+                'id_customer' => $id_customer,
+                'tanggal_order' => now(),
+                'status_order' => 'pending',
+                'total_harga' => $totalHarga,
+                'bukti_pembayaran' => $buktiPath,
             ]);
-        }
 
-        // Kosongkan keranjang
-        Cart::where('id_customer', $id_customer)->delete();
+            // Buat Order Details
+            foreach ($carts as $cart) {
+                $hargaDesain = $cart->desain ? $cart->desain->harga_desain : 0;
+                $subtotalDetail = ($cart->produk->harga_dasar + $hargaDesain) * $cart->quantity;
+                
+                OrderDetail::create([
+                    'id_order' => $order->id_order,
+                    'id_produk' => $cart->id_produk,
+                    'id_desain' => $cart->id_desain, // Will be null for ready-made
+                    'quantity' => $cart->quantity,
+                    'harga_produk' => $cart->produk->harga_dasar,
+                    'harga_desain' => $hargaDesain,
+                    'subtotal' => $subtotalDetail,
+                    'status_desain' => $cart->id_desain ? 'pending' : 'disetujui', // If ready-made, design is already approved implicitly
+                    'tipe_proses' => $cart->tipe_proses,
+                ]);
+            }
+
+            // Kosongkan keranjang
+            Cart::where('id_customer', $id_customer)->delete();
+
+            return $order;
+        });
 
         return redirect()->route('customer.orders.index')->with('success', 'Pesanan sablon Anda berhasil dibuat! Tim kami sedang memverifikasi pembayaran Anda.');
     }

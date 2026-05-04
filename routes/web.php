@@ -33,6 +33,7 @@ Route::middleware('auth:customer')->prefix('customer')->name('customer.')->group
 
     // Keranjang Belanja
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/direct/{produk}', [CartController::class, 'storeDirect'])->name('cart.storeDirect');
     Route::patch('/cart/{cart}/quantity', [CartController::class, 'updateQuantity'])->name('cart.updateQuantity');
     Route::delete('/cart/{cart}', [CartController::class, 'destroy'])->name('cart.destroy');
 
@@ -96,6 +97,7 @@ Route::middleware('auth:customer')->prefix('customer')->name('customer.')->group
 
 // Admin & Owner Routes
 use App\Http\Controllers\Admin\TemplateController;
+use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Owner\ReportController;
 
@@ -110,6 +112,7 @@ Route::middleware('auth:admin')->prefix('admin')->name('admin.')->group(function
 
     // Admin Only
     Route::middleware('role:admin')->group(function () {
+        Route::resource('products', AdminProductController::class);
         Route::resource('templates', TemplateController::class);
         Route::get('orders', [AdminOrderController::class, 'index'])->name('orders.index');
         Route::get('orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
@@ -117,8 +120,8 @@ Route::middleware('auth:admin')->prefix('admin')->name('admin.')->group(function
         Route::patch('orders/{order}/desain/{orderDetail}', [AdminOrderController::class, 'updateStatusDesain'])->name('orders.updateStatusDesain');
     });
 
-    // Owner Only
-    Route::middleware('role:owner')->group(function () {
+    // Owner & Admin
+    Route::middleware('role:owner,admin')->group(function () {
         Route::get('reports', [ReportController::class, 'index'])->name('report.index');
     });
 });

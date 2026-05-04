@@ -70,13 +70,17 @@
                         
                         <!-- Image Container with Hover Effect -->
                         <div class="relative h-64 bg-slate-50 flex items-center justify-center p-6 overflow-hidden">
-                            <!-- Placeholder Image based on Product Type -->
-                            @if($produk->jenis_produk == 'kaos')
-                                <div class="text-7xl lg:text-8xl transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-xl">👕</div>
-                            @elseif($produk->jenis_produk == 'hoodie')
-                                <div class="text-7xl lg:text-8xl transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-xl">🧥</div>
+                            <!-- Placeholder Image or Real Image -->
+                            @if($produk->gambar_produk)
+                                <img src="{{ Storage::url($produk->gambar_produk) }}" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" alt="{{ $produk->nama_produk }}">
                             @else
-                                <div class="text-7xl lg:text-8xl transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-xl">🧢</div>
+                                @if($produk->jenis_produk == 'kaos')
+                                    <div class="text-7xl lg:text-8xl transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-xl">👕</div>
+                                @elseif($produk->jenis_produk == 'hoodie')
+                                    <div class="text-7xl lg:text-8xl transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-xl">🧥</div>
+                                @else
+                                    <div class="text-7xl lg:text-8xl transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-xl">🧢</div>
+                                @endif
                             @endif
                             
                             <!-- Badges -->
@@ -89,7 +93,7 @@
                             <!-- Overlay CTA -->
                             <div class="absolute inset-0 bg-indigo-900/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                                 <a href="{{ route('customer.products.show', $produk->id_produk) }}" class="bg-white text-indigo-900 font-bold px-6 py-3 rounded-xl shadow-2xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                                    Lihat Detail & Mulai Desain
+                                    {{ $produk->tipe_produk == 'jadi' ? 'Lihat Detail & Beli Langsung' : 'Lihat Detail & Mulai Desain' }}
                                 </a>
                             </div>
                         </div>
