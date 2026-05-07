@@ -6,7 +6,7 @@ use App\Models\Produk;
 
 Route::get('/', function () {
     // Dynamic products for landing page
-    $produks = Produk::take(3)->get();
+    $produks = Produk::where('jenis_produk', '!=', 'topi')->take(3)->get();
     return view('welcome', compact('produks'));
 })->name('home');
 

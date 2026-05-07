@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mockup - 07 Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
+        body { font-family: 'Patrick Hand', 'Comic Sans MS', cursive; background-color: #e5e5e5; color: #000; display: flex; justify-content: center; padding: 40px; }
+        .wf-container { width: 1024px; min-height: 768px; background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; display: flex; flex-direction: column; }
+        .wf-border { border: 2px solid #000; }
+        .wf-border-b { border-bottom: 2px solid #000; }
+        .wf-border-r { border-right: 2px solid #000; }
+        .wf-btn { border: 2px solid #000; padding: 4px 12px; background: #fff; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .icon-placeholder { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: 2px solid #000; border-radius: 50%; font-size: 10px; }
+        .browser-header { border-bottom: 2px solid #000; padding: 8px 16px; display: flex; align-items: center; gap: 8px; background: #fff; }
+        .browser-dot { width: 12px; height: 12px; border: 2px solid #000; border-radius: 50%; }
+        .browser-address { border: 2px solid #000; flex-grow: 1; padding: 2px 8px; font-size: 14px; border-radius: 12px; display: flex; align-items: center; gap: 8px; margin-left: 16px; }
+    </style>
+</head>
+<body>
+    <div class="wf-container">
+        <!-- Browser UI -->
+        <div class="browser-header">
+            <div class="flex gap-2"><div class="browser-dot"></div><div class="browser-dot"></div><div class="browser-dot"></div></div>
+            <div class="browser-address"><span>🔒</span> https://sistem-sablon.com/admin/dashboard</div>
+            <div class="browser-dot rounded-sm"></div>
+        </div>
+
+        <div class="flex flex-1">
+            <!-- Sidebar -->
+            <div class="w-64 wf-border-r p-4 flex flex-col gap-4 bg-gray-50">
+                <div class="text-center pb-4 wf-border-b">
+                    <div class="w-16 h-16 rounded-full wf-border mx-auto mb-2 flex items-center justify-center text-xl bg-white">A</div>
+                    <div class="font-bold text-lg">ADMINISTRATOR</div>
+                    <div class="text-sm">Role: Admin</div>
+                    <div class="mt-2 wf-border px-2 py-1 bg-white inline-block text-sm">Status: Aktif</div>
+                </div>
+                <nav class="flex flex-col gap-2">
+                    <div class="font-bold flex items-center gap-2 p-2 wf-border bg-white" style="box-shadow: 2px 2px 0 #000;">
+                        <span class="icon-placeholder">H</span> Beranda
+                    </div>
+                    <div class="font-bold flex items-center gap-2 p-2 mt-2">
+                        <span class="icon-placeholder">D</span> Master Data <span class="ml-auto">▾</span>
+                    </div>
+                    <div class="pl-8 flex items-center gap-2 p-1 cursor-pointer hover:underline">Data Produk</div>
+                    <div class="pl-8 flex items-center gap-2 p-1 cursor-pointer hover:underline">Data Template</div>
+                    <div class="font-bold flex items-center gap-2 p-2 mt-2">
+                        <span class="icon-placeholder">T</span> Transaksi <span class="ml-auto">▾</span>
+                    </div>
+                    <div class="pl-8 flex items-center gap-2 p-1 cursor-pointer hover:underline">Pesanan Masuk</div>
+                </nav>
+                <div class="mt-auto wf-border-t pt-4">
+                    <button class="wf-btn w-full text-black">Logout</button>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex-1 p-8 bg-white">
+                <h1 class="text-3xl font-bold mb-2">Dashboard Admin</h1>
+                <p class="text-gray-600 mb-8">Selamat datang kembali, pantau aktivitas toko hari ini.</p>
+
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-3 gap-6 mb-8">
+                    <div class="wf-border p-6 rounded-lg bg-white relative overflow-hidden">
+                        <div class="text-gray-600 font-bold mb-2">Pesanan Baru</div>
+                        <div class="text-5xl font-bold">12</div>
+                        <div class="absolute right-[-10px] bottom-[-10px] opacity-20 text-8xl">📦</div>
+                    </div>
+                    <div class="wf-border p-6 rounded-lg bg-white relative overflow-hidden">
+                        <div class="text-gray-600 font-bold mb-2">Menunggu Diproses</div>
+                        <div class="text-5xl font-bold">5</div>
+                        <div class="absolute right-[-10px] bottom-[-10px] opacity-20 text-8xl">⚙️</div>
+                    </div>
+                    <div class="wf-border p-6 rounded-lg bg-white relative overflow-hidden">
+                        <div class="text-gray-600 font-bold mb-2">Total Produk</div>
+                        <div class="text-5xl font-bold">24</div>
+                        <div class="absolute right-[-10px] bottom-[-10px] opacity-20 text-8xl">👕</div>
+                    </div>
+                </div>
+
+                <!-- Recent Orders Preview -->
+                <div class="wf-border rounded-lg overflow-hidden">
+                    <div class="wf-border-b bg-gray-50 p-4 font-bold text-lg flex justify-between items-center">
+                        <span>Pesanan Perlu Tindakan</span>
+                        <a href="#" class="text-sm underline">Lihat Semua</a>
+                    </div>
+                    <table class="w-full text-left">
+                        <thead class="wf-border-b">
+                            <tr>
+                                <th class="p-3 wf-border-r">ID Pesanan</th>
+                                <th class="p-3 wf-border-r">Pelanggan</th>
+                                <th class="p-3 wf-border-r">Status</th>
+                                <th class="p-3">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="wf-border-b">
+                                <td class="p-3 wf-border-r">ORD-2026-001</td>
+                                <td class="p-3 wf-border-r">Budi Santoso</td>
+                                <td class="p-3 wf-border-r"><span class="bg-gray-200 px-2 py-1 rounded text-sm wf-border">Menunggu Pembayaran</span></td>
+                                <td class="p-3"><button class="wf-btn text-xs">Cek Detail</button></td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 wf-border-r">ORD-2026-002</td>
+                                <td class="p-3 wf-border-r">Andi Wijaya</td>
+                                <td class="p-3 wf-border-r"><span class="bg-gray-200 px-2 py-1 rounded text-sm wf-border">Perlu Review Desain</span></td>
+                                <td class="p-3"><button class="wf-btn text-xs bg-black text-white">Review Sekarang</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

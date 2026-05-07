@@ -48,7 +48,7 @@
                             <select name="jenis_produk" id="jenis_produk" class="w-full rounded-xl border-slate-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm transition">
                                 <option value="kaos" {{ (old('jenis_produk', $product->jenis_produk) == 'kaos') ? 'selected' : '' }}>Kaos</option>
                                 <option value="hoodie" {{ (old('jenis_produk', $product->jenis_produk) == 'hoodie') ? 'selected' : '' }}>Hoodie</option>
-                                <option value="topi" {{ (old('jenis_produk', $product->jenis_produk) == 'topi') ? 'selected' : '' }}>Topi</option>
+                                {{-- <option value="topi" {{ (old('jenis_produk', $product->jenis_produk) == 'topi') ? 'selected' : '' }}>Topi</option> --}}
                                 <option value="polo" {{ (old('jenis_produk', $product->jenis_produk) == 'polo') ? 'selected' : '' }}>Polo Shirt</option>
                                 <option value="seragam" {{ (old('jenis_produk', $product->jenis_produk) == 'seragam') ? 'selected' : '' }}>Kemeja / Seragam</option>
                             </select>

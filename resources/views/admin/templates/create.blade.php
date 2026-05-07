@@ -35,7 +35,7 @@
                     </div>
 
                     <div class="mb-4">
-                        <label for="kategori" class="block text-sm font-medium text-slate-700 mb-1">Kategori (Baju, Hoodie, Topi, dsb)</label>
+                        <label for="kategori" class="block text-sm font-medium text-slate-700 mb-1">Kategori (Baju, Hoodie, Polo, dsb)</label>
                         <input type="text" name="kategori" id="kategori" class="w-full rounded-lg border-slate-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm" value="{{ old('kategori') ?? 'Kaos' }}" required>
                     </div>
 

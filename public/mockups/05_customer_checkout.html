@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mockup - 05 Checkout</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
+        body { font-family: 'Patrick Hand', 'Comic Sans MS', cursive; background-color: #e5e5e5; color: #000; display: flex; justify-content: center; padding: 40px; }
+        .wf-container { width: 1024px; min-height: 768px; background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; display: flex; flex-direction: column; }
+        .wf-border { border: 2px solid #000; }
+        .wf-border-b { border-bottom: 2px solid #000; }
+        .wf-border-r { border-right: 2px solid #000; }
+        .wf-input { border: 2px solid #000; padding: 8px 12px; background: #fff; border-radius: 4px; outline: none; width: 100%; }
+        .wf-btn { border: 2px solid #000; padding: 6px 16px; background: #fff; border-radius: 4px; font-weight: bold; cursor: pointer; box-shadow: 2px 2px 0 #000; }
+        .icon-placeholder { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 2px solid #000; border-radius: 50%; font-size: 10px; }
+        .img-placeholder { border: 2px solid #000; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; background: #fff; }
+        .img-placeholder::before, .img-placeholder::after { content: ''; position: absolute; background: #000; }
+        .img-placeholder::before { width: 150%; height: 2px; transform: rotate(45deg); }
+        .img-placeholder::after { width: 150%; height: 2px; transform: rotate(-45deg); }
+        .browser-header { border-bottom: 2px solid #000; padding: 8px 16px; display: flex; align-items: center; gap: 8px; background: #fff; }
+        .browser-dot { width: 12px; height: 12px; border: 2px solid #000; border-radius: 50%; }
+        .browser-address { border: 2px solid #000; flex-grow: 1; padding: 2px 8px; font-size: 14px; border-radius: 12px; display: flex; align-items: center; gap: 8px; margin-left: 16px; }
+    </style>
+</head>
+<body>
+    <div class="wf-container">
+        <!-- Browser UI -->
+        <div class="browser-header">
+            <div class="flex gap-2"><div class="browser-dot"></div><div class="browser-dot"></div><div class="browser-dot"></div></div>
+            <div class="browser-address"><span>🔒</span> https://sistem-sablon.com/customer/checkout</div>
+            <div class="browser-dot rounded-sm"></div>
+        </div>
+
+        <div class="wf-border-b p-4 flex justify-between items-center px-8">
+            <h1 class="text-2xl font-bold uppercase tracking-widest">SISTEM SABLON - CHECKOUT</h1>
+            <a href="#" class="font-bold underline">Batal & Kembali ke Keranjang</a>
+        </div>
+
+        <div class="flex-1 p-8">
+            <div class="flex gap-8">
+                <!-- Form Checkout -->
+                <div class="flex-1 flex flex-col gap-6">
+                    <div class="wf-border p-6 rounded-lg bg-white">
+                        <h3 class="font-bold text-xl mb-4">Informasi Pengiriman</h3>
+                        <div class="flex flex-col gap-4">
+                            <div>
+                                <label class="font-bold block mb-1">Nama Penerima</label>
+                                <input type="text" class="wf-input" value="Budi Santoso">
+                            </div>
+                            <div>
+                                <label class="font-bold block mb-1">Nomor Telepon (WhatsApp)</label>
+                                <input type="text" class="wf-input" value="08123456789">
+                            </div>
+                            <div>
+                                <label class="font-bold block mb-1">Alamat Lengkap</label>
+                                <textarea class="wf-input" rows="3">Jl. Mawar No. 123, RT 01/RW 02, Kec. Melati, Kota Kembang</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="wf-border p-6 rounded-lg bg-white">
+                        <h3 class="font-bold text-xl mb-4">Pembayaran</h3>
+                        <p class="mb-4 text-gray-700">Silakan transfer sejumlah <strong>Rp 235.000</strong> ke rekening berikut:</p>
+                        <div class="wf-border p-4 bg-gray-50 text-center font-bold text-lg rounded-lg mb-4">
+                            BANK BCA: 1234567890<br>
+                            A.N. SISTEM SABLON
+                        </div>
+                        <div>
+                            <label class="font-bold block mb-1">Upload Bukti Transfer</label>
+                            <div class="wf-border border-dashed p-8 text-center bg-gray-50 rounded-lg cursor-pointer">
+                                <span class="font-bold text-gray-500">+ Pilih File Gambar (JPG/PNG)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="w-80">
+                    <div class="wf-border p-6 rounded-lg bg-gray-50 sticky top-8">
+                        <h3 class="font-bold text-xl mb-4">Ringkasan Pesanan</h3>
+                        
+                        <div class="flex gap-4 mb-4">
+                            <div class="img-placeholder w-16 h-16 rounded flex-shrink-0"><span class="text-[10px] z-10 bg-white px-1 wf-border">1x</span></div>
+                            <div>
+                                <h4 class="font-bold leading-tight text-sm">Kaos Lengan Pendek (Kustom)</h4>
+                                <p class="text-xs text-gray-600 mt-1">Rp 65.000</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 mb-4">
+                            <div class="img-placeholder w-16 h-16 rounded flex-shrink-0"><span class="text-[10px] z-10 bg-white px-1 wf-border">2x</span></div>
+                            <div>
+                                <h4 class="font-bold leading-tight text-sm">Kaos Anime Naruto (Jadi)</h4>
+                                <p class="text-xs text-gray-600 mt-1">Rp 170.000</p>
+                            </div>
+                        </div>
+
+                        <div class="wf-border-b my-4"></div>
+                        
+                        <div class="flex justify-between mb-2 text-sm">
+                            <span>Subtotal:</span>
+                            <span>Rp 235.000</span>
+                        </div>
+                        <div class="flex justify-between mb-2 text-sm">
+                            <span>Ongkos Kirim (Flat):</span>
+                            <span>Gratis (COD/Ambil Sendiri)</span>
+                        </div>
+                        
+                        <div class="wf-border-b my-4"></div>
+                        
+                        <div class="flex justify-between mb-6 font-bold text-2xl">
+                            <span>Total:</span>
+                            <span>Rp 235.000</span>
+                        </div>
+                        <button class="wf-btn w-full text-lg py-3">Buat Pesanan Sekarang</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

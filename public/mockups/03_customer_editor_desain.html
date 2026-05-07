@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mockup - 03 Editor Desain</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
+        body { font-family: 'Patrick Hand', 'Comic Sans MS', cursive; background-color: #e5e5e5; color: #000; display: flex; justify-content: center; padding: 40px; }
+        .wf-container { width: 1024px; min-height: 768px; background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; display: flex; flex-direction: column; }
+        .wf-border { border: 2px solid #000; }
+        .wf-border-b { border-bottom: 2px solid #000; }
+        .wf-border-r { border-right: 2px solid #000; }
+        .wf-border-l { border-left: 2px solid #000; }
+        .wf-btn { border: 2px solid #000; padding: 6px 16px; background: #fff; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .icon-placeholder { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 2px solid #000; border-radius: 50%; font-size: 10px; }
+        .img-placeholder { border: 2px solid #000; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; background: #fff; }
+        .img-placeholder::before, .img-placeholder::after { content: ''; position: absolute; background: #000; }
+        .img-placeholder::before { width: 150%; height: 2px; transform: rotate(45deg); }
+        .img-placeholder::after { width: 150%; height: 2px; transform: rotate(-45deg); }
+        .canvas-area { background-image: repeating-linear-gradient(45deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%, #f0f0f0), repeating-linear-gradient(45deg, #f0f0f0 25%, #fff 25%, #fff 75%, #f0f0f0 75%, #f0f0f0); background-position: 0 0, 10px 10px; background-size: 20px 20px; }
+        .browser-header { border-bottom: 2px solid #000; padding: 8px 16px; display: flex; align-items: center; gap: 8px; background: #fff; }
+        .browser-dot { width: 12px; height: 12px; border: 2px solid #000; border-radius: 50%; }
+        .browser-address { border: 2px solid #000; flex-grow: 1; padding: 2px 8px; font-size: 14px; border-radius: 12px; display: flex; align-items: center; gap: 8px; margin-left: 16px; }
+    </style>
+</head>
+<body>
+    <div class="wf-container">
+        <!-- Browser UI -->
+        <div class="browser-header">
+            <div class="flex gap-2"><div class="browser-dot"></div><div class="browser-dot"></div><div class="browser-dot"></div></div>
+            <div class="browser-address"><span>🔒</span> https://sistem-sablon.com/customer/design/1</div>
+            <div class="browser-dot rounded-sm"></div>
+        </div>
+
+        <div class="wf-border-b p-3 flex justify-between items-center px-4">
+            <div class="font-bold text-lg"><span class="mr-2">&larr;</span> Kembali ke Katalog</div>
+            <h1 class="text-xl font-bold uppercase">Editor Desain: Kaos Lengan Pendek</h1>
+            <button class="wf-btn" style="box-shadow: 2px 2px 0 #000;">Lanjut Pembayaran</button>
+        </div>
+
+        <div class="flex flex-1 overflow-hidden">
+            <!-- Left Toolbar -->
+            <div class="w-24 wf-border-r flex flex-col items-center py-4 gap-4 bg-gray-50">
+                <div class="flex flex-col items-center gap-1 cursor-pointer"><div class="icon-placeholder mb-1">A</div><span>Teks</span></div>
+                <div class="flex flex-col items-center gap-1 cursor-pointer"><div class="icon-placeholder mb-1">🖼️</div><span>Gambar</span></div>
+                <div class="flex flex-col items-center gap-1 cursor-pointer"><div class="icon-placeholder mb-1">😊</div><span>Stiker</span></div>
+                <div class="flex flex-col items-center gap-1 cursor-pointer mt-auto"><div class="icon-placeholder mb-1">❌</div><span>Hapus</span></div>
+            </div>
+
+            <!-- Main Canvas -->
+            <div class="flex-1 canvas-area flex flex-col items-center justify-center relative">
+                <!-- Mockup Image -->
+                <div class="relative w-[300px] h-[400px]">
+                    <div class="absolute inset-0 wf-border bg-white" style="border-radius: 20px 20px 0 0; opacity: 0.8;"></div>
+                    <div class="absolute inset-0 flex justify-center pt-8">
+                        <!-- T-shirt collar -->
+                        <div class="w-32 h-10 border-b-2 border-black rounded-b-full"></div>
+                    </div>
+                    <!-- Drawing Area (Boundary) -->
+                    <div class="absolute top-[20%] left-[25%] w-[50%] h-[50%] wf-border border-dashed border-gray-400 flex items-center justify-center">
+                        <div class="wf-border p-2 bg-white flex items-center justify-between" style="position: absolute; top: 20px; left: 10px; width: 100px; transform: rotate(-5deg);">
+                            <span>Teks Desain</span>
+                            <div class="w-2 h-2 bg-black rounded-full"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Side Selector -->
+                <div class="absolute bottom-8 flex gap-4">
+                    <button class="wf-btn bg-black text-white">Sisi Depan</button>
+                    <button class="wf-btn">Sisi Belakang</button>
+                </div>
+            </div>
+
+            <!-- Right Panel -->
+            <div class="w-72 wf-border-l p-4 flex flex-col gap-6 overflow-y-auto">
+                <div>
+                    <h3 class="font-bold text-lg mb-2">Pilih Ukuran</h3>
+                    <div class="flex gap-2">
+                        <button class="wf-btn px-2 py-1">S</button>
+                        <button class="wf-btn px-2 py-1 bg-black text-white">M</button>
+                        <button class="wf-btn px-2 py-1">L</button>
+                        <button class="wf-btn px-2 py-1">XL</button>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="font-bold text-lg mb-2">Pilih Warna</h3>
+                    <div class="flex gap-2">
+                        <div class="w-8 h-8 rounded-full wf-border bg-white cursor-pointer ring-2 ring-black ring-offset-2"></div>
+                        <div class="w-8 h-8 rounded-full wf-border bg-black cursor-pointer"></div>
+                        <div class="w-8 h-8 rounded-full wf-border bg-gray-400 cursor-pointer"></div>
+                        <div class="w-8 h-8 rounded-full wf-border bg-gray-600 cursor-pointer"></div>
+                    </div>
+                </div>
+
+                <div class="wf-border-b"></div>
+
+                <div>
+                    <h3 class="font-bold text-lg mb-2">Detail Harga</h3>
+                    <div class="flex justify-between mb-1"><span>Harga Dasar:</span><span>Rp 50.000</span></div>
+                    <div class="flex justify-between mb-1"><span>Sablon Depan:</span><span>Rp 15.000</span></div>
+                    <div class="flex justify-between mb-1 text-gray-500"><span>Sablon Belakang:</span><span>-</span></div>
+                    <div class="flex justify-between font-bold text-xl mt-4 pt-2 wf-border-t"><span>Total:</span><span>Rp 65.000</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

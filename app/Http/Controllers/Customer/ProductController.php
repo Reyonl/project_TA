@@ -14,7 +14,7 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $produks = Produk::all();
+        $produks = Produk::where('jenis_produk', '!=', 'topi')->get();
         
         $activeOrdersCount = 0;
         $cartCount = 0;

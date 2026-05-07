@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mockup - 09 Admin Kelola Pesanan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
+        body { font-family: 'Patrick Hand', 'Comic Sans MS', cursive; background-color: #e5e5e5; color: #000; display: flex; justify-content: center; padding: 40px; }
+        .wf-container { width: 1024px; min-height: 768px; background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; display: flex; flex-direction: column; }
+        .wf-border { border: 2px solid #000; }
+        .wf-border-b { border-bottom: 2px solid #000; }
+        .wf-border-r { border-right: 2px solid #000; }
+        .wf-btn { border: 2px solid #000; padding: 4px 12px; background: #fff; border-radius: 4px; font-weight: bold; cursor: pointer; box-shadow: 2px 2px 0 #000; }
+        .icon-placeholder { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: 2px solid #000; border-radius: 50%; font-size: 10px; }
+        .browser-header { border-bottom: 2px solid #000; padding: 8px 16px; display: flex; align-items: center; gap: 8px; background: #fff; }
+        .browser-dot { width: 12px; height: 12px; border: 2px solid #000; border-radius: 50%; }
+        .browser-address { border: 2px solid #000; flex-grow: 1; padding: 2px 8px; font-size: 14px; border-radius: 12px; display: flex; align-items: center; gap: 8px; margin-left: 16px; }
+        .wf-input { border: 2px solid #000; padding: 4px 8px; outline: none; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="wf-container">
+        <!-- Browser UI -->
+        <div class="browser-header">
+            <div class="flex gap-2"><div class="browser-dot"></div><div class="browser-dot"></div><div class="browser-dot"></div></div>
+            <div class="browser-address"><span>🔒</span> https://sistem-sablon.com/admin/orders</div>
+            <div class="browser-dot rounded-sm"></div>
+        </div>
+
+        <div class="flex flex-1">
+            <!-- Sidebar -->
+            <div class="w-64 wf-border-r p-4 flex flex-col gap-4 bg-gray-50">
+                <div class="text-center pb-4 wf-border-b">
+                    <div class="w-16 h-16 rounded-full wf-border mx-auto mb-2 flex items-center justify-center text-xl bg-white">A</div>
+                    <div class="font-bold text-lg">ADMINISTRATOR</div>
+                </div>
+                <nav class="flex flex-col gap-2">
+                    <div class="font-bold flex items-center gap-2 p-2 mt-2">
+                        <span class="icon-placeholder">H</span> Beranda
+                    </div>
+                    <div class="font-bold flex items-center gap-2 p-2 mt-2">
+                        <span class="icon-placeholder">D</span> Master Data <span class="ml-auto">▾</span>
+                    </div>
+                    <div class="font-bold flex items-center gap-2 p-2 mt-2">
+                        <span class="icon-placeholder">T</span> Transaksi <span class="ml-auto">▾</span>
+                    </div>
+                    <div class="pl-8 flex items-center gap-2 p-1 cursor-pointer font-bold underline bg-white wf-border" style="box-shadow: 2px 2px 0 #000;">Pesanan Masuk</div>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex-1 p-8 bg-white">
+                <h1 class="text-3xl font-bold mb-6">Kelola Pesanan Masuk</h1>
+
+                <!-- Filter -->
+                <div class="wf-border p-4 rounded-lg bg-gray-50 mb-6 flex items-end gap-4">
+                    <div>
+                        <label class="block text-sm font-bold mb-1">Status Pesanan</label>
+                        <select class="wf-input w-48 bg-white"><option>Semua Status</option></select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold mb-1">Pencarian</label>
+                        <input type="text" class="wf-input w-64 bg-white" placeholder="Cari ID Pesanan / Nama...">
+                    </div>
+                    <button class="wf-btn px-6 py-2">Cari Pesanan</button>
+                </div>
+
+                <!-- Orders Table -->
+                <div class="wf-border rounded-lg overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="wf-border-b bg-gray-50">
+                            <tr>
+                                <th class="p-3 wf-border-r">ID Pesanan & Tgl</th>
+                                <th class="p-3 wf-border-r">Pelanggan</th>
+                                <th class="p-3 wf-border-r">Total Pembayaran</th>
+                                <th class="p-3 wf-border-r">Bukti Bayar</th>
+                                <th class="p-3 wf-border-r">Status</th>
+                                <th class="p-3 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Order Row 1 -->
+                            <tr class="wf-border-b">
+                                <td class="p-3 wf-border-r">
+                                    <div class="font-bold">ORD-001</div>
+                                    <div class="text-xs text-gray-600">01 Mei 2026 10:30</div>
+                                </td>
+                                <td class="p-3 wf-border-r">
+                                    <div class="font-bold">Budi Santoso</div>
+                                    <div class="text-xs">08123456789</div>
+                                </td>
+                                <td class="p-3 wf-border-r font-bold">Rp 235.000</td>
+                                <td class="p-3 wf-border-r text-center"><a href="#" class="text-black underline text-sm font-bold">Lihat Foto</a></td>
+                                <td class="p-3 wf-border-r">
+                                    <select class="wf-input text-xs w-full bg-gray-200 font-bold p-1">
+                                        <option>Menunggu Pembayaran</option>
+                                        <option selected>Menunggu Proses</option>
+                                        <option>Sedang Diproses</option>
+                                    </select>
+                                </td>
+                                <td class="p-3 text-center">
+                                    <button class="wf-btn text-xs bg-black text-white px-2 py-1">Review Desain</button>
+                                </td>
+                            </tr>
+                            
+                            <!-- Order Row 2 -->
+                            <tr class="wf-border-b">
+                                <td class="p-3 wf-border-r">
+                                    <div class="font-bold">ORD-002</div>
+                                    <div class="text-xs text-gray-600">01 Mei 2026 09:15</div>
+                                </td>
+                                <td class="p-3 wf-border-r">
+                                    <div class="font-bold">Andi Wijaya</div>
+                                </td>
+                                <td class="p-3 wf-border-r font-bold">Rp 120.000</td>
+                                <td class="p-3 wf-border-r text-center text-gray-400 text-sm">- Belum -</td>
+                                <td class="p-3 wf-border-r">
+                                    <select class="wf-input text-xs w-full bg-gray-100 font-bold p-1">
+                                        <option selected>Menunggu Pembayaran</option>
+                                    </select>
+                                </td>
+                                <td class="p-3 text-center">
+                                    <button class="wf-btn text-xs px-2 py-1 text-gray-600" style="box-shadow:none">Detail</button>
+                                </td>
+                            </tr>
+
+                            <!-- Order Row 3 -->
+                            <tr class="wf-border-b bg-gray-50">
+                                <td class="p-3 wf-border-r">
+                                    <div class="font-bold">ORD-003</div>
+                                    <div class="text-xs text-gray-600">28 Apr 2026 14:00</div>
+                                </td>
+                                <td class="p-3 wf-border-r">
+                                    <div class="font-bold">Siti Aminah</div>
+                                </td>
+                                <td class="p-3 wf-border-r font-bold">Rp 350.000</td>
+                                <td class="p-3 wf-border-r text-center"><span class="text-black text-sm font-bold">✔ Valid</span></td>
+                                <td class="p-3 wf-border-r">
+                                    <select class="wf-input text-xs w-full bg-gray-200 font-bold p-1">
+                                        <option selected>Selesai</option>
+                                    </select>
+                                </td>
+                                <td class="p-3 text-center">
+                                    <button class="wf-btn text-xs px-2 py-1" style="box-shadow:none">Detail</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>
