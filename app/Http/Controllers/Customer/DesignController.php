@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Customer\StoreDesainRequest;
 use Illuminate\Http\Request;
 
 use App\Models\Desain;
@@ -29,25 +30,9 @@ class DesignController extends Controller
         return view('customer.designs.editor', compact('templates', 'produk', 'desainRevisi'));
     }
 
-    public function store(Request $request)
+    public function store(StoreDesainRequest $request)
     {
-        $request->validate([
-            'id_produk' => 'required|exists:produks,id_produk',
-            'file_desain' => 'required|string',
-            'lebar_cm' => 'required|numeric',
-            'tinggi_cm' => 'required|numeric',
-            'file_desain_belakang' => 'nullable|string',
-            'lebar_cm_belakang' => 'nullable|numeric',
-            'tinggi_cm_belakang' => 'nullable|numeric',
-            'file_desain_kiri' => 'nullable|string',
-            'lebar_cm_kiri' => 'nullable|numeric',
-            'tinggi_cm_kiri' => 'nullable|numeric',
-            'file_desain_kanan' => 'nullable|string',
-            'lebar_cm_kanan' => 'nullable|numeric',
-            'tinggi_cm_kanan' => 'nullable|numeric',
-            'warna_baju' => 'nullable|string',
-            'tipe_proses' => 'nullable|in:sablon,bordir',
-        ]);
+        $validated = $request->validated();
 
         $base64_image = $request->file_desain;
         
@@ -141,10 +126,11 @@ class DesignController extends Controller
             'tinggi_cm_kiri' => $request->tinggi_cm_kiri,
             'lebar_cm_kanan' => $request->lebar_cm_kanan,
             'tinggi_cm_kanan' => $request->tinggi_cm_kanan,
-            'harga_desain' => 20000, // Misal tarif sablon custom 20.000
+            'harga_desain' => $request->harga_desain,
             'tanggal_upload' => now(),
             'warna_baju' => $request->warna_baju,
             'raw_assets' => !empty($rawAssetsPaths) ? $rawAssetsPaths : null,
+            'detail_sablon' => $request->detail_sablon,
         ]);
 
         // Simpan langsung ke keranjang belanja
@@ -153,7 +139,6 @@ class DesignController extends Controller
             'id_produk' => $request->id_produk,
             'id_desain' => $desain->id_desain,
             'quantity' => 1,
-            'tipe_proses' => $request->tipe_proses ?? 'sablon',
         ]);
 
         return response()->json([
@@ -163,24 +148,9 @@ class DesignController extends Controller
         ]);
     }
 
-    public function update(Request $request, Desain $desain)
+    public function update(StoreDesainRequest $request, Desain $desain)
     {
-        $request->validate([
-            'id_produk' => 'required|exists:produks,id_produk',
-            'file_desain' => 'required|string',
-            'lebar_cm' => 'required|numeric',
-            'tinggi_cm' => 'required|numeric',
-            'file_desain_belakang' => 'nullable|string',
-            'lebar_cm_belakang' => 'nullable|numeric',
-            'tinggi_cm_belakang' => 'nullable|numeric',
-            'file_desain_kiri' => 'nullable|string',
-            'lebar_cm_kiri' => 'nullable|numeric',
-            'tinggi_cm_kiri' => 'nullable|numeric',
-            'file_desain_kanan' => 'nullable|string',
-            'lebar_cm_kanan' => 'nullable|numeric',
-            'tinggi_cm_kanan' => 'nullable|numeric',
-            'warna_baju' => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
         if ($desain->id_customer !== auth()->guard('customer')->id()) {
             abort(403);
@@ -289,6 +259,8 @@ class DesignController extends Controller
         $desain->lebar_cm_kanan = $request->lebar_cm_kanan;
         $desain->tinggi_cm_kanan = $request->tinggi_cm_kanan;
         $desain->warna_baju = $request->warna_baju;
+        $desain->harga_desain = $request->harga_desain;
+        $desain->detail_sablon = $request->detail_sablon;
         $desain->save();
 
         // Cari OrderDetail yang pake desain ini dan update statusnya ke pending lagi

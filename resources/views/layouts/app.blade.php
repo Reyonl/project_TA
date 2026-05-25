@@ -19,6 +19,7 @@
             .font-outfit { font-family: 'Outfit', sans-serif; }
             body { font-family: 'Inter', sans-serif; }
         </style>
+        @stack('styles')
     </head>
     <body class="font-sans antialiased text-slate-900">
         <div class="min-h-screen bg-slate-50 relative overflow-x-hidden">
@@ -41,5 +42,6 @@
                 {{ $slot }}
             </main>
         </div>
+        @stack('scripts')
     </body>
 </html>

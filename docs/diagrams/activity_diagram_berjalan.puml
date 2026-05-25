@@ -1,0 +1,34 @@
+@startuml
+skinparam Style strictuml
+skinparam ActivityFontName Times New Roman
+skinparam ActivityFontSize 12
+skinparam ActivityBorderColor Black
+skinparam ActivityBackgroundColor White
+skinparam ArrowColor Black
+skinparam ArrowFontName Times New Roman
+skinparam ArrowFontSize 10
+skinparam SwimlaneBorderColor Black
+skinparam SwimlaneTitleFontName Times New Roman
+skinparam SwimlaneTitleFontSize 14
+skinparam SwimlaneTitleFontStyle bold
+
+|Pembeli|
+start
+:Menghubungi Toko\n(Datang Langsung / WhatsApp);
+:Konsultasi Desain dan Menyerahkan File Konsep;
+
+|Petugas|
+:Memeriksa Kelayakan Desain dan\nMenghitung Estimasi Biaya Manual;
+
+|Pembeli|
+:Melakukan Pembayaran\n(Tunai / Transfer Bank);
+
+|Petugas|
+:Memverifikasi Bukti Pembayaran\ndan Memulai Produksi Sablon;
+:Menyelesaikan Proses Sablon Kaos;
+:Menyerahkan / Mengirimkan Pesanan Kaos Sablon;
+
+|Pembeli|
+:Menerima Pesanan Kaos Sablon;
+stop
+@enduml

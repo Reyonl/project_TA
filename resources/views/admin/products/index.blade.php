@@ -60,11 +60,9 @@
                                             <span class="px-2.5 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-md uppercase border border-slate-200">
                                                 {{ $produk->jenis_produk }}
                                             </span>
-                                            @if($produk->tersedia_bordir)
                                             <span class="ml-1 px-2.5 py-1 bg-sky-50 text-sky-700 text-[10px] font-bold rounded-md uppercase border border-sky-100">
-                                                + Bordir
+                                                Sablon
                                             </span>
-                                            @endif
                                         </td>
                                         <td class="p-4">
                                             @if($produk->tipe_produk == 'jadi')

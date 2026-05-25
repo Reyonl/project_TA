@@ -1,0 +1,48 @@
+@startuml
+skinparam Style strictuml
+skinparam ActivityFontName Times New Roman
+skinparam ActivityFontSize 12
+skinparam ActivityBorderColor Black
+skinparam ActivityBackgroundColor White
+skinparam ArrowColor Black
+skinparam ArrowFontName Times New Roman
+skinparam ArrowFontSize 10
+skinparam SwimlaneBorderColor Black
+skinparam SwimlaneTitleFontName Times New Roman
+skinparam SwimlaneTitleFontSize 14
+skinparam SwimlaneTitleFontStyle bold
+
+|Pelanggan|
+start
+:Registrasi / Login Akun;
+
+repeat
+    :Pilih Katalog Kaos Sablon;
+    
+    |Sistem Web|
+    :Inisialisasi Canvas Editor & Muat Model Kaos;
+    
+    |Pelanggan|
+    :Lakukan Desain Interaktif\n(Drag, Resize, Rotate, Color, Upload Gambar);
+    :Simpan Desain ke Keranjang;
+    :Review Keranjang Belanja;
+repeat while (Tambah Produk Lain?) is (Ya) not (Tidak)
+
+:Masuk ke Halaman Checkout;
+
+|Sistem Web|
+:Tampilkan Rincian Pesanan & Detail Rekening Transfer;
+
+|Pelanggan|
+:Transfer Manual dan Upload Bukti Transfer;
+:Kirim & Konfirmasi Pembayaran (Submit Checkout);
+
+|Sistem Web|
+:Simpan Order (status_order: 'pending'),\nDetail Order, & Kosongkan Keranjang;
+:Kirim Notifikasi Verifikasi ke Admin;
+:Tampilkan Halaman Pelacakan Pesanan;
+
+|Pelanggan|
+:Melihat Status Pelacakan Pesanan;
+stop
+@enduml

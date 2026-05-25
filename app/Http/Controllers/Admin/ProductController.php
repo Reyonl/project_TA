@@ -24,18 +24,14 @@ class ProductController extends Controller
     {
         $request->validate([
             'nama_produk' => 'required|string|max:255',
-            'jenis_produk' => 'required|in:kaos,hoodie,topi,polo,seragam',
+            'jenis_produk' => 'required|in:kaos,hoodie,polo',
             'tipe_produk' => 'required|in:kustom,jadi',
             'harga_dasar' => 'required|numeric|min:0',
-            'tersedia_bordir' => 'boolean',
             'deskripsi' => 'nullable|string',
             'gambar_produk' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
         $data = $request->except('gambar_produk');
-        
-        // Ensure boolean works from checkbox
-        $data['tersedia_bordir'] = $request->has('tersedia_bordir') ? 1 : 0;
 
         if ($request->hasFile('gambar_produk')) {
             $data['gambar_produk'] = $request->file('gambar_produk')->store('products', 'public');
@@ -55,17 +51,14 @@ class ProductController extends Controller
     {
         $request->validate([
             'nama_produk' => 'required|string|max:255',
-            'jenis_produk' => 'required|in:kaos,hoodie,topi,polo,seragam',
+            'jenis_produk' => 'required|in:kaos,hoodie,polo',
             'tipe_produk' => 'required|in:kustom,jadi',
             'harga_dasar' => 'required|numeric|min:0',
-            'tersedia_bordir' => 'boolean',
             'deskripsi' => 'nullable|string',
             'gambar_produk' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
         $data = $request->except('gambar_produk');
-        
-        $data['tersedia_bordir'] = $request->has('tersedia_bordir') ? 1 : 0;
 
         if ($request->hasFile('gambar_produk')) {
             if ($product->gambar_produk) {

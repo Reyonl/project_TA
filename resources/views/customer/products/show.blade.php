@@ -60,11 +60,10 @@
                   selectedSize: 'L',
                   selectedTechnique: 'sablon',
                   colorMap: {
-                      'White': '#ffffff', 'Black': '#1e293b', 'Navy': '#1e3a8a', 
-                      'Dark Grey': '#334155', 'Red': '#dc2626', 'Forest Green': '#14532d', 
-                      'Maroon': '#7f1d1d', 'Military Green': '#4B5320', 'Sand': '#D2B48C',
-                      'Light Blue': '#93c5fd', 'Pink': '#f472b6', 'Purple': '#6d28d9',
-                      'Orange': '#f97316', 'Yellow': '#facc15', 'Teal': '#0d9488'
+                      'Maroon': '#7f1d1d', 'Green': '#14532d', 'Grey': '#94a3b8', 
+                      'Army': '#4B5320', 'Yellow': '#facc15', 'White': '#ffffff', 
+                      'Navy': '#1e3a8a', 'Orange': '#f97316', 'Black': '#1e293b', 
+                      'Red': '#dc2626', 'Blue': '#3b82f6', 'Mint': '#a7f3d0'
                   }
               }">
             
@@ -187,23 +186,13 @@
 
                 <!-- Configurator -->
                 <div class="flex flex-col gap-6">
-                    <!-- Technique -->
-                    <div x-show="{{ $produk->tersedia_bordir ? 'true' : 'false' }}">
+                    <!-- Technique (Sablon Only) -->
+                    <div>
                         <div class="flex justify-between items-center mb-3">
-                            <span class="font-bold text-sm text-slate-800 uppercase tracking-widest">Pilih Teknik Cetak</span>
-                            <a href="#" class="text-[10px] text-red-600 font-black uppercase tracking-widest border-b border-red-200">Panduan Teknik</a>
+                            <span class="font-bold text-sm text-slate-800 uppercase tracking-widest">Teknik Cetak</span>
                         </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <button @click="selectedTechnique = 'sablon'" 
-                                    :class="selectedTechnique === 'sablon' ? 'border-red-600 bg-red-50 text-red-700' : 'border-slate-200 bg-white text-slate-500'"
-                                    class="py-3.5 px-4 rounded-xl border-2 font-black text-[10px] uppercase tracking-widest text-center transition-all">
-                                Sablon Digital (DTG)
-                            </button>
-                            <button @click="selectedTechnique = 'bordir'" 
-                                    :class="selectedTechnique === 'bordir' ? 'border-red-600 bg-red-50 text-red-700' : 'border-slate-200 bg-white text-slate-500'"
-                                    class="py-3.5 px-4 rounded-xl border-2 font-black text-[10px] uppercase tracking-widest text-center transition-all">
-                                Bordir (Embroidery)
-                            </button>
+                        <div class="py-3.5 px-4 rounded-xl border-2 border-sky-500 bg-sky-50 text-sky-700 font-black text-[10px] uppercase tracking-widest text-center">
+                            ✨ Sablon Digital (DTG)
                         </div>
                     </div>
 
@@ -234,11 +223,18 @@
                         <div class="flex flex-wrap gap-2">
                             @php
                                 $colors = [
-                                    'White' => 'bg-white', 'Black' => 'bg-slate-900', 'Navy' => 'bg-blue-900', 
-                                    'Dark Grey' => 'bg-slate-700', 'Red' => 'bg-red-600', 'Forest Green' => 'bg-green-800', 
-                                    'Maroon' => 'bg-red-900', 'Military Green' => 'bg-[#4B5320]', 'Sand' => 'bg-[#D2B48C]',
-                                    'Light Blue' => 'bg-blue-300', 'Pink' => 'bg-pink-400', 'Purple' => 'bg-purple-700',
-                                    'Orange' => 'bg-orange-500', 'Yellow' => 'bg-yellow-400', 'Teal' => 'bg-teal-600'
+                                    'Maroon' => 'bg-[#7f1d1d]', 
+                                    'Green' => 'bg-[#14532d]', 
+                                    'Grey' => 'bg-[#94a3b8]', 
+                                    'Army' => 'bg-[#4B5320]', 
+                                    'Yellow' => 'bg-[#facc15]', 
+                                    'White' => 'bg-white', 
+                                    'Navy' => 'bg-[#1e3a8a]', 
+                                    'Orange' => 'bg-[#f97316]', 
+                                    'Black' => 'bg-[#1e293b]', 
+                                    'Red' => 'bg-[#dc2626]', 
+                                    'Blue' => 'bg-[#3b82f6]', 
+                                    'Mint' => 'bg-[#a7f3d0]'
                                 ];
                             @endphp
                             @foreach($colors as $name => $class)

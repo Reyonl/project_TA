@@ -47,9 +47,7 @@
                             <select name="jenis_produk" id="jenis_produk" class="w-full rounded-xl border-slate-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm transition">
                                 <option value="kaos" {{ old('jenis_produk') == 'kaos' ? 'selected' : '' }}>Kaos</option>
                                 <option value="hoodie" {{ old('jenis_produk') == 'hoodie' ? 'selected' : '' }}>Hoodie</option>
-                                {{-- <option value="topi" {{ old('jenis_produk') == 'topi' ? 'selected' : '' }}>Topi</option> --}}
                                 <option value="polo" {{ old('jenis_produk') == 'polo' ? 'selected' : '' }}>Polo Shirt</option>
-                                <option value="seragam" {{ old('jenis_produk') == 'seragam' ? 'selected' : '' }}>Kemeja / Seragam</option>
                             </select>
                         </div>
 
@@ -64,13 +62,13 @@
                     </div>
 
                     <div>
-                        <label class="flex items-center gap-2 p-3 bg-white border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition shadow-sm">
-                            <input type="checkbox" name="tersedia_bordir" value="1" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 w-5 h-5" {{ old('tersedia_bordir') ? 'checked' : '' }}>
+                        <div class="flex items-center gap-2 p-3 bg-sky-50 border border-sky-200 rounded-xl shadow-sm">
+                            <div class="w-5 h-5 rounded bg-sky-500 flex items-center justify-center text-white text-xs">✓</div>
                             <div>
-                                <span class="block text-sm font-bold text-slate-700">Tersedia Opsi Bordir?</span>
-                                <span class="block text-xs text-slate-500">Centang jika pelanggan bisa memilih teknik bordir untuk produk ini.</span>
+                                <span class="block text-sm font-bold text-sky-700">Teknik Cetak: Sablon Digital (DTG)</span>
+                                <span class="block text-xs text-sky-600">Semua produk menggunakan teknik sablon.</span>
                             </div>
-                        </label>
+                        </div>
                     </div>
 
                     <div>

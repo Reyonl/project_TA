@@ -34,76 +34,72 @@
             <div class="browser-dot rounded-sm"></div>
         </div>
 
-        <div class="wf-border-b p-3 flex justify-between items-center px-4">
-            <div class="font-bold text-lg"><span class="mr-2">&larr;</span> Kembali ke Katalog</div>
-            <h1 class="text-xl font-bold uppercase">Editor Desain: Kaos Lengan Pendek</h1>
-            <button class="wf-btn" style="box-shadow: 2px 2px 0 #000;">Lanjut Pembayaran</button>
+        <div class="wf-border-b p-3 flex flex-col px-4 bg-white">
+            <div class="flex justify-between items-center mb-4">
+                <div class="font-bold text-lg"><span class="mr-2">&larr;</span> Kembali ke Katalog</div>
+                <h1 class="text-xl font-bold uppercase tracking-widest">SISTEM SABLON</h1>
+                <div class="w-8 h-8 icon-placeholder rounded-full font-bold">👤</div>
+            </div>
+            
+            <!-- Wizard Progress Bar -->
+            <div class="flex justify-center items-center gap-4 mb-2">
+                <div class="flex flex-col items-center">
+                    <div class="w-8 h-8 rounded-full border-2 border-black bg-black text-white flex items-center justify-center font-bold mb-1">1</div>
+                    <span class="text-xs font-bold">Pilih Warna</span>
+                </div>
+                <div class="w-16 h-0.5 bg-black"></div>
+                <div class="flex flex-col items-center">
+                    <div class="w-8 h-8 rounded-full border-2 border-black bg-white flex items-center justify-center font-bold mb-1">2</div>
+                    <span class="text-xs font-bold text-gray-500">Desain Depan</span>
+                </div>
+                <div class="w-16 h-0.5 bg-gray-300"></div>
+                <div class="flex flex-col items-center opacity-50">
+                    <div class="w-8 h-8 rounded-full border-2 border-black bg-white flex items-center justify-center font-bold mb-1">3</div>
+                    <span class="text-xs font-bold">Desain Belakang</span>
+                </div>
+                <div class="w-16 h-0.5 bg-gray-300"></div>
+                <div class="flex flex-col items-center opacity-50">
+                    <div class="w-8 h-8 rounded-full border-2 border-black bg-white flex items-center justify-center font-bold mb-1">4</div>
+                    <span class="text-xs font-bold">Review</span>
+                </div>
+            </div>
         </div>
 
         <div class="flex flex-1 overflow-hidden">
-            <!-- Left Toolbar -->
-            <div class="w-24 wf-border-r flex flex-col items-center py-4 gap-4 bg-gray-50">
-                <div class="flex flex-col items-center gap-1 cursor-pointer"><div class="icon-placeholder mb-1">A</div><span>Teks</span></div>
-                <div class="flex flex-col items-center gap-1 cursor-pointer"><div class="icon-placeholder mb-1">🖼️</div><span>Gambar</span></div>
-                <div class="flex flex-col items-center gap-1 cursor-pointer"><div class="icon-placeholder mb-1">😊</div><span>Stiker</span></div>
-                <div class="flex flex-col items-center gap-1 cursor-pointer mt-auto"><div class="icon-placeholder mb-1">❌</div><span>Hapus</span></div>
-            </div>
-
-            <!-- Main Canvas -->
-            <div class="flex-1 canvas-area flex flex-col items-center justify-center relative">
+            <!-- Main Canvas / Content Area -->
+            <div class="flex-1 canvas-area flex flex-col items-center justify-center relative border-r-2 border-black p-8">
+                <h2 class="text-2xl font-bold mb-6 text-center">Langkah 1: Pilih Warna Dasar Pakaian</h2>
+                
                 <!-- Mockup Image -->
-                <div class="relative w-[300px] h-[400px]">
-                    <div class="absolute inset-0 wf-border bg-white" style="border-radius: 20px 20px 0 0; opacity: 0.8;"></div>
+                <div class="relative w-[350px] h-[450px]">
+                    <div class="absolute inset-0 wf-border bg-white" style="border-radius: 20px 20px 0 0; opacity: 1;"></div>
                     <div class="absolute inset-0 flex justify-center pt-8">
                         <!-- T-shirt collar -->
                         <div class="w-32 h-10 border-b-2 border-black rounded-b-full"></div>
                     </div>
-                    <!-- Drawing Area (Boundary) -->
-                    <div class="absolute top-[20%] left-[25%] w-[50%] h-[50%] wf-border border-dashed border-gray-400 flex items-center justify-center">
-                        <div class="wf-border p-2 bg-white flex items-center justify-between" style="position: absolute; top: 20px; left: 10px; width: 100px; transform: rotate(-5deg);">
-                            <span>Teks Desain</span>
-                            <div class="w-2 h-2 bg-black rounded-full"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Side Selector -->
-                <div class="absolute bottom-8 flex gap-4">
-                    <button class="wf-btn bg-black text-white">Sisi Depan</button>
-                    <button class="wf-btn">Sisi Belakang</button>
                 </div>
             </div>
 
-            <!-- Right Panel -->
-            <div class="w-72 wf-border-l p-4 flex flex-col gap-6 overflow-y-auto">
-                <div>
-                    <h3 class="font-bold text-lg mb-2">Pilih Ukuran</h3>
-                    <div class="flex gap-2">
-                        <button class="wf-btn px-2 py-1">S</button>
-                        <button class="wf-btn px-2 py-1 bg-black text-white">M</button>
-                        <button class="wf-btn px-2 py-1">L</button>
-                        <button class="wf-btn px-2 py-1">XL</button>
-                    </div>
-                </div>
+            <!-- Right Panel (Controls) -->
+            <div class="w-80 p-6 flex flex-col gap-6 overflow-y-auto bg-gray-50">
                 
                 <div>
-                    <h3 class="font-bold text-lg mb-2">Pilih Warna</h3>
-                    <div class="flex gap-2">
-                        <div class="w-8 h-8 rounded-full wf-border bg-white cursor-pointer ring-2 ring-black ring-offset-2"></div>
-                        <div class="w-8 h-8 rounded-full wf-border bg-black cursor-pointer"></div>
-                        <div class="w-8 h-8 rounded-full wf-border bg-gray-400 cursor-pointer"></div>
-                        <div class="w-8 h-8 rounded-full wf-border bg-gray-600 cursor-pointer"></div>
+                    <h3 class="font-bold text-xl mb-4 border-b-2 border-black pb-2">Opsi Warna Dasar</h3>
+                    <div class="grid grid-cols-4 gap-4">
+                        <div class="w-12 h-12 rounded-full wf-border bg-white cursor-pointer ring-2 ring-black ring-offset-2 mx-auto"></div>
+                        <div class="w-12 h-12 rounded-full wf-border bg-black cursor-pointer mx-auto"></div>
+                        <div class="w-12 h-12 rounded-full wf-border bg-blue-500 cursor-pointer mx-auto"></div>
+                        <div class="w-12 h-12 rounded-full wf-border bg-red-500 cursor-pointer mx-auto"></div>
+                        <div class="w-12 h-12 rounded-full wf-border bg-green-500 cursor-pointer mx-auto"></div>
+                        <div class="w-12 h-12 rounded-full wf-border bg-yellow-500 cursor-pointer mx-auto"></div>
                     </div>
                 </div>
 
-                <div class="wf-border-b"></div>
-
-                <div>
-                    <h3 class="font-bold text-lg mb-2">Detail Harga</h3>
-                    <div class="flex justify-between mb-1"><span>Harga Dasar:</span><span>Rp 50.000</span></div>
-                    <div class="flex justify-between mb-1"><span>Sablon Depan:</span><span>Rp 15.000</span></div>
-                    <div class="flex justify-between mb-1 text-gray-500"><span>Sablon Belakang:</span><span>-</span></div>
-                    <div class="flex justify-between font-bold text-xl mt-4 pt-2 wf-border-t"><span>Total:</span><span>Rp 65.000</span></div>
+                <div class="mt-auto border-t-2 border-black pt-4">
+                    <button class="wf-btn bg-black text-white w-full py-3 text-lg flex justify-between items-center" style="box-shadow: 4px 4px 0 #000;">
+                        <span>Lanjut ke Desain Depan</span>
+                        <span>&rarr;</span>
+                    </button>
                 </div>
             </div>
         </div>

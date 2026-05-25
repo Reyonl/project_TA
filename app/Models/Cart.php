@@ -14,7 +14,6 @@ class Cart extends Model
         'id_produk',
         'id_desain',
         'quantity',
-        'tipe_proses',
     ];
 
     public function customer()

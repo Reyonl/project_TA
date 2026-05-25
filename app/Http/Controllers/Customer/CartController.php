@@ -30,7 +30,6 @@ class CartController extends Controller
     {
         $request->validate([
             'quantity' => 'required|integer|min:1',
-            'technique' => 'required|in:sablon,bordir',
             // color and size can be stored in a JSON column or note in the future if needed, 
             // but currently the Cart/OrderDetails table doesn't have size/color directly (it's in Desain).
             // For now, we will just add the product. If size is critical, we might need a migration for carts.
@@ -43,7 +42,6 @@ class CartController extends Controller
             'id_produk' => $produk->id_produk,
             'id_desain' => null, // No custom design for ready-made
             'quantity' => $request->quantity,
-            'tipe_proses' => $request->technique,
         ]);
 
         return redirect()->route('customer.cart.index')->with('success', 'Produk berhasil ditambahkan ke keranjang.');

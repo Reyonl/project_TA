@@ -14,7 +14,6 @@ class Produk extends Model
         'jenis_produk',
         'harga_dasar',
         'deskripsi',
-        'tersedia_bordir',
         'tipe_produk',
         'gambar_produk',
     ];

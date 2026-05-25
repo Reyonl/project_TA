@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mockup - 06 Riwayat Pesanan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
+        body { font-family: 'Patrick Hand', 'Comic Sans MS', cursive; background-color: #e5e5e5; color: #000; display: flex; justify-content: center; padding: 40px; }
+        .wf-container { width: 1024px; min-height: 768px; background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; display: flex; flex-direction: column; }
+        .wf-border { border: 2px solid #000; }
+        .wf-border-b { border-bottom: 2px solid #000; }
+        .wf-border-r { border-right: 2px solid #000; }
+        .wf-btn { border: 2px solid #000; padding: 6px 16px; background: #fff; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .icon-placeholder { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 2px solid #000; border-radius: 50%; font-size: 10px; }
+        .browser-header { border-bottom: 2px solid #000; padding: 8px 16px; display: flex; align-items: center; gap: 8px; background: #fff; }
+        .browser-dot { width: 12px; height: 12px; border: 2px solid #000; border-radius: 50%; }
+        .browser-address { border: 2px solid #000; flex-grow: 1; padding: 2px 8px; font-size: 14px; border-radius: 12px; display: flex; align-items: center; gap: 8px; margin-left: 16px; }
+    </style>
+</head>
+<body>
+    <div class="wf-container">
+        <!-- Browser UI -->
+        <div class="browser-header">
+            <div class="flex gap-2"><div class="browser-dot"></div><div class="browser-dot"></div><div class="browser-dot"></div></div>
+            <div class="browser-address"><span>🔒</span> https://sistem-sablon.com/customer/orders</div>
+            <div class="browser-dot rounded-sm"></div>
+        </div>
+
+        <!-- Navbar -->
+        <div class="wf-border-b p-4 flex justify-between items-center px-8">
+            <div class="flex items-center gap-4">
+                <div class="icon-placeholder">Logo</div>
+                <h1 class="text-xl font-bold uppercase tracking-widest">SISTEM SABLON</h1>
+            </div>
+            <div class="flex items-center gap-6 font-bold text-lg">
+                <span>Katalog</span>
+                <span class="underline">Pesanan Saya (2)</span>
+                <span>Keranjang (0)</span>
+                <div class="flex items-center gap-2 ml-4">
+                    <div class="icon-placeholder">U</div>
+                    <span>Halo, Budi Santoso</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex-1 p-8">
+            <h2 class="text-3xl font-bold mb-6">Riwayat Pesanan Saya</h2>
+
+            <div class="flex flex-col gap-6">
+                <!-- Order 1 -->
+                <div class="wf-border rounded-lg bg-white overflow-hidden">
+                    <div class="wf-border-b bg-gray-50 p-4 flex justify-between items-center">
+                        <div>
+                            <span class="font-bold mr-4">ID: ORD-202605-001</span>
+                            <span class="text-gray-600 text-sm">Tanggal: 01 Mei 2026</span>
+                        </div>
+                        <div class="wf-border px-3 py-1 bg-white font-bold rounded">
+                            Status: SEDANG DIPROSES
+                        </div>
+                    </div>
+                    <div class="p-6 flex justify-between items-center">
+                        <div class="flex gap-6">
+                            <div class="flex flex-col items-center">
+                                <div class="w-20 h-20 wf-border flex items-center justify-center bg-gray-100 rounded mb-2 text-xs text-center">Gambar Kaos</div>
+                                <span class="font-bold">2 Barang</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg mb-1">Kaos Lengan Pendek (Kustom) + 1 Lainnya</h3>
+                                <p class="text-gray-600 mb-2">Total Belanja: <strong class="text-black">Rp 235.000</strong></p>
+                                <p class="text-sm bg-gray-200 wf-border px-2 py-1 inline-block">Desain Disetujui Admin</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <button class="wf-btn" style="box-shadow: 2px 2px 0 #000;">Lihat Detail Pesanan</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order 2 -->
+                <div class="wf-border rounded-lg bg-white overflow-hidden">
+                    <div class="wf-border-b bg-gray-50 p-4 flex justify-between items-center">
+                        <div>
+                            <span class="font-bold mr-4">ID: ORD-202604-099</span>
+                            <span class="text-gray-600 text-sm">Tanggal: 15 Apr 2026</span>
+                        </div>
+                        <div class="wf-border px-3 py-1 bg-white font-bold rounded">
+                            Status: SELESAI
+                        </div>
+                    </div>
+                    <div class="p-6 flex justify-between items-center">
+                        <div class="flex gap-6">
+                            <div class="flex flex-col items-center">
+                                <div class="w-20 h-20 wf-border flex items-center justify-center bg-gray-100 rounded mb-2 text-xs text-center">Gambar Hoodie</div>
+                                <span class="font-bold">1 Barang</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg mb-1">Hoodie Jumper (Jadi)</h3>
+                                <p class="text-gray-600 mb-2">Total Belanja: <strong class="text-black">Rp 120.000</strong></p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <button class="wf-btn bg-gray-100 text-gray-500">Lihat Detail Pesanan</button>
+                            <button class="wf-btn" style="box-shadow: 2px 2px 0 #000;">Pesan Lagi</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>

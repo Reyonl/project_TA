@@ -1,0 +1,53 @@
+@startuml activity_checkout
+skinparam backgroundColor white
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 13
+
+skinparam activity {
+  BackgroundColor white
+  BorderColor black
+  FontColor black
+}
+skinparam activityDiamond {
+  BackgroundColor white
+  BorderColor black
+}
+skinparam arrowColor black
+skinparam swimlane {
+  BorderColor black
+  BorderThickness 1
+  TitleFontColor black
+  TitleFontSize 16
+}
+
+|Pelanggan|
+start
+:Klik "Checkout" di Keranjang;
+
+|Sistem|
+:Menampilkan Ringkasan Pesanan \n& Form Bukti Pembayaran;
+
+|Pelanggan|
+:Melakukan Transfer Bank \nsesuai Total Harga;
+
+repeat
+  |Pelanggan|
+  :Mengunggah Bukti Pembayaran \n& Klik "Buat Pesanan";
+
+  |Sistem|
+  :Memvalidasi File Bukti Pembayaran;
+repeat while (File Bukti Valid?) is (Tidak)
+-> Ya;
+
+|Sistem|
+:Menyimpan File Bukti Pembayaran \nke Penyimpanan (Storage);
+:Menyimpan Data Pesanan Baru \nke Basis Data;
+:Mengosongkan Keranjang Belanja;
+:Mengubah Status Pesanan \n(Menunggu Verifikasi);
+
+|Pelanggan|
+:Menerima Notifikasi Sukses \n& Melihat Riwayat Pesanan;
+stop
+@enduml

@@ -19,7 +19,6 @@ class OrderDetail extends Model
         'subtotal',
         'status_desain',
         'catatan_admin',
-        'tipe_proses',
     ];
 
     public function order()

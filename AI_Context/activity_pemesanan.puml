@@ -1,0 +1,59 @@
+@startuml activity_pemesanan
+skinparam backgroundColor white
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 13
+
+skinparam activity {
+  BackgroundColor white
+  BorderColor black
+  FontColor black
+}
+skinparam activityDiamond {
+  BackgroundColor white
+  BorderColor black
+}
+skinparam arrowColor black
+skinparam swimlane {
+  BorderColor black
+  BorderThickness 1
+  TitleFontColor black
+  TitleFontSize 16
+}
+
+|Pembeli|
+start
+:Memilih Cara Pemesanan;
+
+if (Datang Langsung?) then (Ya)
+  :Datang ke Tempat Sablon;
+  :Konsultasi Desain;
+else (Tidak)
+  :Menghubungi via WhatsApp / Instagram;
+  :Mengirim Detail Desain;
+endif
+
+|Petugas / Desainer|
+:Membuat Desain Custom;
+:Menunjukkan Hasil Desain;
+
+|Pembeli|
+if (Desain Sesuai?) then (Ya)
+  :Memilih Ukuran;
+  :Melakukan Pembayaran;
+else (Revisi)
+  |Petugas / Desainer|
+  :Melakukan Revisi Desain;
+  |Pembeli|
+  :Memeriksa Kembali Desain;
+endif
+
+|Petugas / Desainer|
+:Proses Sablon;
+:Pesanan Selesai;
+
+|Pembeli|
+:Mengambil / Menerima Pesanan;
+stop
+@enduml

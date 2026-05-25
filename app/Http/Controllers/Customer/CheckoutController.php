@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Customer\StoreCheckoutRequest;
 use Illuminate\Http\Request;
 
 use App\Models\Order;
@@ -32,11 +33,8 @@ class CheckoutController extends Controller
         return view('customer.checkout.index', compact('carts', 'totalHarga'));
     }
 
-    public function store(Request $request)
+    public function store(StoreCheckoutRequest $request)
     {
-        $request->validate([
-            'bukti_pembayaran' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-        ]);
 
         $id_customer = Auth::guard('customer')->id();
         $carts = Cart::where('id_customer', $id_customer)->get();
@@ -86,7 +84,6 @@ class CheckoutController extends Controller
                     'harga_desain' => $hargaDesain,
                     'subtotal' => $subtotalDetail,
                     'status_desain' => $cart->id_desain ? 'pending' : 'disetujui', // If ready-made, design is already approved implicitly
-                    'tipe_proses' => $cart->tipe_proses,
                 ]);
             }
 

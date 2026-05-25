@@ -1,0 +1,72 @@
+@startuml activity_pemesanan
+skinparam backgroundColor white
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 13
+
+skinparam activity {
+  BackgroundColor white
+  BorderColor black
+  FontColor black
+}
+skinparam activityDiamond {
+  BackgroundColor white
+  BorderColor black
+}
+skinparam arrowColor black
+skinparam swimlane {
+  BorderColor black
+  BorderThickness 1
+  TitleFontColor black
+  TitleFontSize 16
+}
+
+|Pelanggan|
+start
+:Membuka Halaman Katalog;
+:Memilih Produk Sablon;
+
+if (Tipe Pemesanan?) then (Desain Sendiri)
+  :Membuka Editor Desain (Wizard);
+  :Memilih Warna Baju (Langkah 1);
+  :Membuat Desain Depan (Langkah 2);
+  :Membuat Desain Belakang (Langkah 3);
+  :Menyimpan & Tinjau Harga (Langkah 4);
+else (Produk Jadi)
+  :Melihat Detail Produk;
+endif
+
+:Memasukkan ke Keranjang;
+:Melakukan Checkout;
+
+|Sistem|
+:Menyimpan Pesanan;
+
+|Pelanggan|
+:Mengunggah Bukti Pembayaran;
+
+|Admin|
+:Memvalidasi Pembayaran;
+if (Desain Custom?) then (Ya)
+  |Admin|
+  :Memeriksa Detail Desain;
+  if (Perlu Revisi?) then (Ya)
+    :Mengirim Catatan Revisi;
+    |Pelanggan|
+    :Mengirim Desain Perbaikan;
+    |Admin|
+  else (Tidak)
+  endif
+  :Menyetujui Desain;
+else (Tidak)
+endif
+
+|Admin|
+:Memproses Sablon (Produksi);
+:Mengirim Pesanan (Selesai);
+
+|Pelanggan|
+:Menerima Pesanan;
+stop
+@enduml

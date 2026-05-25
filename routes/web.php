@@ -96,6 +96,7 @@ Route::middleware('auth:customer')->prefix('customer')->name('customer.')->group
 });
 
 // Admin & Owner Routes
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\TemplateController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
@@ -103,12 +104,7 @@ use App\Http\Controllers\Owner\ReportController;
 
 Route::middleware('auth:admin')->prefix('admin')->name('admin.')->group(function () {
     
-    Route::get('/dashboard', function () {
-        if(auth()->guard('admin')->user()->role == 'owner') {
-            return redirect()->route('admin.report.index');
-        }
-        return view('admin.dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Admin Only
     Route::middleware('role:admin')->group(function () {

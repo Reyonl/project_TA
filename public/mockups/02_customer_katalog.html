@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mockup - 02 Katalog</title>
+    <title>Mockup - 02 Katalog Pelanggan</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
@@ -11,13 +11,17 @@
         .wf-container { width: 1024px; min-height: 768px; background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; display: flex; flex-direction: column; }
         .wf-border { border: 2px solid #000; }
         .wf-border-b { border-bottom: 2px solid #000; }
-        .wf-border-r { border-right: 2px solid #000; }
-        .wf-btn { border: 2px solid #000; padding: 6px 16px; background: #fff; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .wf-btn { border: 2px solid #000; padding: 8px 16px; background: #fff; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .wf-btn-primary { background: #000; color: #fff; }
+        .wf-btn-outline { background: #fff; color: #000; }
         .icon-placeholder { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 2px solid #000; border-radius: 50%; font-size: 10px; }
-        .img-placeholder { border: 2px solid #000; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; background: #fff; }
-        .img-placeholder::before, .img-placeholder::after { content: ''; position: absolute; background: #000; }
-        .img-placeholder::before { width: 150%; height: 2px; transform: rotate(45deg); }
-        .img-placeholder::after { width: 150%; height: 2px; transform: rotate(-45deg); }
+        .img-placeholder { border: 2px solid #000; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; background: #f5f5f5; }
+        .img-placeholder::before, .img-placeholder::after { content: ''; position: absolute; background: #ccc; }
+        .img-placeholder::before { width: 150%; height: 1px; transform: rotate(45deg); }
+        .img-placeholder::after { width: 150%; height: 1px; transform: rotate(-45deg); }
+        .badge { border: 2px solid #000; padding: 3px 10px; font-size: 11px; font-weight: bold; border-radius: 12px; text-transform: uppercase; display: inline-flex; align-items: center; gap: 4px; }
+        .badge-kustom { background: #e0e7ff; }
+        .badge-jadi { background: #d1fae5; }
         /* Browser bar */
         .browser-header { border-bottom: 2px solid #000; padding: 8px 16px; display: flex; align-items: center; gap: 8px; background: #fff; }
         .browser-dot { width: 12px; height: 12px; border: 2px solid #000; border-radius: 50%; }
@@ -34,7 +38,7 @@
                 <div class="browser-dot"></div>
             </div>
             <div class="browser-address">
-                <span>🔒</span> https://sistem-sablon.com/customer/katalog
+                <span>🔒</span> https://sistem-sablon.com/customer/dashboard
             </div>
             <div class="browser-dot rounded-sm"></div>
         </div>
@@ -56,80 +60,139 @@
             </div>
         </div>
 
-        <!-- Layout -->
-        <div class="flex flex-1">
-            <!-- Sidebar Filter -->
-            <div class="w-64 wf-border-r p-6 flex flex-col gap-6">
+        <!-- Content Area -->
+        <div class="flex-1 flex flex-col">
+            
+            <!-- Hero Banner (simplified wireframe) -->
+            <div class="bg-gray-800 text-white p-8 flex justify-between items-center">
                 <div>
-                    <h3 class="font-bold text-xl mb-4">Kategori</h3>
-                    <div class="flex flex-col gap-2">
-                        <label class="flex items-center gap-2"><input type="checkbox" checked> Semua Baju</label>
-                        <label class="flex items-center gap-2"><input type="checkbox"> Kaos</label>
-                        <label class="flex items-center gap-2"><input type="checkbox"> Hoodie</label>
-                        <label class="flex items-center gap-2"><input type="checkbox"> Polo Shirt</label>
-                        <label class="flex items-center gap-2"><input type="checkbox"> Kemeja</label>
-                    </div>
+                    <h2 class="text-3xl font-bold mb-2">Selamat Datang, Pelanggan!</h2>
+                    <p class="text-gray-300 text-lg">Wujudkan ide kreatifmu menjadi nyata. Mulai custom desain pakaian.</p>
                 </div>
-                <div class="wf-border-b"></div>
-                <div>
-                    <h3 class="font-bold text-xl mb-4">Tipe Produk</h3>
-                    <div class="flex flex-col gap-2">
-                        <label class="flex items-center gap-2"><input type="radio" name="tipe" checked> Semua Tipe</label>
-                        <label class="flex items-center gap-2"><input type="radio" name="tipe"> Kustom Desain</label>
-                        <label class="flex items-center gap-2"><input type="radio" name="tipe"> Beli Langsung (Jadi)</label>
+                <div class="flex gap-3">
+                    <!-- Quick Stats -->
+                    <div class="wf-border bg-white/20 backdrop-blur p-4 rounded-xl text-center w-32" style="border-color: rgba(255,255,255,0.4);">
+                        <div class="text-xl mb-1">📦</div>
+                        <div class="font-bold text-sm">Pesanan Aktif</div>
+                        <div class="text-xs text-gray-300">12 pesanan</div>
+                    </div>
+                    <div class="wf-border bg-white/20 backdrop-blur p-4 rounded-xl text-center w-32" style="border-color: rgba(255,255,255,0.4);">
+                        <div class="text-xl mb-1">🛒</div>
+                        <div class="font-bold text-sm">Keranjang</div>
+                        <div class="text-xs text-gray-300">0 item</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Content -->
-            <div class="flex-1 p-8">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-3xl font-bold">Katalog Produk</h2>
-                    <select class="wf-border p-2 rounded"><option>Urutkan: Terbaru</option></select>
+            <!-- Catalog Header + Search -->
+            <div class="p-6 px-8 flex items-center justify-between border-b-2 border-black">
+                <div class="flex items-center gap-3">
+                    <span class="text-xl">✨</span>
+                    <div>
+                        <h2 class="text-2xl font-bold">Katalog Produk</h2>
+                        <p class="text-sm text-gray-500">5 produk tersedia untuk kamu</p>
+                    </div>
+                </div>
+                <!-- Search Bar -->
+                <div class="wf-border rounded-xl px-4 py-2 flex items-center gap-2 w-72">
+                    <span>🔍</span>
+                    <span class="text-gray-400">Cari produk...</span>
+                </div>
+            </div>
+
+            <!-- Product Grid -->
+            <div class="p-8 grid grid-cols-3 gap-6 flex-1">
+                
+                <!-- Product Card 1: Kustom -->
+                <div class="wf-border rounded-2xl bg-white flex flex-col overflow-hidden">
+                    <!-- Image Area with badges -->
+                    <div class="w-full h-40 relative bg-slate-100 flex items-center justify-center border-b-2 border-black overflow-hidden p-4">
+                        <span class="bg-white px-2 py-1 z-10 text-xs absolute wf-border" style="top: 8px; right: 8px; border-radius: 8px;">KAOS</span>
+                        <span class="z-10 text-xs absolute badge badge-kustom" style="top: 8px; left: 8px;">✏️ Kustom Desain</span>
+                        <img src="/images/mockups/kaos.png" alt="Kaos" class="h-full object-contain hover:scale-110 transition-transform duration-300">
+                    </div>
+                    <!-- Content -->
+                    <div class="p-4 flex flex-col flex-grow">
+                        <h4 class="font-bold text-lg mb-1">Kaos Lengan Pendek</h4>
+                        <p class="text-xs text-gray-500 mb-3 flex-grow">Kaos polos bahan cotton combed 30s yang nyaman dan cocok untuk di...</p>
+                        <div class="border-t-2 border-black pt-3">
+                            <div class="mb-2">
+                                <span class="text-xs text-gray-400">Mulai dari</span>
+                                <div class="text-xl font-bold">Rp 50.000 <span class="text-xs font-normal text-gray-400">/ pcs</span></div>
+                            </div>
+                            <button class="wf-btn wf-btn-primary w-full" style="box-shadow: 2px 2px 0 #000;">
+                                ✏️ Mulai Desain Kustom
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-3 gap-6">
-                    <!-- Product 1 -->
-                    <div class="wf-border p-4 rounded-lg bg-white flex flex-col">
-                        <div class="img-placeholder w-full h-40 mb-3 rounded">
-                            <span class="bg-white px-2 py-1 z-10 wf-border text-xs">Kaos Depan Belakang</span>
-                        </div>
-                        <h4 class="font-bold text-lg">Kaos Lengan Pendek</h4>
-                        <p class="text-sm text-gray-600 mb-2">Tipe: Kustom</p>
-                        <p class="font-bold mb-4">Rp 50.000</p>
-                        <button class="wf-btn w-full mt-auto" style="box-shadow: 2px 2px 0 #000;">Buat Desain</button>
+                <!-- Product Card 2: Kustom -->
+                <div class="wf-border rounded-2xl bg-white flex flex-col overflow-hidden">
+                    <div class="w-full h-40 relative bg-slate-100 flex items-center justify-center border-b-2 border-black overflow-hidden p-4">
+                        <span class="bg-white px-2 py-1 z-10 text-xs absolute wf-border" style="top: 8px; right: 8px; border-radius: 8px;">HOODIE</span>
+                        <span class="z-10 text-xs absolute badge badge-kustom" style="top: 8px; left: 8px;">✏️ Kustom Desain</span>
+                        <img src="/images/mockups/hoodie.png" alt="Hoodie" class="h-full object-contain hover:scale-110 transition-transform duration-300">
                     </div>
-                    <!-- Product 2 -->
-                    <div class="wf-border p-4 rounded-lg bg-white flex flex-col">
-                        <div class="img-placeholder w-full h-40 mb-3 rounded">
-                            <span class="bg-white px-2 py-1 z-10 wf-border text-xs">Hoodie</span>
+                    <div class="p-4 flex flex-col flex-grow">
+                        <h4 class="font-bold text-lg mb-1">Hoodie Jumper</h4>
+                        <p class="text-xs text-gray-500 mb-3 flex-grow">Hoodie polos jumper bahan fleece tebal premium untuk custom...</p>
+                        <div class="border-t-2 border-black pt-3">
+                            <div class="mb-2">
+                                <span class="text-xs text-gray-400">Mulai dari</span>
+                                <div class="text-xl font-bold">Rp 120.000 <span class="text-xs font-normal text-gray-400">/ pcs</span></div>
+                            </div>
+                            <button class="wf-btn wf-btn-primary w-full" style="box-shadow: 2px 2px 0 #000;">
+                                ✏️ Mulai Desain Kustom
+                            </button>
                         </div>
-                        <h4 class="font-bold text-lg">Hoodie Jumper</h4>
-                        <p class="text-sm text-gray-600 mb-2">Tipe: Kustom</p>
-                        <p class="font-bold mb-4">Rp 120.000</p>
-                        <button class="wf-btn w-full mt-auto" style="box-shadow: 2px 2px 0 #000;">Buat Desain</button>
-                    </div>
-                    <!-- Product 3 -->
-                    <div class="wf-border p-4 rounded-lg bg-white flex flex-col">
-                        <div class="img-placeholder w-full h-40 mb-3 rounded">
-                            <span class="bg-white px-2 py-1 z-10 wf-border text-xs">Desain Jadi 1</span>
-                        </div>
-                        <h4 class="font-bold text-lg">Kaos Anime Naruto</h4>
-                        <p class="text-sm text-gray-600 mb-2">Tipe: Langsung Beli</p>
-                        <p class="font-bold mb-4">Rp 85.000</p>
-                        <button class="wf-btn w-full mt-auto">Lihat Detail</button>
-                    </div>
-                    <!-- Product 4 -->
-                    <div class="wf-border p-4 rounded-lg bg-white flex flex-col">
-                        <div class="img-placeholder w-full h-40 mb-3 rounded">
-                            <span class="bg-white px-2 py-1 z-10 wf-border text-xs">Polo Shirt</span>
-                        </div>
-                        <h4 class="font-bold text-lg">Polo Shirt Premium</h4>
-                        <p class="text-sm text-gray-600 mb-2">Tipe: Kustom</p>
-                        <p class="font-bold mb-4">Rp 75.000</p>
-                        <button class="wf-btn w-full mt-auto" style="box-shadow: 2px 2px 0 #000;">Buat Desain</button>
                     </div>
                 </div>
+
+                <!-- Product Card 3: Siap Beli (Jadi) -->
+                <div class="wf-border rounded-2xl bg-white flex flex-col overflow-hidden">
+                    <div class="w-full h-40 relative bg-slate-100 flex items-center justify-center border-b-2 border-black overflow-hidden p-4">
+                        <span class="bg-white px-2 py-1 z-10 text-xs absolute wf-border" style="top: 8px; right: 8px; border-radius: 8px;">KAOS</span>
+                        <span class="z-10 text-xs absolute badge badge-jadi" style="top: 8px; left: 8px;">✓ Siap Beli</span>
+                        <img src="/images/mockups/kaos.png" alt="Kaos Jadi" class="h-full object-contain hover:scale-110 transition-transform duration-300">
+                    </div>
+                    <div class="p-4 flex flex-col flex-grow">
+                        <h4 class="font-bold text-lg mb-1">Kaos Anime Naruto</h4>
+                        <p class="text-xs text-gray-500 mb-3 flex-grow">Kaos desain jadi bertema anime Naruto. Langsung beli tanpa desain...</p>
+                        <div class="border-t-2 border-black pt-3">
+                            <div class="mb-2">
+                                <span class="text-xs text-gray-400">Mulai dari</span>
+                                <div class="text-xl font-bold">Rp 85.000 <span class="text-xs font-normal text-gray-400">/ pcs</span></div>
+                            </div>
+                            <button class="wf-btn wf-btn-outline w-full" style="box-shadow: 2px 2px 0 #000;">
+                                🛒 Lihat & Beli Langsung
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Card 4: Kustom -->
+                <div class="wf-border rounded-2xl bg-white flex flex-col overflow-hidden">
+                    <div class="w-full h-40 relative bg-slate-100 flex items-center justify-center border-b-2 border-black overflow-hidden p-4">
+                        <span class="bg-white px-2 py-1 z-10 text-xs absolute wf-border" style="top: 8px; right: 8px; border-radius: 8px;">POLO</span>
+                        <span class="z-10 text-xs absolute badge badge-kustom" style="top: 8px; left: 8px;">✏️ Kustom Desain</span>
+                        <img src="/images/mockups/polo.png" alt="Polo" class="h-full object-contain hover:scale-110 transition-transform duration-300">
+                    </div>
+                    <div class="p-4 flex flex-col flex-grow">
+                        <h4 class="font-bold text-lg mb-1">Polo Shirt Premium</h4>
+                        <p class="text-xs text-gray-500 mb-3 flex-grow">Kaos kerah bahan Lacoste Pique berkualitas. Cocok untuk seragam...</p>
+                        <div class="border-t-2 border-black pt-3">
+                            <div class="mb-2">
+                                <span class="text-xs text-gray-400">Mulai dari</span>
+                                <div class="text-xl font-bold">Rp 75.000 <span class="text-xs font-normal text-gray-400">/ pcs</span></div>
+                            </div>
+                            <button class="wf-btn wf-btn-primary w-full" style="box-shadow: 2px 2px 0 #000;">
+                                ✏️ Mulai Desain Kustom
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>

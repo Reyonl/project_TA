@@ -259,18 +259,25 @@
                                     
                                     <div class="flex items-center gap-2 mb-2">
                                         <span class="px-2 py-0.5 bg-slate-900 text-white text-[9px] font-black uppercase tracking-widest rounded">{{ $detail->produk->jenis_produk }}</span>
-                                        <span class="px-2 py-0.5 {{ $detail->tipe_proses == 'bordir' ? 'bg-red-600' : 'bg-sky-500' }} text-white text-[9px] font-black uppercase tracking-widest rounded">{{ $detail->tipe_proses }}</span>
+                                        <span class="px-2 py-0.5 bg-sky-500 text-white text-[9px] font-black uppercase tracking-widest rounded">Sablon</span>
                                     </div>
-                                    <div class="flex items-center gap-2 mb-2">
+                                    <div class="flex flex-col mb-2">
                                         @if($detail->desain)
                                             <p class="text-sm text-slate-500">Desain: {{ $detail->desain->nama_desain ?? 'Desain Kustom' }}</p>
-                                            @if($detail->desain->warna_baju)
-                                            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
-                                                Warna Baju:
-                                                <span class="w-3 h-3 rounded-full border border-slate-300 shadow-sm" style="background-color: {{ $detail->desain->warna_baju }}"></span>
-                                                {{ strtoupper($detail->desain->warna_baju) }}
-                                            </span>
-                                            @endif
+                                            <div class="flex flex-wrap gap-2 mt-1">
+                                                @if($detail->desain->warna_baju)
+                                                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                                                    Warna Baju:
+                                                    <span class="w-3 h-3 rounded-full border border-slate-300 shadow-sm" style="background-color: {{ $detail->desain->warna_baju }}"></span>
+                                                    {{ strtoupper($detail->desain->warna_baju) }}
+                                                </span>
+                                                @endif
+                                                @if($detail->desain->detail_sablon)
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                                                    Rincian Sablon: <strong class="ml-1 text-slate-800">{{ $detail->desain->detail_sablon }}</strong>
+                                                </span>
+                                                @endif
+                                            </div>
                                         @else
                                             <p class="text-sm font-semibold text-slate-600 bg-slate-100 px-2 rounded-md">Beli Langsung</p>
                                         @endif

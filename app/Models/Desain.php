@@ -22,6 +22,7 @@ class Desain extends Model
         'tanggal_upload',
         'warna_baju',
         'raw_assets',
+        'detail_sablon',
     ];
 
     protected $casts = [

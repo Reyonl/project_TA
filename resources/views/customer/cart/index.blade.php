@@ -87,13 +87,18 @@
                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-900 text-white">
                                                     {{ $cart->produk->jenis_produk }}
                                                 </span>
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest {{ $cart->tipe_proses == 'bordir' ? 'bg-red-600 text-white' : 'bg-sky-500 text-white' }}">
-                                                    {{ $cart->tipe_proses }}
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-sky-500 text-white">
+                                                    Sablon
                                                 </span>
                                                 @if($cart->desain)
                                                     <div class="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
                                                         Warna: 
                                                         <span class="w-4 h-4 rounded-full border border-slate-300 shadow-sm" style="background-color: {{ $cart->desain->warna_baju ?: '#ffffff' }}"></span>
+                                                    </div>
+                                                @endif
+                                                @if($cart->desain && $cart->desain->detail_sablon)
+                                                    <div class="w-full text-xs text-slate-500 mt-2 bg-white/70 border border-slate-200/50 p-2 rounded-lg col-span-2">
+                                                        <span class="font-bold text-slate-600">Rincian Sablon:</span> {{ $cart->desain->detail_sablon }}
                                                     </div>
                                                 @endif
                                             </div>

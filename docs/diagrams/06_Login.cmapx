@@ -1,0 +1,4 @@
+<map id="06_Login_map" name="06_Login_map">
+<area shape="rect" id="id1" href="Gagal" title="Gagal" alt="" coords="210,252,240,266"/>
+<area shape="rect" id="id2" href="Berhasil" title="Berhasil" alt="" coords="139,300,184,313"/>
+</map>

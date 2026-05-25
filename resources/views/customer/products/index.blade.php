@@ -2,7 +2,7 @@
     <div class="min-h-screen bg-slate-50 pb-16">
         
         <!-- Hero Section & Quick Stats -->
-        <div class="bg-indigo-900 py-16 relative overflow-hidden">
+        <div class="bg-indigo-900 py-14 relative overflow-hidden">
             <!-- Background Decoration -->
             <div class="absolute inset-0 overflow-hidden">
                 <div class="absolute -top-24 -right-24 w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob"></div>
@@ -27,19 +27,19 @@
 
                     <!-- Quick Stats Cards (Glassmorphism) -->
                     <div class="flex gap-4">
-                        <a href="{{ route('customer.orders.index') }}" class="group bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-2xl p-5 w-40 transition-all duration-300">
+                        <a href="{{ route('customer.orders.index') }}" class="group bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-2xl p-5 w-40 transition-all duration-300 hover:-translate-y-1">
                             <div class="flex items-center justify-between mb-2">
                                 <span class="text-2xl">📦</span>
-                                <span class="bg-indigo-500/50 text-indigo-100 text-xs font-bold px-2 py-1 rounded-lg">{{ $activeOrdersCount }}</span>
+                                <span class="bg-indigo-500/50 text-indigo-100 text-xs font-bold px-2.5 py-1 rounded-lg min-w-[28px] text-center">{{ $activeOrdersCount }}</span>
                             </div>
                             <h4 class="text-indigo-100 font-semibold group-hover:text-white transition-colors">Pesanan Aktif</h4>
                             <p class="text-indigo-300 text-xs mt-1">Cek status produksi</p>
                         </a>
                         
-                        <a href="{{ route('customer.cart.index') }}" class="group bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-2xl p-5 w-40 transition-all duration-300">
+                        <a href="{{ route('customer.cart.index') }}" class="group bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-2xl p-5 w-40 transition-all duration-300 hover:-translate-y-1">
                             <div class="flex items-center justify-between mb-2">
                                 <span class="text-2xl">🛒</span>
-                                <span class="bg-pink-500/50 text-pink-100 text-xs font-bold px-2 py-1 rounded-lg">{{ $cartCount }}</span>
+                                <span class="bg-pink-500/50 text-pink-100 text-xs font-bold px-2.5 py-1 rounded-lg min-w-[28px] text-center">{{ $cartCount }}</span>
                             </div>
                             <h4 class="text-indigo-100 font-semibold group-hover:text-white transition-colors">Keranjang</h4>
                             <p class="text-indigo-300 text-xs mt-1">Lanjutkan checkout</p>
@@ -50,77 +50,154 @@
         </div>
 
         <!-- Catalog Section -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 -translate-y-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
             
-            <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-200">
-                <h2 class="text-2xl font-bold text-slate-900 flex items-center gap-3">
-                    <span class="p-2 bg-indigo-100 text-indigo-600 rounded-lg shadow-sm">✨</span>
-                    Katalog Produk Unggulan
-                </h2>
-                <div class="flex gap-2">
-                    <span class="px-4 py-1.5 bg-slate-800 text-slate-100 text-sm font-semibold rounded-full shadow-sm hover:bg-slate-700 cursor-pointer transition">Semua</span>
-                    <span class="px-4 py-1.5 bg-white text-slate-600 border border-slate-200 text-sm font-medium rounded-full shadow-sm hover:bg-slate-50 cursor-pointer transition">Kaos</span>
-                    <span class="px-4 py-1.5 bg-white text-slate-600 border border-slate-200 text-sm font-medium rounded-full shadow-sm hover:bg-slate-50 cursor-pointer transition">Bordir</span>
+            <!-- Section Header with Search -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="p-2.5 bg-indigo-100 text-indigo-600 rounded-xl shadow-sm text-lg">✨</span>
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900">Katalog Produk</h2>
+                        <p class="text-slate-500 text-sm mt-0.5">{{ count($produks) }} produk tersedia untuk kamu</p>
+                    </div>
+                </div>
+                
+                <!-- Search Bar -->
+                <div class="relative w-full sm:w-80">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                    <input type="text" id="searchInput" placeholder="Cari produk..." 
+                        class="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-300 shadow-sm transition-all duration-200">
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Product Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7" id="productGrid">
                 @forelse ($produks as $produk)
-                    <div class="group relative bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(79,70,229,0.15)] hover:-translate-y-1.5 transition-all duration-300 flex flex-col h-full">
+                    <div class="product-card group relative bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-[0_4px_24px_rgb(0,0,0,0.04)] hover:shadow-[0_12px_40px_rgb(79,70,229,0.12)] hover:-translate-y-2 transition-all duration-300 flex flex-col h-full"
+                         data-name="{{ strtolower($produk->nama_produk) }}" 
+                         data-jenis="{{ $produk->jenis_produk }}"
+                         data-tipe="{{ $produk->tipe_produk }}">
                         
-                        <!-- Image Container with Hover Effect -->
-                        <div class="relative h-64 bg-slate-50 flex items-center justify-center p-6 overflow-hidden">
-                            <!-- Placeholder Image or Real Image -->
+                        <!-- Image Container -->
+                        <div class="relative h-60 bg-gradient-to-br {{ $produk->tipe_produk == 'jadi' ? 'from-emerald-50 to-teal-50' : 'from-indigo-50 to-purple-50' }} flex items-center justify-center p-6 overflow-hidden">
                             @if($produk->gambar_produk)
-                                <img src="{{ Storage::url($produk->gambar_produk) }}" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" alt="{{ $produk->nama_produk }}">
+                                <img src="{{ Storage::url($produk->gambar_produk) }}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" alt="{{ $produk->nama_produk }}">
                             @else
-                                @if($produk->jenis_produk == 'kaos')
-                                    <div class="text-7xl lg:text-8xl transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-xl">👕</div>
-                                @elseif($produk->jenis_produk == 'hoodie')
-                                    <div class="text-7xl lg:text-8xl transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-xl">🧥</div>
-                                @else
-                                    <div class="text-7xl lg:text-8xl transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-xl">🧢</div>
-                                @endif
+                                <!-- SVG Placeholder Illustration -->
+                                <div class="flex flex-col items-center justify-center gap-3 transform group-hover:scale-105 transition-transform duration-500">
+                                    @if($produk->jenis_produk == 'kaos')
+                                        <svg class="w-24 h-24 {{ $produk->tipe_produk == 'jadi' ? 'text-emerald-300' : 'text-indigo-300' }}" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M30 25L20 35L30 45V85H70V45L80 35L70 25H60C60 30.523 55.523 35 50 35C44.477 35 40 30.523 40 25H30Z" fill="currentColor" opacity="0.3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M40 25C40 30.523 44.477 35 50 35C55.523 35 60 30.523 60 25" stroke="currentColor" stroke-width="2" fill="none"/>
+                                        </svg>
+                                    @elseif($produk->jenis_produk == 'hoodie')
+                                        <svg class="w-24 h-24 {{ $produk->tipe_produk == 'jadi' ? 'text-emerald-300' : 'text-indigo-300' }}" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M28 30L18 42L28 50V88H72V50L82 42L72 30H62C62 36.627 56.627 42 50 42C43.373 42 38 36.627 38 30H28Z" fill="currentColor" opacity="0.3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M42 12C42 12 44 22 50 22C56 22 58 12 58 12" stroke="currentColor" stroke-width="2" fill="none"/>
+                                            <path d="M38 30C38 36.627 43.373 42 50 42C56.627 42 62 36.627 62 30" stroke="currentColor" stroke-width="2" fill="none"/>
+                                            <path d="M44 50V70" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.5"/>
+                                        </svg>
+                                    @else
+                                        <svg class="w-24 h-24 {{ $produk->tipe_produk == 'jadi' ? 'text-emerald-300' : 'text-indigo-300' }}" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M30 25L20 35L30 45V85H70V45L80 35L70 25H60C60 30.523 55.523 35 50 35C44.477 35 40 30.523 40 25H30Z" fill="currentColor" opacity="0.3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <rect x="35" y="45" width="30" height="4" rx="2" fill="currentColor" opacity="0.2"/>
+                                        </svg>
+                                    @endif
+                                    <span class="text-xs font-medium {{ $produk->tipe_produk == 'jadi' ? 'text-emerald-400' : 'text-indigo-400' }}">Preview belum tersedia</span>
+                                </div>
                             @endif
                             
-                            <!-- Badges -->
-                            <div class="absolute top-4 right-4 flex flex-col gap-2">
-                                <div class="bg-white/90 backdrop-blur text-indigo-800 text-xs font-bold px-3 py-1.5 rounded-xl uppercase tracking-wide shadow-sm border border-indigo-100">
+                            <!-- Category & Type Badges -->
+                            <div class="absolute top-4 left-4 flex flex-col gap-2">
+                                @if($produk->tipe_produk == 'jadi')
+                                    <div class="bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-lg shadow-emerald-500/20">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                        Siap Beli
+                                    </div>
+                                @else
+                                    <div class="bg-indigo-500 text-white text-xs font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-lg shadow-indigo-500/20">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                        Kustom Desain
+                                    </div>
+                                @endif
+                            </div>
+
+                            <div class="absolute top-4 right-4">
+                                <div class="bg-white/90 backdrop-blur text-slate-600 text-xs font-semibold px-3 py-1.5 rounded-xl uppercase tracking-wide shadow-sm border border-slate-100">
                                     {{ $produk->jenis_produk }}
                                 </div>
                             </div>
                             
-                            <!-- Overlay CTA -->
-                            <div class="absolute inset-0 bg-indigo-900/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                                <a href="{{ route('customer.products.show', $produk->id_produk) }}" class="bg-white text-indigo-900 font-bold px-6 py-3 rounded-xl shadow-2xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                                    {{ $produk->tipe_produk == 'jadi' ? 'Lihat Detail & Beli Langsung' : 'Lihat Detail & Mulai Desain' }}
+                            <!-- Hover Overlay CTA -->
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end justify-center pb-6">
+                                <a href="{{ route('customer.products.show', $produk->id_produk) }}" 
+                                   class="bg-white text-slate-900 font-bold px-6 py-3 rounded-2xl shadow-2xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 flex items-center gap-2 hover:bg-indigo-50">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                    Lihat Detail
                                 </a>
                             </div>
                         </div>
 
                         <!-- Card Content -->
                         <div class="p-6 flex flex-col flex-grow">
-                            <h3 class="text-xl font-bold text-slate-900 mb-2 truncate" title="{{ $produk->nama_produk }}">{{ $produk->nama_produk }}</h3>
-                            <p class="text-slate-500 text-sm mb-6 flex-grow line-clamp-2 leading-relaxed">{{ $produk->deskripsi }}</p>
+                            <h3 class="text-lg font-bold text-slate-900 mb-1.5 truncate" title="{{ $produk->nama_produk }}">{{ $produk->nama_produk }}</h3>
+                            <p class="text-slate-400 text-sm mb-5 flex-grow line-clamp-2 leading-relaxed">{{ $produk->deskripsi ?: 'Produk berkualitas tinggi dengan bahan pilihan terbaik.' }}</p>
                             
-                            <div class="pt-4 border-t border-slate-100 flex items-center justify-between mt-auto">
-                                <div>
-                                    <p class="text-xs text-slate-400 font-medium mb-0.5">Mulai dari</p>
-                                    <span class="text-2xl font-black text-indigo-600 bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">Rp {{ number_format($produk->harga_dasar, 0, ',', '.') }}</span>
+                            <!-- Price & CTA Row -->
+                            <div class="pt-4 border-t border-slate-100 mt-auto">
+                                <div class="flex items-end justify-between mb-4">
+                                    <div>
+                                        <p class="text-xs text-slate-400 font-medium mb-0.5">Mulai dari</p>
+                                        <span class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r {{ $produk->tipe_produk == 'jadi' ? 'from-emerald-600 to-teal-600' : 'from-indigo-600 to-purple-600' }}">
+                                            Rp {{ number_format($produk->harga_dasar, 0, ',', '.') }}
+                                        </span>
+                                        <span class="text-xs text-slate-400 ml-1">/ pcs</span>
+                                    </div>
                                 </div>
-                                <a href="{{ route('customer.products.show', $produk->id_produk) }}" class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300 hover:shadow-lg hover:shadow-indigo-200">
-                                    <svg class="w-5 h-5 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                
+                                <!-- Action Button — different style per product type -->
+                                <a href="{{ route('customer.products.show', $produk->id_produk) }}" 
+                                   class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl font-bold text-sm transition-all duration-200 
+                                   {{ $produk->tipe_produk == 'jadi' 
+                                       ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-500 hover:text-white hover:shadow-lg hover:shadow-emerald-200' 
+                                       : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-600 hover:text-white hover:shadow-lg hover:shadow-indigo-200' }}">
+                                    @if($produk->tipe_produk == 'jadi')
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"></path></svg>
+                                        Lihat & Beli Langsung
+                                    @else
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                        Mulai Desain Kustom
+                                    @endif
                                 </a>
                             </div>
                         </div>
                     </div>
                 @empty
-                    <div class="col-span-full border-2 border-dashed border-slate-200 rounded-3xl p-16 flex flex-col items-center justify-center text-center bg-slate-50/50">
-                        <div class="w-24 h-24 bg-white rounded-full shadow-sm flex items-center justify-center text-5xl mb-6">📦</div>
+                    <div class="col-span-full border-2 border-dashed border-slate-200 rounded-3xl p-16 flex flex-col items-center justify-center text-center bg-white/50">
+                        <div class="w-28 h-28 bg-indigo-50 rounded-3xl flex items-center justify-center mb-6">
+                            <svg class="w-14 h-14 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                            </svg>
+                        </div>
                         <h3 class="text-2xl font-bold text-slate-900 mb-2">Katalog Masih Kosong</h3>
-                        <p class="text-slate-500 max-w-md mx-auto">Kami sedang mempersiapkan produk-produk sablon terbaik untuk Anda. Silakan cek kembali beberapa saat lagi!</p>
+                        <p class="text-slate-500 max-w-md mx-auto leading-relaxed">Kami sedang mempersiapkan produk-produk sablon terbaik untuk Anda. Silakan cek kembali beberapa saat lagi!</p>
                     </div>
                 @endforelse
+            </div>
+
+            <!-- No Results Message (hidden by default, shown via JS) -->
+            <div id="noResults" class="hidden col-span-full border-2 border-dashed border-slate-200 rounded-3xl p-12 flex flex-col items-center justify-center text-center bg-white/50 mt-7">
+                <div class="w-20 h-20 bg-amber-50 rounded-2xl flex items-center justify-center mb-5">
+                    <svg class="w-10 h-10 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 mb-1">Produk Tidak Ditemukan</h3>
+                <p class="text-slate-500 text-sm">Coba kata kunci lain atau hapus pencarian</p>
             </div>
         </div>
     </div>
@@ -150,5 +227,39 @@
             overflow: hidden;
         }
     </style>
+    @endpush
+
+    <!-- Client-side Search Script -->
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const productGrid = document.getElementById('productGrid');
+            const noResults = document.getElementById('noResults');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const query = this.value.toLowerCase().trim();
+                    const cards = productGrid.querySelectorAll('.product-card');
+                    let visibleCount = 0;
+                    
+                    cards.forEach(card => {
+                        const name = card.dataset.name || '';
+                        const jenis = card.dataset.jenis || '';
+                        const tipe = card.dataset.tipe || '';
+                        const matches = name.includes(query) || jenis.includes(query) || tipe.includes(query);
+                        
+                        card.style.display = matches ? '' : 'none';
+                        if (matches) visibleCount++;
+                    });
+                    
+                    // Show/hide no results message
+                    if (noResults) {
+                        noResults.classList.toggle('hidden', visibleCount > 0);
+                    }
+                });
+            }
+        });
+    </script>
     @endpush
 </x-app-layout>

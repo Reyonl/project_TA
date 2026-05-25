@@ -19,15 +19,48 @@
                         @foreach($carts as $cart)
                             <div class="flex items-center gap-4 p-4 border border-slate-100 rounded-xl bg-slate-50">
                                 <!-- Mini Thumbnail -->
-                                <div class="w-16 h-16 bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden flex-shrink-0 relative flex items-center justify-center p-1">
+                                <div class="w-16 h-16 bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden flex-shrink-0 relative flex items-center justify-center">
                                     @if($cart->desain)
-                                        <img src="{{ Str::startsWith($cart->desain->file_desain, 'data:image') ? $cart->desain->file_desain : Storage::url($cart->desain->file_desain) }}" class="w-full h-full object-contain">
+                                        @php
+                                            $bajuType = $cart->produk->jenis_produk;
+                                            $bajuColor = $cart->desain->warna_baju ?: '#ffffff';
+                                            $mockupBase = match($bajuType) {
+                                                'kaos' => 'kaos',
+                                                'hoodie' => 'hoodie',
+                                                'topi' => 'topi',
+                                                'polo' => 'polo',
+                                                'seragam' => 'seragam',
+                                                default => 'kaos'
+                                            };
+                                            $mockupUrl = asset('images/mockups/' . $mockupBase . '.png');
+                                        @endphp
+                                        
+                                        <!-- Mini Composite -->
+                                        <div class="absolute inset-0 z-0">
+                                            <div class="w-full h-full flex items-center justify-center relative overflow-hidden">
+                                                <img src="{{ $mockupUrl }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-90 z-0">
+                                                <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10"
+                                                     style="-webkit-mask-image: url('{{ $mockupUrl }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ $mockupUrl }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
+                                                    <div class="w-full h-full" style="background-color: {{ $bajuColor }};"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Desain Overlay -->
+                                        <div class="absolute z-20" style="top: 20%; left: 27.08%; width: 45.83%; height: 53.33%;">
+                                            @if($cart->desain->file_desain)
+                                                <img src="{{ Str::startsWith($cart->desain->file_desain, 'data:image') ? $cart->desain->file_desain : Storage::url($cart->desain->file_desain) }}" class="w-full h-full object-contain">
+                                            @endif
+                                        </div>
                                     @else
-                                        @if($cart->produk->gambar_produk)
-                                            <img src="{{ Storage::url($cart->produk->gambar_produk) }}" class="w-full h-full object-cover">
-                                        @else
-                                            <span class="text-2xl">👕</span>
-                                        @endif
+                                        <!-- Produk Jadi -->
+                                        <div class="absolute inset-0 z-0 flex items-center justify-center bg-slate-50">
+                                            @if($cart->produk->gambar_produk)
+                                                <img src="{{ Storage::url($cart->produk->gambar_produk) }}" class="w-full h-full object-cover">
+                                            @else
+                                                <span class="text-2xl">👕</span>
+                                            @endif
+                                        </div>
                                     @endif
                                 </div>
                                 <div class="flex-1">
@@ -37,6 +70,9 @@
                                             | Warna: <span class="inline-block w-3 h-3 rounded-full border border-slate-300 translate-y-0.5 ml-1" style="background-color: {{ $cart->desain->warna_baju ?: '#ffffff' }}"></span>
                                         @endif
                                     </p>
+                                    @if($cart->desain && $cart->desain->detail_sablon)
+                                        <p class="text-[11px] text-slate-500 mt-1 italic"><span class="font-bold text-slate-600">Rincian:</span> {{ $cart->desain->detail_sablon }}</p>
+                                    @endif
                                     @php $hargaDesain = $cart->desain ? $cart->desain->harga_desain : 0; @endphp
                                     <p class="text-sm font-semibold text-indigo-600 mt-1">Rp {{ number_format($cart->produk->harga_dasar + $hargaDesain, 0, ',', '.') }} <span class="text-xs text-slate-400">x {{ $cart->quantity }}</span></p>
                                 </div>

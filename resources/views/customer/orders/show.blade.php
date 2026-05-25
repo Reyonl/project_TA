@@ -202,12 +202,15 @@
                                 <p class="font-bold text-slate-800">{{ $detail->produk->nama_produk ?? 'Produk' }}</p>
                                 <div class="flex items-center gap-2 mt-1">
                                     <span class="px-2 py-0.5 bg-slate-900 text-white text-[9px] font-black uppercase tracking-widest rounded-md">{{ $detail->produk->jenis_produk }}</span>
-                                    <span class="px-2 py-0.5 {{ $detail->tipe_proses == 'bordir' ? 'bg-red-600' : 'bg-sky-500' }} text-white text-[9px] font-black uppercase tracking-widest rounded-md">{{ $detail->tipe_proses }}</span>
+                                    <span class="px-2 py-0.5 bg-sky-500 text-white text-[9px] font-black uppercase tracking-widest rounded-md">Sablon</span>
                                 </div>
                                 <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-600">
                                     <span>Jumlah: <strong>{{ $detail->quantity }} pcs</strong></span>
                                     <span>Harga Produk: <strong>Rp {{ number_format($detail->harga_produk, 0, ',', '.') }}</strong></span>
                                     <span>Harga Desain: <strong>Rp {{ number_format($detail->harga_desain, 0, ',', '.') }}</strong></span>
+                                    @if($detail->desain && $detail->desain->detail_sablon)
+                                        <span class="block w-full text-xs text-slate-500 mt-2 bg-slate-100 p-2 rounded-lg border border-slate-200/50"><strong class="text-slate-600">Rincian Sablon:</strong> {{ $detail->desain->detail_sablon }}</span>
+                                    @endif
                                 </div>
                             </div>
 
