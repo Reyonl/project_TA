@@ -24,8 +24,9 @@
                                         @php
                                             $bajuType = $cart->produk->jenis_produk;
                                             $bajuColor = $cart->desain->warna_baju ?: '#ffffff';
+                                            $isPanjang = \Illuminate\Support\Str::contains(strtolower($cart->produk->nama_produk), 'panjang');
                                             $mockupBase = match($bajuType) {
-                                                'kaos' => 'kaos',
+                                                'kaos' => $isPanjang ? 'kaos_panjang' : 'kaos',
                                                 'hoodie' => 'hoodie',
                                                 'topi' => 'topi',
                                                 'polo' => 'polo',
@@ -102,6 +103,9 @@
 
                     <form action="{{ route('customer.checkout.store') }}" method="POST" enctype="multipart/form-data" id="checkoutForm">
                         @csrf
+                        @foreach($carts as $cart)
+                            <input type="hidden" name="cart_ids[]" value="{{ $cart->id_cart }}">
+                        @endforeach
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-slate-700 mb-2">Upload Bukti Transfer <span class="text-red-500">*</span></label>
                             

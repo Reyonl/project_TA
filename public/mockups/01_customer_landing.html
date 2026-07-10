@@ -42,7 +42,15 @@
         <!-- Navbar -->
         <div class="wf-border-b p-4 flex justify-between items-center px-8">
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white text-sm font-bold">D</div>
+                <div class="relative border-2 border-black bg-white" style="width: 60px; height: 30px;">
+                    <svg class="absolute inset-0 w-full h-full text-gray-300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                        <line x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="1" />
+                        <line x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="1" />
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center font-bold text-xs z-10">
+                        <span class="bg-white px-1">Logo</span>
+                    </div>
+                </div>
                 <h1 class="text-xl font-bold uppercase tracking-widest">DAILY.CO</h1>
             </div>
             <div class="flex items-center gap-6 font-bold text-sm">
@@ -85,7 +93,7 @@
                 <div class="wf-border rounded-2xl bg-white flex flex-col overflow-hidden">
                     <div class="w-full h-40 relative bg-slate-100 flex items-center justify-center border-b-2 border-black overflow-hidden p-4">
                         <span class="bg-white px-2 py-1 z-10 text-xs absolute wf-border" style="top: 8px; right: 8px; border-radius: 8px;">KAOS</span>
-                        <img src="/images/mockups/kaos.png" alt="Kaos" class="h-full object-contain hover:scale-110 transition-transform duration-300">
+                        <div class="img-placeholder w-full h-full text-xs font-bold text-gray-400 flex items-center justify-center z-0">[Gambar Kaos]</div>
                     </div>
                     <div class="p-4">
                         <h4 class="font-bold text-lg mb-1">Kaos Polos Premium</h4>
@@ -103,7 +111,7 @@
                 <div class="wf-border rounded-2xl bg-white flex flex-col overflow-hidden">
                     <div class="w-full h-40 relative bg-slate-100 flex items-center justify-center border-b-2 border-black overflow-hidden p-4">
                         <span class="bg-white px-2 py-1 z-10 text-xs absolute wf-border" style="top: 8px; right: 8px; border-radius: 8px;">HOODIE</span>
-                        <img src="/images/mockups/hoodie.png" alt="Hoodie" class="h-full object-contain hover:scale-110 transition-transform duration-300">
+                        <div class="img-placeholder w-full h-full text-xs font-bold text-gray-400 flex items-center justify-center z-0">[Gambar Hoodie]</div>
                     </div>
                     <div class="p-4">
                         <h4 class="font-bold text-lg mb-1">Hoodie Jumper</h4>
@@ -121,7 +129,7 @@
                 <div class="wf-border rounded-2xl bg-white flex flex-col overflow-hidden">
                     <div class="w-full h-40 relative bg-slate-100 flex items-center justify-center border-b-2 border-black overflow-hidden p-4">
                         <span class="bg-white px-2 py-1 z-10 text-xs absolute wf-border" style="top: 8px; right: 8px; border-radius: 8px;">POLO</span>
-                        <img src="/images/mockups/polo.png" alt="Polo" class="h-full object-contain hover:scale-110 transition-transform duration-300">
+                        <div class="img-placeholder w-full h-full text-xs font-bold text-gray-400 flex items-center justify-center z-0">[Gambar Polo]</div>
                     </div>
                     <div class="p-4">
                         <h4 class="font-bold text-lg mb-1">Polo Shirt Katun</h4>
@@ -141,7 +149,15 @@
         <!-- Footer -->
         <div class="bg-gray-900 text-white p-6 flex justify-between items-center">
             <div class="flex items-center gap-2">
-                <div class="w-6 h-6 bg-gray-700 rounded-full flex items-center justify-center text-xs font-bold text-gray-400">D</div>
+                <div class="relative border-2 border-white bg-gray-800 text-white" style="width: 50px; height: 25px;">
+                    <svg class="absolute inset-0 w-full h-full text-gray-600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                        <line x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="1" />
+                        <line x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="1" />
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center font-bold text-[10px] z-10">
+                        <span class="bg-gray-800 px-1">Logo</span>
+                    </div>
+                </div>
                 <span class="font-bold text-gray-500">DAILY.CO</span>
             </div>
             <p class="text-gray-500 text-sm">&copy; 2026 DAILY.CO. Redefining your style.</p>

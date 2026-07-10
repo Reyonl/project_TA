@@ -275,8 +275,10 @@
                                     if ($side === 'left')  return ['width' => 110, 'height' => 75, 'top' => 285, 'left' => 140, 'label' => 'Bordir Kiri'];
                                     if ($side === 'right') return ['width' => 110, 'height' => 75, 'top' => 285, 'left' => 230, 'label' => 'Bordir Kanan'];
                                 }
-                                if ($jenis === 'polo') return ['width' => 90, 'height' => 90, 'top' => 180, 'left' => 140, 'label' => 'Pocket'];
-                                if ($jenis === 'seragam') return ['width' => 100, 'height' => 100, 'top' => 180, 'left' => 135, 'label' => 'Dada'];
+                                if ($side === 'front') {
+                                    if ($jenis === 'polo') return ['width' => 90, 'height' => 90, 'top' => 160, 'left' => 265, 'label' => 'Pocket'];
+                                    if ($jenis === 'seragam') return ['width' => 100, 'height' => 100, 'top' => 180, 'left' => 135, 'label' => 'Dada'];
+                                }
                                 
                                 return ['width' => 220, 'height' => 320, 'top' => 120, 'left' => 130, 'label' => 'Area Cetak'];
                             };

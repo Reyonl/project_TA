@@ -1,0 +1,46 @@
+@startuml act_02_Membuat_Desain_Custom
+skinparam Style strictuml
+skinparam ActivityFontName Times New Roman
+skinparam ActivityFontSize 12
+skinparam ActivityBorderColor Black
+skinparam ActivityBackgroundColor White
+skinparam ArrowColor Black
+skinparam ArrowFontName Times New Roman
+skinparam ArrowFontSize 10
+skinparam SwimlaneBorderColor Black
+skinparam SwimlaneTitleFontName Times New Roman
+skinparam SwimlaneTitleFontSize 14
+skinparam SwimlaneTitleFontStyle bold
+
+|Pelanggan|
+start
+:Memilih Katalog Produk Sablon Kustom;
+
+|Sistem|
+:Inisialisasi Canvas Editor & Muat Model Mockup;
+
+|Pelanggan|
+if (Pilih Template Mentahan?) then (Ya)
+  :Memilih Aset Gambar Template dari Daftar;
+  |Sistem|
+  :Memuat Template ke Bidang Canvas;
+  |Pelanggan|
+else (Tidak)
+endif
+
+:Menentukan Warna Pakaian;
+:Menambahkan Gambar Kustom / Stiker / Teks;
+:Mengatur Posisi Desain\n(Tampak Depan / Belakang / Kiri / Kanan);
+:Tinjau Rincian Sablon & Akumulasi Harga;
+:Klik Tombol "Simpan Desain";
+
+|Sistem|
+:Menerjemahkan Gambar Mockup Base64;
+:Mengunggah Berkas Mockup ke Storage;
+:Menyimpan Data Desain ke Tabel 'desains';
+:Memasukkan Item Desain Kustom ke Tabel 'carts';
+:Mengembalikan Sinyal Sukses & URL Pengalihan;
+|Pelanggan|
+:Menerima Respon & Diarahkan ke Halaman Keranjang;
+stop
+@enduml

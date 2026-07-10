@@ -19,6 +19,8 @@ class StoreCheckoutRequest extends FormRequest
     {
         return [
             'bukti_pembayaran' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'cart_ids' => 'required|array|min:1',
+            'cart_ids.*' => 'exists:carts,id_cart',
         ];
     }
 

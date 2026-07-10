@@ -1,0 +1,51 @@
+@startuml act_09_Review_Desain_Order
+skinparam Style strictuml
+skinparam ActivityFontName Times New Roman
+skinparam ActivityFontSize 12
+skinparam ActivityBorderColor Black
+skinparam ActivityBackgroundColor White
+skinparam ArrowColor Black
+skinparam ArrowFontName Times New Roman
+skinparam ArrowFontSize 10
+skinparam SwimlaneBorderColor Black
+skinparam SwimlaneTitleFontName Times New Roman
+skinparam SwimlaneTitleFontSize 14
+skinparam SwimlaneTitleFontStyle bold
+
+|Admin|
+start
+:Membuka Halaman Detail Pesanan (Review Desain);
+
+|Sistem|
+:Menampilkan Gambar Mockup Desain (Depan/Belakang/Kiri/Kanan);
+
+|Admin|
+if (Apakah Desain Layak Cetak / Sesuai?) then (Tidak (Revisi))
+  :Klik Tombol "Tolak & Minta Revisi"\n(<<extends>> Beri Catatan Revisi);
+  :Mengisi Form Catatan Revisi (Sebab Penolakan);
+  :Klik "Kirim Permintaan Revisi";
+  |Sistem|
+  :Menyimpan Catatan di kolom 'catatan_admin' order_details;
+  :Mengubah status_desain menjadi 'revisi';
+  :Refresh Halaman & Kirim Status ke Pelanggan;
+  |Pelanggan|
+  :Membuka Tracking & Melihat Alert Catatan Revisi;
+  :Klik "Perbaiki Sekarang";
+  :Mengubah Desain di Editor Canvas & Klik Simpan;
+  |Sistem|
+  :Menyimpan Gambar Mockup Hasil Koreksi Baru ke Storage;
+  :Memperbarui Record Desain di Tabel 'desains';
+  :Mengubah kembali status_desain menjadi 'pending';
+  :Mencatat Keterangan Perbaikan Otomatis di Catatan Admin;
+  |Admin|
+  :Melihat Kembali Hasil Perbaikan Terbaru;
+  stop
+else (Ya (Setujui))
+  |Admin|
+  :Klik Tombol "Setujui Desain";
+  |Sistem|
+  :Mengubah status_desain menjadi 'disetujui' di order_details;
+  :Refresh Halaman & Tandai Desain Siap Produksi;
+  stop
+endif
+@enduml

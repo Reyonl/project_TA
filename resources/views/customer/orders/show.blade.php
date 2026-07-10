@@ -134,7 +134,7 @@
                                             // Dynamic overlay positioning
                                             $overlayStyle = match($detail->produk->jenis_produk) {
                                                 'topi' => 'top: 40%; left: 35%; width: 30%; height: 25%;',
-                                                'polo' => 'top: 30%; left: 30%; width: 20%; height: 18%;',
+                                                'polo' => 'top: 26.66%; left: 55.2%; width: 18.75%; height: 15%;',
                                                 'seragam' => 'top: 30%; left: 28%; width: 22%; height: 20%;',
                                                 default => 'top: 20%; left: 27.08%; width: 45.83%; height: 53.33%;'
                                             };

@@ -1,0 +1,45 @@
+@startuml act_03_Kelola_Keranjang
+skinparam Style strictuml
+skinparam ActivityFontName Times New Roman
+skinparam ActivityFontSize 12
+skinparam ActivityBorderColor Black
+skinparam ActivityBackgroundColor White
+skinparam ArrowColor Black
+skinparam ArrowFontName Times New Roman
+skinparam ArrowFontSize 10
+skinparam SwimlaneBorderColor Black
+skinparam SwimlaneTitleFontName Times New Roman
+skinparam SwimlaneTitleFontSize 14
+skinparam SwimlaneTitleFontStyle bold
+
+|Pelanggan|
+start
+:Membuka Halaman Keranjang Belanja;
+
+|Sistem|
+:Mengambil Data Item Belanja dari Tabel 'carts';
+:Menampilkan Rincian Keranjang (Daftar Produk & Subtotal);
+
+|Pelanggan|
+if (Pilih Tindakan Keranjang?) then (Ubah Kuantitas)
+  :Mengubah Kuantitas (Quantity) Item;
+  |Sistem|
+  :Memperbarui Kuantitas Item di Database;
+  :Menghitung Ulang Total Tagihan Keranjang;
+  :Refresh Halaman Keranjang;
+  stop
+elseif (Hapus Item) then (Hapus)
+  |Pelanggan|
+  :Memilih "Hapus" pada Item tertentu\n(<<extends>> Hapus Item Keranjang);
+  |Sistem|
+  :Menghapus Record Terpilih dari Tabel 'carts';
+  :Refresh Halaman Keranjang & Total Tagihan;
+  stop
+else (Lanjut Checkout)
+  |Pelanggan|
+  :Memilih Item & Klik Tombol "Checkout";
+  |Sistem|
+  :Mengarahkan ke Halaman Formulir Checkout;
+  stop
+endif
+@enduml

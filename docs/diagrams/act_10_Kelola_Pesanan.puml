@@ -1,0 +1,46 @@
+@startuml act_10_Kelola_Pesanan
+skinparam Style strictuml
+skinparam ActivityFontName Times New Roman
+skinparam ActivityFontSize 12
+skinparam ActivityBorderColor Black
+skinparam ActivityBackgroundColor White
+skinparam ArrowColor Black
+skinparam ArrowFontName Times New Roman
+skinparam ArrowFontSize 10
+skinparam SwimlaneBorderColor Black
+skinparam SwimlaneTitleFontName Times New Roman
+skinparam SwimlaneTitleFontSize 14
+skinparam SwimlaneTitleFontStyle bold
+
+|Admin|
+start
+:Mengakses Menu Manajemen Pesanan;
+
+|Sistem|
+:Menampilkan Daftar Seluruh Pesanan Masuk;
+
+|Admin|
+:Membuka Rincian Pesanan & Memeriksa Bukti Pembayaran;
+if (Pembayaran / Bukti Valid?) then (Tidak)
+  :Memilih Status "Dibatalkan"\n(<<extends>> Batalkan Pesanan);
+  :Klik Tombol "Simpan Status";
+  |Sistem|
+  :Memperbarui status_order Pesanan menjadi 'dibatalkan';
+  stop
+else (Ya)
+  |Admin|
+  :Memilih Status "Diproses" (Produksi Sablon);
+  :Klik Tombol "Simpan Status";
+  |Sistem|
+  :Memperbarui status_order Pesanan menjadi 'diproses';
+  
+  |Admin|
+  :Melakukan Produksi Cetak Sablon Pakaian;
+  :Mengirim Pesanan ke Ekspedisi Kurir;
+  :Memperbarui Status menjadi "Dikirim" / "Selesai";
+  :Klik Tombol "Simpan Status";
+  |Sistem|
+  :Memperbarui status_order Pesanan menjadi 'dikirim' / 'selesai';
+  stop
+endif
+@enduml

@@ -15,15 +15,30 @@
                 </div>
             @endif
 
+            <form action="{{ route('customer.checkout.index') }}" method="GET" id="cartForm"></form>
+
             <div class="lg:flex gap-8">
                 <!-- Data Keranjang -->
                 <div class="lg:w-2/3">
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-2xl border border-slate-100">
                         <div class="p-6">
-                            <h3 class="text-lg font-bold text-slate-800 border-b border-slate-100 pb-4 mb-4">Item Desain Anda</h3>
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
+                                <h3 class="text-lg font-bold text-slate-800">Item Desain Anda</h3>
+                                @if(count($carts) > 0)
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" id="selectAllCheckbox" checked class="w-5 h-5 accent-indigo-600 cursor-pointer">
+                                    <label for="selectAllCheckbox" class="text-xs font-bold text-slate-500 uppercase tracking-wider cursor-pointer">Pilih Semua</label>
+                                </div>
+                                @endif
+                            </div>
 
                             @forelse($carts as $cart)
                                 <div class="flex flex-col sm:flex-row gap-6 p-4 bg-slate-50 border border-slate-100 rounded-xl mb-4 relative group hover:shadow-md transition">
+                                    
+                                    <!-- Checkbox Select Item -->
+                                    <div class="flex items-center justify-center pr-2">
+                                        <input type="checkbox" name="cart_ids[]" value="{{ $cart->id_cart }}" form="cartForm" checked class="cart-item-checkbox w-6 h-6 accent-indigo-600 cursor-pointer" data-price="{{ ($cart->produk->harga_dasar + ($cart->desain ? $cart->desain->harga_desain : 0)) * $cart->quantity }}">
+                                    </div>
                                     
                                     <!-- Thumbnail Desain -->
                                     <div class="w-full sm:w-32 aspect-[3/4] bg-white rounded-lg shadow-inner overflow-hidden flex items-center justify-center relative flex-shrink-0">
@@ -31,8 +46,9 @@
                                             @php
                                                 $bajuType = $cart->produk->jenis_produk;
                                                 $bajuColor = $cart->desain->warna_baju ?: '#ffffff';
+                                                $isPanjang = \Illuminate\Support\Str::contains(strtolower($cart->produk->nama_produk), 'panjang');
                                                 $mockupBase = match($bajuType) {
-                                                    'kaos' => 'kaos',
+                                                    'kaos' => $isPanjang ? 'kaos_panjang' : 'kaos',
                                                     'hoodie' => 'hoodie',
                                                     'topi' => 'topi',
                                                     'polo' => 'polo',
@@ -94,6 +110,7 @@
                                                     <div class="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
                                                         Warna: 
                                                         <span class="w-4 h-4 rounded-full border border-slate-300 shadow-sm" style="background-color: {{ $cart->desain->warna_baju ?: '#ffffff' }}"></span>
+                                                        <span class="uppercase text-[10px] tracking-wider text-slate-400">{{ $cart->desain->warna_baju ?: '#FFFFFF' }}</span>
                                                     </div>
                                                 @endif
                                                 @if($cart->desain && $cart->desain->detail_sablon)
@@ -161,7 +178,7 @@
                                     $itemTotal = ($c->produk->harga_dasar + $hargaDesain) * $c->quantity;
                                     $netTotal += $itemTotal;
                                 @endphp
-                                <div class="flex justify-between items-start text-sm">
+                                <div class="flex justify-between items-start text-sm summary-item" id="summary-cart-{{ $c->id_cart }}">
                                     <span class="text-indigo-800">{{ $c->produk->nama_produk }} <span class="font-bold text-xs bg-indigo-200 text-indigo-800 px-1.5 rounded-md ml-1">x{{ $c->quantity }}</span></span>
                                     <span class="text-indigo-900 font-medium whitespace-nowrap">Rp {{ number_format($itemTotal, 0, ',', '.') }}</span>
                                 </div>
@@ -171,14 +188,14 @@
                         <div class="border-t border-indigo-200 border-dashed pt-4 mb-8">
                             <div class="flex justify-between items-center text-lg">
                                 <span class="font-bold text-indigo-900">Total Pembayaran</span>
-                                <span class="font-black text-indigo-600 text-xl tracking-tight">Rp {{ number_format($netTotal, 0, ',', '.') }}</span>
+                                <span class="font-black text-indigo-600 text-xl tracking-tight" id="totalHargaVal">Rp {{ number_format($netTotal, 0, ',', '.') }}</span>
                             </div>
                             <p class="text-xs text-indigo-400 mt-2">*Belum termasuk ongkir.</p>
                         </div>
 
-                        <a href="{{ route('customer.checkout.index') }}" class="w-full block text-center py-4 bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-bold rounded-xl shadow-lg shadow-indigo-200 transition transform hover:-translate-y-0.5">
-                            Checkout Sekarang ({{ count($carts) }})
-                        </a>
+                        <button type="submit" form="cartForm" id="checkoutBtn" class="w-full block text-center py-4 bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-bold rounded-xl shadow-lg shadow-indigo-200 transition transform hover:-translate-y-0.5">
+                            Checkout Sekarang (<span id="selectedCount">{{ count($carts) }}</span>)
+                        </button>
                     </div>
                 </div>
 
@@ -186,8 +203,72 @@
         </div>
     </div>
 
-    <!-- Script AJAX untuk real-time update Qty -->
+    <!-- Script AJAX untuk real-time update Qty & Skenario Pilih Item -->
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkboxes = document.querySelectorAll('.cart-item-checkbox');
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            const selectedCountSpan = document.getElementById('selectedCount');
+            const checkoutBtn = document.getElementById('checkoutBtn');
+            const totalHargaVal = document.getElementById('totalHargaVal');
+
+            function updateSummary() {
+                let total = 0;
+                let count = 0;
+
+                checkboxes.forEach(cb => {
+                    const cartId = cb.value;
+                    const price = parseFloat(cb.getAttribute('data-price')) || 0;
+                    const summaryRow = document.getElementById('summary-cart-' + cartId);
+
+                    if (cb.checked) {
+                        total += price;
+                        count++;
+                        if (summaryRow) summaryRow.style.display = 'flex';
+                    } else {
+                        if (summaryRow) summaryRow.style.display = 'none';
+                    }
+                });
+
+                if (selectedCountSpan) selectedCountSpan.textContent = count;
+                if (totalHargaVal) totalHargaVal.textContent = 'Rp ' + total.toLocaleString('id-ID');
+
+                if (checkoutBtn) {
+                    if (count === 0) {
+                        checkoutBtn.disabled = true;
+                        checkoutBtn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700', 'cursor-pointer');
+                        checkoutBtn.classList.add('bg-slate-400', 'cursor-not-allowed');
+                    } else {
+                        checkoutBtn.disabled = false;
+                        checkoutBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-700', 'cursor-pointer');
+                        checkoutBtn.classList.remove('bg-slate-400', 'cursor-not-allowed');
+                    }
+                }
+
+                if (selectAllCheckbox) {
+                    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+                    const someChecked = Array.from(checkboxes).some(cb => cb.checked);
+                    selectAllCheckbox.checked = allChecked;
+                    selectAllCheckbox.indeterminate = someChecked && !allChecked;
+                }
+            }
+
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', updateSummary);
+            });
+
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', function() {
+                    checkboxes.forEach(cb => {
+                        cb.checked = selectAllCheckbox.checked;
+                    });
+                    updateSummary();
+                });
+            }
+
+            updateSummary();
+        });
+
         function updateCartQuantity(cartId, quantity) {
             fetch(`/customer/cart/${cartId}/quantity`, {
                 method: 'PATCH',

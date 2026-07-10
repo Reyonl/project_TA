@@ -38,13 +38,12 @@ else (Produk Jadi)
 endif
 
 :Memasukkan ke Keranjang;
-:Melakukan Checkout;
+:Masuk Halaman Checkout;
+:Transfer Manual & Unggah Bukti Pembayaran;
+:Kirim & Konfirmasi Pembayaran;
 
 |Sistem|
-:Menyimpan Pesanan;
-
-|Pelanggan|
-:Mengunggah Bukti Pembayaran;
+:Menyimpan Transaksi Pesanan & Mengosongkan Keranjang;
 
 |Admin|
 :Memvalidasi Pembayaran;
@@ -52,9 +51,9 @@ if (Desain Custom?) then (Ya)
   |Admin|
   :Memeriksa Detail Desain;
   if (Perlu Revisi?) then (Ya)
-    :Mengirim Catatan Revisi;
+    :Tolak Desain & Kirim Catatan Revisi;
     |Pelanggan|
-    :Mengirim Desain Perbaikan;
+    :Menyunting Ulang Desain di Editor Canvas & Simpan;
     |Admin|
   else (Tidak)
   endif

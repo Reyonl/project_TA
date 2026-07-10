@@ -254,7 +254,6 @@ Controller -> Storage : Menghapus file gambar
 Controller -> DB : Menghapus data templat
 Controller --> View : Mengarahkan kembali
 deactivate Controller
-@enduml
 
 @startuml 09_Review_Desain
 hide footbox
@@ -263,31 +262,44 @@ skinparam shadowing false
 
 actor "Admin" as Admin
 actor "Pelanggan" as Customer
-boundary "Detail Pesanan / Timeline" as View
-control "Kontroler Pesanan" as Controller
+boundary "Detail Pesanan" as View
+control "Kontroler Pesanan\n(Admin / Customer)" as Controller
+boundary "Penyimpanan\n(Storage)" as Storage
 database "Basis Data" as DB
 
 Admin -> View : Memeriksa detail desain pesanan
 
 alt [Perlu Direvisi (Admin)]
-    Admin -> View : Mengetik pesan revisi & lampirkan gambar
-    View -> Controller : Mengirim data revisi
+    Admin -> View : Mengisi formulir & kirim catatan revisi
+    View -> Controller : Minta tolak desain & kirim catatan
     activate Controller
-    Controller -> DB : Menyimpan pesan di tabel OrderRevision
-    Controller -> DB : Memperbarui status desain pesanan menjadi "revisi"
+    Controller -> DB : Memperbarui status_desain 'revisi' & catatan_admin di tabel order_details
+    activate DB
+    DB --> Controller : Status & catatan tersimpan
+    deactivate DB
     Controller --> View : Mengarahkan kembali dengan pesan sukses
     deactivate Controller
 end
 
 Customer -> View : Membuka detail pesanan
-View --> Customer : Menampilkan timeline & pesan revisi dari Admin
+View --> Customer : Menampilkan rincian pesanan & catatan revisi dari Admin
 
 alt [Mengirim Perbaikan (Customer)]
-    Customer -> View : Mengetik balasan & unggah desain baru
-    View -> Controller : Mengirim data revisi
+    Customer -> View : Klik tombol "Perbaiki Sekarang"
+    View --> Customer : Membuka Editor Desain dengan data revisi
+    Customer -> View : Melakukan edit desain baju & simpan
+    View -> Controller : Mengirim data gambar Base64 perbaikan
     activate Controller
-    Controller -> DB : Menyimpan balasan di tabel OrderRevision
-    Controller --> View : Mengarahkan kembali
+    Controller -> Storage : Mengunggah file gambar mockup baru
+    activate Storage
+    Storage --> Controller : Mengembalikan lokasi gambar
+    deactivate Storage
+    Controller -> DB : Menyimpan data desain baru di tabel desains
+    activate DB
+    Controller -> DB : Memperbarui status_desain 'pending' di tabel order_details
+    DB --> Controller : Data tersimpan
+    deactivate DB
+    Controller --> View : Mengarahkan kembali ke halaman Riwayat
     deactivate Controller
 end
 
@@ -295,9 +307,51 @@ alt [Desain Disetujui Akhir (Admin)]
     Admin -> View : Klik "Setujui Desain"
     View -> Controller : Mengirim status disetujui
     activate Controller
-    Controller -> DB : Memperbarui status desain menjadi "disetujui"
+    Controller -> DB : Memperbarui status_desain 'disetujui' di tabel order_details
+    activate DB
+    DB --> Controller : Status terupdate
+    deactivate DB
     Controller --> View : Mengarahkan kembali
     deactivate Controller
+end
+@enduml
+
+@startuml 11_Laporan
+hide footbox
+skinparam monochrome true
+skinparam shadowing false
+
+actor "Pemilik" as Owner
+boundary "Halaman Laporan\n(Browser)" as View
+control "Kontroler Laporan" as Controller
+database "Basis Data" as DB
+
+Owner -> View : Memilih rentang tanggal & Filter
+View -> Controller : Meminta laporan sesuai tanggal
+activate Controller
+Controller -> DB : Mengambil ringkasan pesanan & metrics
+activate DB
+DB --> Controller : Data laporan & statistik penjualan
+deactivate DB
+Controller --> View : Menampilkan grafik, KPI, & tabel transaksi
+deactivate Controller
+
+alt [Cetak PDF / Print Laporan]
+    Owner -> View : Klik "Surat Cetak"
+    View -> View : Memicu fungsi window.print() browser
+    note over View : CSS @media print memformat layout\nserta kop surat laporan secara dinamis
+    View --> Owner : Menampilkan dialog cetak / Simpan PDF
+else [Ekspor Excel / CSV]
+    Owner -> View : Klik "Download Excel"
+    View -> Controller : Meminta unduhan file CSV (export_csv=1)
+    activate Controller
+    Controller -> DB : Mengambil semua data pesanan periode filter
+    activate DB
+    DB --> Controller : Data pesanan
+    deactivate DB
+    Controller -> View : Mengirimkan file stream CSV/Excel
+    deactivate Controller
+    View --> Owner : Memicu unduhan file Excel/CSV
 end
 @enduml
 

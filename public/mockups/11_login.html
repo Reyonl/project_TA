@@ -34,20 +34,28 @@
                 <div class="absolute -top-3 -right-3 w-6 h-6 bg-gray-200 wf-border rotate-12"></div>
                 
                 <div class="flex flex-col items-center mb-6">
-                    <div class="icon-placeholder">Logo</div>
-                    <h2 class="text-2xl font-bold uppercase tracking-wider text-center">Masuk ke Akun</h2>
+                    <div class="relative border-2 border-black bg-white mb-4" style="width: 120px; height: 60px;">
+                        <svg class="absolute inset-0 w-full h-full text-gray-300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                            <line x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="1" />
+                            <line x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="1" />
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center font-bold text-base z-10">
+                            <span class="bg-white px-1">Logo</span>
+                        </div>
+                    </div>
+                    <h2 class="text-2xl font-bold uppercase tracking-wider text-center">Login</h2>
                     <p class="text-gray-500 text-sm mt-2 text-center">Silakan masuk untuk mulai mendesain dan memesan baju.</p>
                 </div>
 
                 <div class="flex flex-col gap-4">
                     <div>
                         <label class="block font-bold mb-1">Email</label>
-                        <input type="email" class="wf-input" placeholder="contoh@email.com">
+                        <input type="email" class="wf-input" placeholder="masukan email">
                     </div>
                     
                     <div>
                         <label class="block font-bold mb-1">Password</label>
-                        <input type="password" class="wf-input" placeholder="********">
+                        <input type="password" class="wf-input" placeholder="masukan password">
                     </div>
 
                     <div class="flex justify-between items-center text-sm">
@@ -58,11 +66,8 @@
                         <a href="#" class="font-bold underline">Lupa Password?</a>
                     </div>
 
-                    <button class="wf-btn mt-4 text-lg" style="background-color: #000; color: #fff;">Login</button>
-                    
-                    <div class="text-center mt-6 text-sm">
-                        Belum punya akun? <a href="12_register.html" class="font-bold underline text-black">Daftar Sekarang</a>
-                    </div>
+                    <button class="wf-btn mt-4 text-lg" style="background-color: #000; color: #fff;">Masuk</button>
+                    <a href="12_register.html" class="wf-btn mt-2 text-lg text-black bg-white text-center">Daftar</a>
                 </div>
             </div>
         </div>

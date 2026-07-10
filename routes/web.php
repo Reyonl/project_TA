@@ -5,8 +5,14 @@ use Illuminate\Support\Facades\Route;
 use App\Models\Produk;
 
 Route::get('/', function () {
-    // Dynamic products for landing page
-    $produks = Produk::where('jenis_produk', '!=', 'topi')->take(3)->get();
+    // Group products by their base name to avoid cluttering landing page with variants
+    $allProduks = Produk::where('jenis_produk', '!=', 'topi')->get();
+    $grouped = $allProduks->groupBy(function($item) {
+        $parts = explode(' ', $item->nama_produk);
+        return ($parts[0] === 'Kaos') ? $parts[0] . ' ' . ($parts[1] ?? '') : $parts[0];
+    });
+    $produks = $grouped->map->first()->take(3)->values();
+    
     return view('welcome', compact('produks'));
 })->name('home');
 
@@ -123,3 +129,4 @@ Route::middleware('auth:admin')->prefix('admin')->name('admin.')->group(function
 });
 
 require __DIR__.'/auth.php';
+require __DIR__.'/settings.php';

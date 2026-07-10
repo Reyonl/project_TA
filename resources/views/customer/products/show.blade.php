@@ -56,6 +56,8 @@
         <!-- Product Detail Area -->
         <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col lg:flex-row gap-12" 
               x-data="{ 
+                  variants: {{ Js::from($variants) }},
+                  selectedVariant: {{ Js::from($produk) }},
                   selectedColor: 'White', 
                   selectedSize: 'L',
                   selectedTechnique: 'sablon',
@@ -83,8 +85,9 @@
                     <!-- Thumbnails (Vertical) -->
                     <div class="hidden md:flex flex-col gap-3 w-20 xl:w-24 shrink-0">
                         @php
+                            $isPanjang = \Illuminate\Support\Str::contains(strtolower($produk->nama_produk), 'panjang');
                             $baseImg = match($produk->jenis_produk) {
-                                'kaos' => 'kaos.png',
+                                'kaos' => $isPanjang ? 'kaos_panjang.png' : 'kaos.png',
                                 'hoodie' => 'hoodie.png',
                                 'topi' => 'topi.png',
                                 'polo' => 'polo.png',
@@ -155,7 +158,7 @@
                 <!-- Title & Reviews -->
                 <div class="mb-6 flex justify-between items-start">
                     <div>
-                        <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 leading-tight mb-2">{{ $produk->nama_produk }}</h1>
+                        <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 leading-tight mb-2" x-text="selectedVariant.nama_produk">{{ $produk->nama_produk }}</h1>
                         <div class="flex items-center gap-2 text-sm font-medium">
                             <div class="flex text-yellow-400">
                                 @for($i=0; $i<5; $i++)
@@ -164,6 +167,34 @@
                             </div>
                             <span class="text-indigo-600 hover:underline cursor-pointer">4.8 (1,284 Ulasan)</span>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Pilihan Bahan / Varian -->
+                <div class="mb-8" x-show="variants.length > 1" style="display: none;" x-init="$el.style.display = 'block'">
+                    <h4 class="font-bold text-sm text-slate-800 mb-3 uppercase tracking-widest">Pilihan Bahan</h4>
+                    <div class="flex flex-col gap-3">
+                        <template x-for="variant in variants" :key="variant.id_produk">
+                            <label class="flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all duration-200"
+                                   :class="selectedVariant.id_produk === variant.id_produk ? 'border-indigo-600 bg-indigo-50/50 shadow-md' : 'border-slate-200 hover:border-indigo-300 hover:bg-slate-50'"
+                                   @click="selectedVariant = variant">
+                                <div class="flex items-center gap-4">
+                                    <!-- Radio circle -->
+                                    <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors"
+                                         :class="selectedVariant.id_produk === variant.id_produk ? 'border-indigo-600' : 'border-slate-300'">
+                                        <div class="w-2.5 h-2.5 rounded-full bg-indigo-600 transition-transform duration-200"
+                                             :class="selectedVariant.id_produk === variant.id_produk ? 'scale-100' : 'scale-0'"></div>
+                                    </div>
+                                    <div>
+                                        <span class="font-bold text-slate-900 block" x-text="variant.nama_produk.replace('{{ $groupName }}', '').trim() || variant.nama_produk"></span>
+                                        <span class="text-xs text-slate-500 line-clamp-1 mt-0.5" x-text="variant.deskripsi"></span>
+                                    </div>
+                                </div>
+                                <div class="text-right shrink-0 ml-4">
+                                    <span class="font-black text-indigo-600 text-sm" x-text="'Rp ' + new Intl.NumberFormat('id-ID').format(variant.harga_dasar)"></span>
+                                </div>
+                            </label>
+                        </template>
                     </div>
                 </div>
 
@@ -189,10 +220,10 @@
                     <!-- Technique (Sablon Only) -->
                     <div>
                         <div class="flex justify-between items-center mb-3">
-                            <span class="font-bold text-sm text-slate-800 uppercase tracking-widest">Teknik Cetak</span>
+                            <span class="font-bold text-sm text-slate-800 uppercase tracking-widest">Teknologi Cetak</span>
                         </div>
-                        <div class="py-3.5 px-4 rounded-xl border-2 border-sky-500 bg-sky-50 text-sky-700 font-black text-[10px] uppercase tracking-widest text-center">
-                            ✨ Sablon Digital (DTG)
+                        <div class="py-3.5 px-4 rounded-xl border-2 border-indigo-500 bg-indigo-50 text-indigo-700 font-black text-xs uppercase tracking-widest text-center shadow-sm">
+                            ✨ DTF, CUTTING, HEATPRESS
                         </div>
                     </div>
 
@@ -278,7 +309,7 @@
                 <div class="bg-slate-50 rounded-xl p-5 border border-slate-100 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                         <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Harga Dasar</p>
-                        <div class="text-3xl font-black text-slate-900">
+                        <div class="text-3xl font-black text-slate-900" x-text="'Rp ' + new Intl.NumberFormat('id-ID').format(selectedVariant.harga_dasar)">
                             Rp {{ number_format($produk->harga_dasar, 0, ',', '.') }}
                         </div>
                     </div>
@@ -292,7 +323,7 @@
                 <!-- Call to Action -->
                 <div class="mt-auto">
                     @if($produk->tipe_produk == 'jadi')
-                        <form action="{{ route('customer.cart.storeDirect', $produk->id_produk) }}" method="POST">
+                        <form :action="`{{ url('/customer/cart/direct') }}/${selectedVariant.id_produk}`" method="POST">
                             @csrf
                             <input type="hidden" name="technique" x-bind:value="selectedTechnique">
                             <input type="hidden" name="color" x-bind:value="selectedColor">
@@ -313,7 +344,7 @@
                             </button>
                         </form>
                     @else
-                        <a :href="`{{ route('customer.designs.editor', $produk->id_produk) }}?technique=${selectedTechnique}&color=${selectedColor}&size=${selectedSize}`" class="group relative block w-full text-center py-5 rounded-2xl bg-red-600 hover:bg-red-500 text-white font-black text-xl shadow-2xl shadow-red-200 transition-all duration-300 transform active:scale-[0.98] overflow-hidden">
+                        <a :href="`{{ url('/customer/design') }}/${selectedVariant.id_produk}?technique=${selectedTechnique}&color=${selectedColor}&size=${selectedSize}`" class="group relative block w-full text-center py-5 rounded-2xl bg-red-600 hover:bg-red-500 text-white font-black text-xl shadow-2xl shadow-red-200 transition-all duration-300 transform active:scale-[0.98] overflow-hidden">
                             <span class="relative z-10 flex items-center justify-center gap-3">
                                 MULAI DESAIN SEKARANG
                                 <svg class="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>

@@ -14,7 +14,12 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $produks = Produk::whereIn('jenis_produk', ['kaos', 'hoodie', 'polo'])->get();
+        $allProduks = Produk::whereIn('jenis_produk', ['kaos', 'hoodie', 'polo'])->get();
+        $grouped = $allProduks->groupBy(function($item) {
+            $parts = explode(' ', $item->nama_produk);
+            return ($parts[0] === 'Kaos') ? $parts[0] . ' ' . ($parts[1] ?? '') : $parts[0];
+        });
+        $produks = $grouped->map->first()->values();
         
         $activeOrdersCount = 0;
         $cartCount = 0;
@@ -32,6 +37,11 @@ class ProductController extends Controller
 
     public function show(Produk $produk)
     {
-        return view('customer.products.show', compact('produk'));
+        // Get variants belonging to the same group
+        $parts = explode(' ', $produk->nama_produk);
+        $groupName = ($parts[0] === 'Kaos') ? $parts[0] . ' ' . ($parts[1] ?? '') : $parts[0];
+        $variants = Produk::where('nama_produk', 'like', $groupName . '%')->get();
+
+        return view('customer.products.show', compact('produk', 'variants', 'groupName'));
     }
 }

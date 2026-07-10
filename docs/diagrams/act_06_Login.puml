@@ -1,0 +1,65 @@
+@startuml act_06_Login
+skinparam Style strictuml
+skinparam ActivityFontName Times New Roman
+skinparam ActivityFontSize 12
+skinparam ActivityBorderColor Black
+skinparam ActivityBackgroundColor White
+skinparam ArrowColor Black
+skinparam ArrowFontName Times New Roman
+skinparam ArrowFontSize 10
+skinparam SwimlaneBorderColor Black
+skinparam SwimlaneTitleFontName Times New Roman
+skinparam SwimlaneTitleFontSize 14
+skinparam SwimlaneTitleFontStyle bold
+
+|Pengguna|
+start
+:Membuka Halaman Masuk (Login);
+
+|Sistem|
+:Menampilkan Formulir Login;
+
+|Pengguna|
+if (Pilih Tindakan Akun?) then (Input Login)
+  :Mengisi Email & Password;
+  :Klik Tombol "Login";
+  |Sistem|
+  :Melakukan Verifikasi Kredensial;
+  if (Kredensial Sesuai?) then (Ya)
+    :Membuat Sesi Pengguna (Session Login);
+    if (Peran / Guard Pengguna?) then (Admin / Owner)
+      :Mengarahkan ke Dasbor Admin;
+    else (Customer)
+      :Mengarahkan ke Dasbor Customer;
+    endif
+    |Pengguna|
+    :Menampilkan Dasbor & Mulai Aktivitas;
+    stop
+  else (Tidak)
+    |Sistem|
+    :Mengembalikan ke Form Login dengan Validasi Gagal;
+    |Pengguna|
+    :Melihat Pesan Error & Mencoba Kembali;
+    stop
+  endif
+elseif (Lupa Password) then (Minta Reset)
+  |Pengguna|
+  :Klik "Lupa Password" / Reset Link\n(<<extends>> Lupa Password);
+  |Sistem|
+  :Menampilkan Halaman Reset Password;
+  |Pengguna|
+  :Mengisi Email Akun;
+  :Klik "Kirim Tautan Reset";
+  |Sistem|
+  :Mengirim Email Link Reset & Arahkan Kembali;
+  stop
+else (Logout Sesi)
+  |Pengguna|
+  :Memilih Tindakan "Logout" di Akun;
+  |Sistem|
+  :Menghancurkan Sesi Pengguna (Session Invalidate);
+  :Meregenerasi Token CSRF Baru;
+  :Mengarahkan ke Halaman Utama Landing Page;
+  stop
+endif
+@enduml

@@ -156,7 +156,11 @@
 
                             <!-- Card Content -->
                             <div class="p-6 flex flex-col flex-grow relative bg-white z-20">
-                                <h3 class="text-xl font-bold text-slate-900 mb-2 truncate" title="{{ $item->nama_produk }}">{{ $item->nama_produk }}</h3>
+                                @php
+                                    $parts = explode(' ', $item->nama_produk);
+                                    $displayName = ($parts[0] === 'Kaos') ? $parts[0] . ' ' . ($parts[1] ?? '') : $parts[0];
+                                @endphp
+                                <h3 class="text-xl font-bold text-slate-900 mb-2 truncate" title="{{ $displayName }}">{{ $displayName }} Custom</h3>
                                 <p class="text-slate-500 text-sm mb-6 flex-grow line-clamp-2 leading-relaxed">{{ $item->deskripsi }}</p>
                                 
                                 <div class="pt-4 border-t border-slate-100 flex items-center justify-between mt-auto">

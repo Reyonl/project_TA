@@ -1,0 +1,59 @@
+@startuml act_07_Kelola_Data_Produk
+skinparam Style strictuml
+skinparam ActivityFontName Times New Roman
+skinparam ActivityFontSize 12
+skinparam ActivityBorderColor Black
+skinparam ActivityBackgroundColor White
+skinparam ArrowColor Black
+skinparam ArrowFontName Times New Roman
+skinparam ArrowFontSize 10
+skinparam SwimlaneBorderColor Black
+skinparam SwimlaneTitleFontName Times New Roman
+skinparam SwimlaneTitleFontSize 14
+skinparam SwimlaneTitleFontStyle bold
+
+|Admin|
+start
+:Mengakses Menu Kelola Produk;
+
+|Sistem|
+:Mengambil Data Semua Produk dari Database;
+:Menampilkan Tabel Daftar Produk;
+
+|Admin|
+if (Pilih Tindakan Produk?) then (Tambah Produk)
+  :Klik "Tambah Produk";
+  :Mengisi Formulir Produk baru\n(Nama, Jenis, Tipe, Harga, & Gambar);
+  :Klik Tombol "Simpan";
+  |Sistem|
+  :Melakukan Validasi Form Input;
+  :Mengunggah File Gambar Produk ke Storage;
+  :Menyimpan Record Produk Baru ke Basis Data;
+elseif (Edit Produk) then (Edit)
+  |Admin|
+  :Klik "Edit" pada Produk Tertentu;
+  :Mengubah Data pada Formulir Sunting;
+  :Klik Tombol "Perbarui";
+  |Sistem|
+  :Melakukan Validasi Form Input;
+  if (Unggah Gambar Baru?) then (Ya)
+    :Menghapus File Gambar Lama dari Storage;
+    :Mengunggah File Gambar Baru ke Storage;
+  else (Tidak)
+  endif
+  :Memperbarui Record Produk di Database;
+else (Hapus Produk)
+  |Admin|
+  :Klik Tombol "Hapus" pada Produk;
+  |Sistem|
+  :Menghapus File Gambar Produk dari Storage;
+  :Menghapus Data Record Produk dari Database;
+endif
+
+|Sistem|
+:Mengarahkan Kembali ke Halaman Daftar Produk;
+:Menampilkan Pesan Notifikasi Sukses;
+|Admin|
+:Menerima Halaman yang Telah Diperbarui;
+stop
+@enduml

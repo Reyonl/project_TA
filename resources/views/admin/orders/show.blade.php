@@ -113,7 +113,7 @@
                                                         @php
                                                             $overlayStyle = match($detail->produk->jenis_produk) {
                                                                 'topi' => 'top: 40%; left: 35%; width: 30%; height: 25%;',
-                                                                'polo' => 'top: 30%; left: 30%; width: 20%; height: 18%;',
+                                                                'polo' => 'top: 26.66%; left: 55.2%; width: 18.75%; height: 15%;',
                                                                 'seragam' => 'top: 30%; left: 28%; width: 22%; height: 20%;',
                                                                 default => 'top: 20%; left: 27.08%; width: 45.83%; height: 53.33%;'
                                                             };
@@ -458,11 +458,16 @@
             const overlayContainer = document.getElementById('modalOverlayContainer');
             const styles = {
                 'topi': { top: '40%', left: '35%', width: '30%', height: '25%' },
-                'polo': { top: '30%', left: '30%', width: '20%', height: '18%' },
+                'polo': { top: '26.66%', left: '55.2%', width: '18.75%', height: '15%' },
                 'seragam': { top: '30%', left: '28%', width: '22%', height: '20%' },
                 'default': { top: '20%', left: '27.08%', width: '45.83%', height: '53.33%' }
             };
-            const s = styles[bajuType] || styles['default'];
+            let s = styles['default'];
+            if (side === 'front' && styles[bajuType]) {
+                s = styles[bajuType];
+            } else if (side !== 'front' && bajuType === 'topi') {
+                s = styles['topi'];
+            }
             overlayContainer.style.top = s.top;
             overlayContainer.style.left = s.left;
             overlayContainer.style.width = s.width;
@@ -578,7 +583,7 @@
                 // Sesuai layout visual di CSS dinamis
                 const styles = {
                     'topi': { top: 0.40, left: 0.35, width: 0.30, height: 0.25 },
-                    'polo': { top: 0.30, left: 0.30, width: 0.20, height: 0.18 },
+                    'polo': { top: 0.2666, left: 0.552, width: 0.1875, height: 0.15 },
                     'seragam': { top: 0.30, left: 0.28, width: 0.22, height: 0.20 },
                     'default': { top: 0.20, left: 0.2708, width: 0.4583, height: 0.5333 }
                 };

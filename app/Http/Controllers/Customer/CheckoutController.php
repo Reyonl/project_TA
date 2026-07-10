@@ -15,13 +15,22 @@ use Illuminate\Support\Facades\DB;
 
 class CheckoutController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $id_customer = Auth::guard('customer')->id();
-        $carts = Cart::where('id_customer', $id_customer)->with(['produk', 'desain'])->get();
+        $cartIds = $request->query('cart_ids');
+
+        if (!$cartIds || !is_array($cartIds)) {
+            return redirect()->route('customer.cart.index')->with('error', 'Silakan pilih minimal 1 item untuk checkout.');
+        }
+
+        $carts = Cart::where('id_customer', $id_customer)
+            ->whereIn('id_cart', $cartIds)
+            ->with(['produk', 'desain'])
+            ->get();
 
         if ($carts->isEmpty()) {
-            return redirect()->route('customer.cart.index')->with('error', 'Keranjang Anda kosong.');
+            return redirect()->route('customer.cart.index')->with('error', 'Keranjang Anda kosong atau item tidak ditemukan.');
         }
 
         $totalHarga = 0;
@@ -35,9 +44,14 @@ class CheckoutController extends Controller
 
     public function store(StoreCheckoutRequest $request)
     {
-
         $id_customer = Auth::guard('customer')->id();
-        $carts = Cart::where('id_customer', $id_customer)->get();
+        $cartIds = $request->input('cart_ids');
+
+        if (!$cartIds || !is_array($cartIds)) {
+            return redirect()->route('customer.cart.index')->with('error', 'Silakan pilih minimal 1 item untuk checkout.');
+        }
+
+        $carts = Cart::where('id_customer', $id_customer)->whereIn('id_cart', $cartIds)->get();
 
         if ($carts->isEmpty()) {
             return redirect()->route('customer.cart.index')->with('error', 'Keranjang Anda kosong.');
@@ -60,7 +74,7 @@ class CheckoutController extends Controller
         }
 
         // Gunakan transaction agar order & detail atomik
-        $order = DB::transaction(function () use ($id_customer, $totalHarga, $buktiPath, $carts) {
+        $order = DB::transaction(function () use ($id_customer, $totalHarga, $buktiPath, $carts, $cartIds) {
             // Buat Order Induk
             $order = Order::create([
                 'id_customer' => $id_customer,
@@ -87,8 +101,8 @@ class CheckoutController extends Controller
                 ]);
             }
 
-            // Kosongkan keranjang
-            Cart::where('id_customer', $id_customer)->delete();
+            // Kosongkan keranjang (hanya item yang dicheckout)
+            Cart::where('id_customer', $id_customer)->whereIn('id_cart', $cartIds)->delete();
 
             return $order;
         });

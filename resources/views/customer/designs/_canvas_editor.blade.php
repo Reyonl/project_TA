@@ -1,13 +1,20 @@
 {{-- Canvas Editor Partial - used in Step 2 (front) and Step 3 (others) --}}
 @php
     $hasBack = in_array($produk->jenis_produk, ['kaos', 'hoodie', 'polo', 'seragam']);
+    $isPanjang = \Illuminate\Support\Str::contains(strtolower($produk->nama_produk), 'panjang');
     $mockupBase = match($produk->jenis_produk) {
-        'kaos' => 'kaos', 'hoodie' => 'hoodie', 'polo' => 'polo', 'seragam' => 'seragam', default => 'kaos'
+        'kaos' => $isPanjang ? 'kaos_panjang' : 'kaos',
+        'hoodie' => 'hoodie',
+        'polo' => 'polo',
+        'seragam' => 'seragam',
+        default => 'kaos'
     };
     $getPrintArea = function($side) use ($produk) {
         $jenis = strtolower($produk->jenis_produk);
-        if ($jenis === 'polo') return ['width' => 90, 'height' => 90, 'top' => 180, 'left' => 140, 'label' => 'Pocket'];
-        if ($jenis === 'seragam') return ['width' => 100, 'height' => 100, 'top' => 180, 'left' => 135, 'label' => 'Dada'];
+        if ($side === 'front') {
+            if ($jenis === 'polo') return ['width' => 90, 'height' => 90, 'top' => 160, 'left' => 265, 'label' => 'Pocket'];
+            if ($jenis === 'seragam') return ['width' => 100, 'height' => 100, 'top' => 180, 'left' => 135, 'label' => 'Dada'];
+        }
         return ['width' => 220, 'height' => 320, 'top' => 120, 'left' => 130, 'label' => 'Area Cetak'];
     };
 @endphp
@@ -157,9 +164,10 @@
                 <div class="absolute z-20" style="top: {{ $pa['top'] }}px; left: {{ $pa['left'] }}px; width: {{ $pa['width'] }}px; height: {{ $pa['height'] }}px;" x-show="activeSide === 'front'">
                     <canvas id="tshirt-canvas-front" width="{{ $pa['width'] }}" height="{{ $pa['height'] }}"></canvas>
                 </div>
+                @php $paBack = $getPrintArea('back'); @endphp
                 {{-- Fabric Canvas Back --}}
-                <div class="absolute z-20" style="top: {{ $pa['top'] }}px; left: {{ $pa['left'] }}px; width: {{ $pa['width'] }}px; height: {{ $pa['height'] }}px;" x-show="activeSide === 'back'" x-cloak>
-                    <canvas id="tshirt-canvas-back" width="{{ $pa['width'] }}" height="{{ $pa['height'] }}"></canvas>
+                <div class="absolute z-20" style="top: {{ $paBack['top'] }}px; left: {{ $paBack['left'] }}px; width: {{ $paBack['width'] }}px; height: {{ $paBack['height'] }}px;" x-show="activeSide === 'back'" x-cloak>
+                    <canvas id="tshirt-canvas-back" width="{{ $paBack['width'] }}" height="{{ $paBack['height'] }}"></canvas>
                 </div>
             </div>
         </div>
@@ -172,6 +180,7 @@
             <button onclick="window.activeCanvas.discardActiveObject(); window.activeCanvas.requestRenderAll();" class="text-slate-400 hover:text-red-500 transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
+        </div>
         <div class="p-6 space-y-8">
             {{-- Sablon Size Picker for Selected Object --}}
             <div id="objectSablonSizeControl" class="space-y-3 pb-6 border-b border-slate-100">

@@ -87,28 +87,19 @@
                             @if($produk->gambar_produk)
                                 <img src="{{ Storage::url($produk->gambar_produk) }}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" alt="{{ $produk->nama_produk }}">
                             @else
-                                <!-- SVG Placeholder Illustration -->
-                                <div class="flex flex-col items-center justify-center gap-3 transform group-hover:scale-105 transition-transform duration-500">
-                                    @if($produk->jenis_produk == 'kaos')
-                                        <svg class="w-24 h-24 {{ $produk->tipe_produk == 'jadi' ? 'text-emerald-300' : 'text-indigo-300' }}" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M30 25L20 35L30 45V85H70V45L80 35L70 25H60C60 30.523 55.523 35 50 35C44.477 35 40 30.523 40 25H30Z" fill="currentColor" opacity="0.3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                            <path d="M40 25C40 30.523 44.477 35 50 35C55.523 35 60 30.523 60 25" stroke="currentColor" stroke-width="2" fill="none"/>
-                                        </svg>
-                                    @elseif($produk->jenis_produk == 'hoodie')
-                                        <svg class="w-24 h-24 {{ $produk->tipe_produk == 'jadi' ? 'text-emerald-300' : 'text-indigo-300' }}" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M28 30L18 42L28 50V88H72V50L82 42L72 30H62C62 36.627 56.627 42 50 42C43.373 42 38 36.627 38 30H28Z" fill="currentColor" opacity="0.3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                            <path d="M42 12C42 12 44 22 50 22C56 22 58 12 58 12" stroke="currentColor" stroke-width="2" fill="none"/>
-                                            <path d="M38 30C38 36.627 43.373 42 50 42C56.627 42 62 36.627 62 30" stroke="currentColor" stroke-width="2" fill="none"/>
-                                            <path d="M44 50V70" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.5"/>
-                                        </svg>
-                                    @else
-                                        <svg class="w-24 h-24 {{ $produk->tipe_produk == 'jadi' ? 'text-emerald-300' : 'text-indigo-300' }}" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M30 25L20 35L30 45V85H70V45L80 35L70 25H60C60 30.523 55.523 35 50 35C44.477 35 40 30.523 40 25H30Z" fill="currentColor" opacity="0.3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                            <rect x="35" y="45" width="30" height="4" rx="2" fill="currentColor" opacity="0.2"/>
-                                        </svg>
-                                    @endif
-                                    <span class="text-xs font-medium {{ $produk->tipe_produk == 'jadi' ? 'text-emerald-400' : 'text-indigo-400' }}">Preview belum tersedia</span>
-                                </div>
+                                <!-- Mockup Illustration -->
+                                @php
+                                    $isPanjang = \Illuminate\Support\Str::contains(strtolower($produk->nama_produk), 'panjang');
+                                    $baseImg = match($produk->jenis_produk) {
+                                        'kaos' => $isPanjang ? 'kaos_panjang.png' : 'kaos.png',
+                                        'hoodie' => 'hoodie.png',
+                                        'topi' => 'topi.png',
+                                        'polo' => 'polo.png',
+                                        'seragam' => 'seragam.png',
+                                        default => 'kaos.png'
+                                    };
+                                @endphp
+                                <img src="{{ asset('images/mockups/'.$baseImg) }}" class="w-full h-full object-contain transform group-hover:scale-105 transition-transform duration-500 drop-shadow-2xl" style="filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));" alt="{{ $produk->nama_produk }}">
                             @endif
                             
                             <!-- Category & Type Badges -->
@@ -144,7 +135,11 @@
 
                         <!-- Card Content -->
                         <div class="p-6 flex flex-col flex-grow">
-                            <h3 class="text-lg font-bold text-slate-900 mb-1.5 truncate" title="{{ $produk->nama_produk }}">{{ $produk->nama_produk }}</h3>
+                            @php
+                                $parts = explode(' ', $produk->nama_produk);
+                                $displayName = ($parts[0] === 'Kaos') ? $parts[0] . ' ' . ($parts[1] ?? '') : $parts[0];
+                            @endphp
+                            <h3 class="text-lg font-bold text-slate-900 mb-1.5 truncate" title="{{ $displayName }}">{{ $displayName }} Custom</h3>
                             <p class="text-slate-400 text-sm mb-5 flex-grow line-clamp-2 leading-relaxed">{{ $produk->deskripsi ?: 'Produk berkualitas tinggi dengan bahan pilihan terbaik.' }}</p>
                             
                             <!-- Price & CTA Row -->

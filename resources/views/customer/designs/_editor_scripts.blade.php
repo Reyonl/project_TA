@@ -1,3 +1,13 @@
+@php
+    $isPanjang = \Illuminate\Support\Str::contains(strtolower($produk->nama_produk), 'panjang');
+    $mockupBase = match($produk->jenis_produk) {
+        'kaos' => $isPanjang ? 'kaos_panjang' : 'kaos',
+        'hoodie' => 'hoodie',
+        'polo' => 'polo',
+        'seragam' => 'seragam',
+        default => 'kaos'
+    };
+@endphp
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 function initFabricEditor() {
@@ -23,8 +33,8 @@ function initFabricEditor() {
     };
 
     // Generate preview thumbnails for Step 4
-    const mockupFrontUrl = '{{ asset("images/mockups/" . (match($produk->jenis_produk) { "kaos" => "kaos", "hoodie" => "hoodie", "polo" => "polo", "seragam" => "seragam", default => "kaos" }) . ".png") }}';
-    const mockupBackUrl = '{{ asset("images/mockups/" . (match($produk->jenis_produk) { "kaos" => "kaos", "hoodie" => "hoodie", "polo" => "polo", "seragam" => "seragam", default => "kaos" }) . "_belakang.png") }}';
+    const mockupFrontUrl = '{{ asset("images/mockups/" . $mockupBase . ".png") }}';
+    const mockupBackUrl = '{{ asset("images/mockups/" . $mockupBase . "_belakang.png") }}';
 
     function compositePreview(targetImgId, fabricCanvas, mockupUrl, hasDesign) {
         const targetImg = document.getElementById(targetImgId);
@@ -378,10 +388,110 @@ function initFabricEditor() {
         }
     };
 
+    window.resizeObjectToSablonSize = function(obj, size) {
+        if (!obj) return;
+        
+        if (!size) size = obj.sablonSize || 'a5';
+        obj.sablonSize = size;
+
+        let sideName = 'front';
+        try {
+            const el = document.querySelector('[x-data]');
+            if (el && window.Alpine && window.Alpine.$data) {
+                sideName = window.Alpine.$data(el).activeSide || 'front';
+            }
+        } catch(e) {}
+        
+        const dims = (window.printAreaDims && window.printAreaDims[sideName]) || { width: 220, height: 320 };
+        const pa_width = dims.width;
+        const pa_height = dims.height;
+
+        // Visual proportions relative to the print area bounds:
+        // Asumsi standar lebar sablon adalah 28cm yang dipetakan ke pa_width (misal: 220px)
+        // Maka 1 cm = pa_width / 28
+        let px_per_cm = pa_width / 28;
+        if (pa_width < 120) {
+            // Untuk polo atau seragam, area cetak aslinya lebih kecil (sekitar 10-12 cm)
+            px_per_cm = pa_width / 10;
+        }
+
+        let targetWidth, targetHeight;
+        
+        if (size === 'a4') { // Ukuran asli A4: ~20x25 cm
+            targetWidth = 20 * px_per_cm;
+            targetHeight = 25 * px_per_cm;
+        } else if (size === 'a3') { // Ukuran asli A3: ~25x35 cm
+            targetWidth = 25 * px_per_cm;
+            targetHeight = 35 * px_per_cm;
+        } else { // Ukuran A5 Logo: 10x10 cm
+            targetWidth = 10 * px_per_cm;
+            targetHeight = 10 * px_per_cm;
+        }
+
+        const margin = 10;
+        targetWidth = Math.min(targetWidth, pa_width - margin);
+        targetHeight = Math.min(targetHeight, pa_height - margin);
+
+        const origWidth = obj.width;
+        const origHeight = obj.height;
+
+        if (origWidth && origHeight) {
+            const scaleX = targetWidth / origWidth;
+            const scaleY = targetHeight / origHeight;
+            const scale = Math.min(scaleX, scaleY);
+            
+            obj.set({
+                scaleX: scale,
+                scaleY: scale,
+                lockScalingX: false,
+                lockScalingY: false,
+                lockUniScaling: true
+            });
+            
+            if (typeof obj.setControlsVisibility === 'function') {
+                obj.setControlsVisibility({
+                    mt: false, mb: false, ml: false, mr: false,
+                    tl: true, tr: true, bl: true, br: true,
+                    mtr: true
+                });
+            }
+        }
+
+        // Keep object within printable bounds
+        let left = obj.left || 0;
+        let top = obj.top || 0;
+        const scaledWidth = (obj.width || 0) * (obj.scaleX || 1);
+        const scaledHeight = (obj.height || 0) * (obj.scaleY || 1);
+        const oX = obj.originX || 'left';
+        const oY = obj.originY || 'top';
+        
+        if (oX === 'center') {
+            if (left - scaledWidth/2 < 0) left = scaledWidth/2;
+            if (left + scaledWidth/2 > pa_width) left = pa_width - scaledWidth/2;
+        } else {
+            if (left < 0) left = 0;
+            if (left + scaledWidth > pa_width) left = pa_width - scaledWidth;
+        }
+        
+        if (oY === 'center') {
+            if (top - scaledHeight/2 < 0) top = scaledHeight/2;
+            if (top + scaledHeight/2 > pa_height) top = pa_height - scaledHeight/2;
+        } else {
+            if (top < 0) top = 0;
+            if (top + scaledHeight > pa_height) top = pa_height - scaledHeight;
+        }
+        
+        obj.set({ left: left, top: top });
+        obj.setCoords();
+        if (obj.canvas) {
+            obj.canvas.requestRenderAll();
+        }
+    };
+
     window.setObjectSablonSize = function(size) {
         const activeObj = window.activeCanvas.getActiveObject();
         if (activeObj) {
-            activeObj.sablonSize = size;
+            window.resizeObjectToSablonSize(activeObj, size);
             window.updateSablonSizeButtons(size);
             window.recalculateTotalPrice();
         }
@@ -391,12 +501,60 @@ function initFabricEditor() {
     const canvasesToHandle = [canvasFront, canvasBack];
     if(canvasLeft) canvasesToHandle.push(canvasLeft);
     if(canvasRight) canvasesToHandle.push(canvasRight);
+
+    function constrainObjectBounds(e) {
+        const obj = e.target;
+        if (!obj) return;
+        
+        let sideName = 'front';
+        try {
+            const el = document.querySelector('[x-data]');
+            if (el && window.Alpine && window.Alpine.$data) {
+                sideName = window.Alpine.$data(el).activeSide || 'front';
+            }
+        } catch(err) {}
+        
+        const dims = (window.printAreaDims && window.printAreaDims[sideName]) || { width: 220, height: 320 };
+        const pa_width = dims.width;
+        const pa_height = dims.height;
+
+        obj.setCoords();
+        const boundingRect = obj.getBoundingRect();
+
+        let leftOffset = 0;
+        let topOffset = 0;
+
+        if (boundingRect.left < 0) {
+            leftOffset = -boundingRect.left;
+        } else if (boundingRect.left + boundingRect.width > pa_width) {
+            leftOffset = pa_width - (boundingRect.left + boundingRect.width);
+        }
+
+        if (boundingRect.top < 0) {
+            topOffset = -boundingRect.top;
+        } else if (boundingRect.top + boundingRect.height > pa_height) {
+            topOffset = pa_height - (boundingRect.top + boundingRect.height);
+        }
+
+        if (leftOffset !== 0) obj.set('left', obj.left + leftOffset);
+        if (topOffset !== 0) obj.set('top', obj.top + topOffset);
+    }
+
     canvasesToHandle.forEach(c => { 
         c.on('selection:created', showControls); 
         c.on('selection:updated', showControls); 
         c.on('selection:cleared', hideControls); 
-        c.on('object:added', window.recalculateTotalPrice);
+        c.on('object:added', function(e) {
+            const obj = e.target;
+            if (obj) {
+                const size = obj.sablonSize || ((obj.type === 'i-text' || obj.customType === 'custom-svg') ? 'a5' : 'a4');
+                window.resizeObjectToSablonSize(obj, size);
+            }
+            window.recalculateTotalPrice();
+        });
         c.on('object:removed', window.recalculateTotalPrice);
+        c.on('object:moving', constrainObjectBounds);
+        c.on('object:scaling', constrainObjectBounds);
     });
 
     function showControls(e) {
@@ -411,13 +569,27 @@ function initFabricEditor() {
         // Set active size buttons
         const size = activeObj.sablonSize || 'a5';
         window.updateSablonSizeButtons(size);
+        if (!activeObj.lockScalingX) {
+            window.resizeObjectToSablonSize(activeObj, size);
+        }
 
         if(activeObj.type === 'i-text') {
             textControls.classList.remove('hidden'); textControls.classList.add('flex');
             fontFamilyControl.value = activeObj.fontFamily.replace(/["']/g, "");
-            textColorControl.value = activeObj.fill;
-            document.getElementById('textColorVal').textContent = activeObj.fill.toUpperCase();
-            textStrokeColor.value = activeObj.stroke || '#ffffff';
+            
+            let fillHex = '#000000';
+            if (activeObj.fill) {
+                fillHex = new fabric.Color(activeObj.fill).toHex();
+                fillHex = '#' + (fillHex === '000000' && activeObj.fill !== 'black' && activeObj.fill !== '#000000' && activeObj.fill !== 'rgb(0,0,0)' ? '000000' : fillHex);
+                if(fillHex.length > 7) fillHex = fillHex.substring(0, 7); // Strip alpha if any
+            }
+            textColorControl.value = fillHex;
+            document.getElementById('textColorVal').textContent = fillHex.toUpperCase();
+            
+            let strokeHex = '#ffffff';
+            if (activeObj.stroke) strokeHex = '#' + new fabric.Color(activeObj.stroke).toHex();
+            textStrokeColor.value = strokeHex.substring(0, 7);
+            
             textStrokeWidth.value = activeObj.strokeWidth || 0;
             textShadowToggle.checked = !!activeObj.shadow;
         } else if(activeObj.type === 'image' && activeObj.customType === 'custom-image') {
@@ -425,7 +597,12 @@ function initFabricEditor() {
         } else if((activeObj.type === 'group' || activeObj.type === 'path') && activeObj.customType === 'custom-svg') {
             svgControls.classList.remove('hidden'); svgControls.classList.add('flex');
             let tc = activeObj.type === 'group' && activeObj._objects && activeObj._objects.length > 0 ? (activeObj._objects[0].fill || '#000000') : (activeObj.fill || '#000000');
-            if(typeof tc === 'string' && tc.startsWith('#')) { svgColorControl.value = tc; document.getElementById('svgColorVal').textContent = tc.toUpperCase(); }
+            if (tc) {
+                let svgHex = '#' + new fabric.Color(tc).toHex();
+                svgHex = svgHex.substring(0, 7);
+                svgColorControl.value = svgHex;
+                document.getElementById('svgColorVal').textContent = svgHex.toUpperCase();
+            }
         }
     }
 
@@ -462,9 +639,17 @@ function initFabricEditor() {
     // SVG color change
     if(svgColorControl) svgColorControl.addEventListener('input', function() {
         const o = window.activeCanvas.getActiveObject();
-        if(o && o.type === 'group' && o.customType === 'custom-svg') {
-            function applyDeep(obj, col) { if(obj._objects) obj._objects.forEach(c => applyDeep(c, col)); else { if(obj.fill && obj.fill !== 'none') obj.set('fill', col); if(obj.stroke && obj.stroke !== 'none') obj.set('stroke', col); } }
-            applyDeep(o, this.value); window.activeCanvas.renderAll();
+        if(o && o.customType === 'custom-svg') {
+            function applyDeep(obj, col) {
+                if(obj._objects && obj._objects.length > 0) {
+                    obj._objects.forEach(c => applyDeep(c, col));
+                } else {
+                    if(obj.fill && obj.fill !== 'none') obj.set('fill', col);
+                    if(obj.stroke && obj.stroke !== 'none') obj.set('stroke', col);
+                }
+            }
+            applyDeep(o, this.value);
+            window.activeCanvas.renderAll();
         }
     });
 

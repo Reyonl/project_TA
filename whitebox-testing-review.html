@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>White Box Testing — Cyclomatic Complexity Analysis</title>
+    <meta name="description" content="Laporan analisis White Box Testing menggunakan metode Cyclomatic Complexity (McCabe) untuk sistem pemesanan sablon custom DailyCo.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-base: #06060f;
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #111827;
+            --bg-card: rgba(15, 20, 40, 0.7);
+            --bg-card-hover: rgba(20, 28, 55, 0.85);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-purple: #8b5cf6;
+            --accent-violet: #a78bfa;
+            --accent-green: #10b981;
+            --accent-emerald: #34d399;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --border: rgba(255, 255, 255, 0.06);
+            --border-light: rgba(255, 255, 255, 0.1);
+            --glass: rgba(255, 255, 255, 0.03);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --radius-xs: 6px;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-base);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* ── SCROLL PROGRESS ─────────────────────────── */
+        #scroll-progress {
+            position: fixed; top: 0; left: 0; height: 3px; z-index: 9999;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple), var(--accent-green));
+            width: 0%; transition: width 0.1s linear;
+        }
+
+        /* ── NAVIGATION ──────────────────────────────── */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            background: rgba(6, 6, 15, 0.75);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            transition: all 0.3s ease;
+        }
+        nav.scrolled { background: rgba(6, 6, 15, 0.95); }
+        .nav-inner {
+            max-width: 1400px; margin: 0 auto;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 64px;
+        }
+        .nav-logo {
+            font-weight: 800; font-size: 1.1rem;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; display: flex; align-items: center; gap: 0.5rem;
+        }
+        .nav-logo svg { width: 22px; height: 22px; }
+        .nav-links { display: flex; gap: 0.25rem; }
+        .nav-links a {
+            color: var(--text-secondary); text-decoration: none; font-size: 0.82rem;
+            padding: 0.4rem 0.85rem; border-radius: 8px; font-weight: 500;
+            transition: all 0.25s ease; white-space: nowrap;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--text-primary); background: rgba(255,255,255,0.06);
+        }
+        .mobile-menu-btn {
+            display: none; background: none; border: none; color: var(--text-primary);
+            cursor: pointer; padding: 8px;
+        }
+
+        /* ── HERO ────────────────────────────────────── */
+        .hero {
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            text-align: center; padding: 6rem 2rem 4rem;
+            background: radial-gradient(ellipse at 20% 50%, rgba(59,130,246,0.08) 0%, transparent 50%),
+                        radial-gradient(ellipse at 80% 20%, rgba(139,92,246,0.08) 0%, transparent 50%),
+                        radial-gradient(ellipse at 50% 80%, rgba(16,185,129,0.06) 0%, transparent 50%);
+            position: relative;
+        }
+        .hero::after {
+            content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 200px;
+            background: linear-gradient(to bottom, transparent, var(--bg-base));
+        }
+        .hero-content { position: relative; z-index: 1; max-width: 900px; }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2);
+            border-radius: 100px; padding: 0.4rem 1.2rem; font-size: 0.8rem;
+            color: var(--accent-blue); font-weight: 600; margin-bottom: 1.5rem;
+            letter-spacing: 0.05em; text-transform: uppercase;
+        }
+        .hero h1 {
+            font-size: clamp(2.2rem, 5vw, 3.8rem); font-weight: 900;
+            line-height: 1.1; margin-bottom: 1.2rem;
+            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .hero p { font-size: 1.1rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto 3rem; }
+
+        /* ── STATS GRID ──────────────────────────────── */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem; max-width: 800px; margin: 0 auto;
+        }
+        .stat-card {
+            background: var(--bg-card); border: 1px solid var(--border-light);
+            border-radius: var(--radius); padding: 1.5rem; text-align: center;
+            backdrop-filter: blur(12px); transition: all 0.35s ease;
+            position: relative; overflow: hidden;
+        }
+        .stat-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        }
+        .stat-card:nth-child(1)::before { background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan)); }
+        .stat-card:nth-child(2)::before { background: linear-gradient(90deg, var(--accent-purple), var(--accent-violet)); }
+        .stat-card:nth-child(3)::before { background: linear-gradient(90deg, var(--accent-green), var(--accent-emerald)); }
+        .stat-card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.15); }
+        .stat-value {
+            font-size: 2.8rem; font-weight: 900; font-family: 'JetBrains Mono', monospace;
+            line-height: 1;
+        }
+        .stat-card:nth-child(1) .stat-value { color: var(--accent-blue); }
+        .stat-card:nth-child(2) .stat-value { color: var(--accent-purple); }
+        .stat-card:nth-child(3) .stat-value { color: var(--accent-green); }
+        .stat-label { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.4rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; }
+        .stat-sublabel { font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.3rem; font-weight: 500; }
+
+        /* ── SECTIONS ────────────────────────────────── */
+        .section { padding: 5rem 2rem; position: relative; }
+        .section-inner { max-width: 1300px; margin: 0 auto; }
+        .section-header {
+            text-align: center; margin-bottom: 3.5rem;
+        }
+        .section-number {
+            font-size: 0.75rem; font-weight: 700; letter-spacing: 0.15em;
+            text-transform: uppercase; margin-bottom: 0.75rem; display: block;
+        }
+        .section-number.blue { color: var(--accent-blue); }
+        .section-number.purple { color: var(--accent-purple); }
+        .section-number.green { color: var(--accent-green); }
+        .section-title {
+            font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 800;
+            line-height: 1.2; margin-bottom: 0.75rem;
+        }
+        .section-desc { color: var(--text-secondary); max-width: 700px; margin: 0 auto; font-size: 0.95rem; }
+        .feature-divider {
+            height: 1px; max-width: 1300px; margin: 0 auto;
+            background: linear-gradient(90deg, transparent, var(--border-light), transparent);
+        }
+
+        /* ── CARDS ────────────────────────────────────── */
+        .card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 2rem;
+            backdrop-filter: blur(12px); transition: border-color 0.3s;
+        }
+        .card:hover { border-color: var(--border-light); }
+        .card-title {
+            font-size: 1rem; font-weight: 700; margin-bottom: 1rem;
+            display: flex; align-items: center; gap: 0.6rem;
+        }
+        .card-title .icon {
+            width: 32px; height: 32px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem;
+        }
+        .card-title .icon.blue { background: rgba(59,130,246,0.15); color: var(--accent-blue); }
+        .card-title .icon.purple { background: rgba(139,92,246,0.15); color: var(--accent-purple); }
+        .card-title .icon.green { background: rgba(16,185,129,0.15); color: var(--accent-green); }
+        .card-title .icon.amber { background: rgba(245,158,11,0.15); color: var(--accent-amber); }
+        .card-title .icon.rose { background: rgba(244,63,94,0.15); color: var(--accent-rose); }
+
+        /* ── SUBSECTION TITLE ─────────────────────────── */
+        .sub-title {
+            font-size: 1.25rem; font-weight: 700; margin: 3rem 0 1.5rem;
+            padding-left: 1rem; border-left: 3px solid;
+        }
+        .sub-title.blue { border-color: var(--accent-blue); }
+        .sub-title.purple { border-color: var(--accent-purple); }
+        .sub-title.green { border-color: var(--accent-green); }
+        .sub-caption { text-align: center; font-size: 0.82rem; color: var(--text-muted); margin-top: 1rem; font-style: italic; }
+
+        /* ── DIAGRAM CONTAINER ────────────────────────── */
+        .diagram-container {
+            background: rgba(10, 14, 26, 0.6); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 2rem; margin: 1rem 0;
+            overflow-x: auto; text-align: center;
+        }
+        .diagram-container .mermaid { display: inline-block; min-width: 100%; }
+        .diagram-container .mermaid svg { max-width: 100%; height: auto; }
+
+        /* ── FORMULA ──────────────────────────────────── */
+        .formula-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 2rem 2.5rem;
+            font-family: 'JetBrains Mono', monospace; margin: 1.5rem 0;
+        }
+        .formula-line { font-size: 1.05rem; margin: 0.4rem 0; color: var(--text-secondary); }
+        .formula-line.result { color: var(--text-primary); font-weight: 700; font-size: 1.2rem; }
+        .formula-highlight {
+            display: inline-block; padding: 0.15rem 0.75rem; border-radius: 6px;
+            font-weight: 700;
+        }
+        .formula-highlight.blue { background: rgba(59,130,246,0.15); color: var(--accent-blue); }
+        .formula-highlight.purple { background: rgba(139,92,246,0.15); color: var(--accent-purple); }
+        .formula-highlight.green { background: rgba(16,185,129,0.15); color: var(--accent-green); }
+
+        /* ── PATH LIST ────────────────────────────────── */
+        .path-list { display: grid; gap: 0.6rem; margin: 1rem 0; }
+        .path-item {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); padding: 0.85rem 1.25rem;
+            display: flex; align-items: center; gap: 1rem;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;
+            transition: all 0.25s;
+        }
+        .path-item:hover { border-color: var(--border-light); background: var(--bg-card-hover); }
+        .path-badge {
+            flex-shrink: 0; width: 65px; text-align: center; padding: 0.25rem 0;
+            border-radius: 6px; font-weight: 700; font-size: 0.75rem;
+        }
+        .path-badge.blue { background: rgba(59,130,246,0.15); color: var(--accent-blue); }
+        .path-badge.purple { background: rgba(139,92,246,0.15); color: var(--accent-purple); }
+        .path-badge.green { background: rgba(16,185,129,0.15); color: var(--accent-green); }
+        .path-nodes { color: var(--text-secondary); word-break: break-all; }
+
+        /* ── TABLES ───────────────────────────────────── */
+        .table-wrap {
+            overflow-x: auto; margin: 1rem 0; border-radius: var(--radius);
+            border: 1px solid var(--border);
+            scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent;
+        }
+        .table-wrap::-webkit-scrollbar { height: 6px; }
+        .table-wrap::-webkit-scrollbar-track { background: transparent; }
+        .table-wrap::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+        table {
+            width: 100%; border-collapse: collapse; font-size: 0.8rem;
+            white-space: nowrap;
+        }
+        table th {
+            background: rgba(255,255,255,0.04); color: var(--text-secondary);
+            font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+            font-size: 0.7rem; padding: 0.75rem 0.6rem;
+            border-bottom: 1px solid var(--border-light);
+            position: sticky; top: 0; z-index: 1;
+        }
+        table td {
+            padding: 0.6rem; border-bottom: 1px solid var(--border);
+            color: var(--text-secondary); vertical-align: top;
+        }
+        table tr:hover td { background: rgba(255,255,255,0.02); }
+        table td:first-child { font-weight: 600; color: var(--text-primary); }
+        .matrix-table td, .matrix-table th { text-align: center; min-width: 36px; padding: 0.5rem 0.4rem; }
+        .matrix-table .edge-label { color: var(--accent-cyan); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+        .matrix-table .node-col { background: rgba(255,255,255,0.03); font-weight: 700; color: var(--text-primary); }
+        .matrix-table .sum-col { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; text-align: right !important; min-width: 80px; }
+        .matrix-table .summary-row td { background: rgba(59,130,246,0.05); font-weight: 700; border-top: 2px solid var(--border-light); }
+        .tc-table { white-space: normal; }
+        .tc-table td { font-size: 0.78rem; line-height: 1.5; min-width: 120px; }
+        .tc-table td:nth-child(1) { min-width: 40px; text-align: center; }
+        .tc-table td:nth-child(2) { min-width: 70px; text-align: center; font-family: 'JetBrains Mono', monospace; }
+        .tc-table .status { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 100px; font-size: 0.7rem; font-weight: 600; background: rgba(16,185,129,0.15); color: var(--accent-green); }
+
+        /* ── NODE INFO TABLE ──────────────────────────── */
+        .node-table td:first-child {
+            text-align: center; font-family: 'JetBrains Mono', monospace;
+            width: 50px; color: var(--accent-cyan);
+        }
+
+        /* ── COMPARISON ──────────────────────────────── */
+        .comparison-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+        .compare-card { position: relative; overflow: hidden; }
+        .compare-card .complexity-bar {
+            height: 6px; border-radius: 3px; margin-top: 1rem;
+            background: rgba(255,255,255,0.05);
+        }
+        .compare-card .complexity-fill { height: 100%; border-radius: 3px; transition: width 1.5s ease; }
+        .compare-card .meta-row { display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.78rem; }
+        .compare-card .meta-label { color: var(--text-muted); }
+        .compare-card .meta-value { font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+        .risk-badge {
+            display: inline-block; padding: 0.2rem 0.7rem; border-radius: 100px;
+            font-size: 0.7rem; font-weight: 600;
+        }
+        .risk-low { background: rgba(16,185,129,0.12); color: var(--accent-green); }
+        .risk-medium { background: rgba(245,158,11,0.12); color: var(--accent-amber); }
+
+        /* ── FOOTER ───────────────────────────────────── */
+        footer {
+            text-align: center; padding: 3rem 2rem; border-top: 1px solid var(--border);
+            color: var(--text-muted); font-size: 0.8rem;
+        }
+
+        /* ── SCROLL TO TOP ────────────────────────────── */
+        #scroll-top {
+            position: fixed; bottom: 2rem; right: 2rem; z-index: 100;
+            width: 44px; height: 44px; border-radius: 12px;
+            background: var(--bg-secondary); border: 1px solid var(--border-light);
+            color: var(--text-primary); cursor: pointer; display: none;
+            align-items: center; justify-content: center; font-size: 1.1rem;
+            transition: all 0.3s; backdrop-filter: blur(12px);
+        }
+        #scroll-top:hover { background: var(--accent-blue); border-color: var(--accent-blue); transform: translateY(-2px); }
+        #scroll-top.visible { display: flex; }
+
+        /* ── ANIMATIONS ──────────────────────────────── */
+        .fade-up {
+            opacity: 0; transform: translateY(30px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+        .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+        /* ── RESPONSIVE ──────────────────────────────── */
+        @media (max-width: 768px) {
+            .nav-links { display: none; position: absolute; top: 64px; left: 0; right: 0;
+                flex-direction: column; background: rgba(6,6,15,0.97); padding: 1rem;
+                border-bottom: 1px solid var(--border); gap: 0.25rem; }
+            .nav-links.open { display: flex; }
+            .mobile-menu-btn { display: block; }
+            .section { padding: 3rem 1rem; }
+            .card { padding: 1.25rem; }
+            .formula-card { padding: 1.25rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .diagram-container { padding: 1rem; }
+        }
+
+        @media print {
+            nav, #scroll-top, #scroll-progress { display: none !important; }
+            .hero { min-height: auto; padding: 2rem; }
+            .section { padding: 2rem 0; }
+            body { background: white; color: #111; }
+            .card, .formula-card, .diagram-container, .path-item {
+                background: #f8f8f8; border-color: #ddd; color: #111;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="scroll-progress"></div>
+
+<!-- ══════════════ NAVIGATION ══════════════ -->
+<nav id="main-nav">
+    <div class="nav-inner">
+        <div class="nav-logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+            White Box Testing
+        </div>
+        <button class="mobile-menu-btn" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle menu">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div class="nav-links">
+            <a href="#overview">Ringkasan</a>
+            <a href="#feature1">Fitur 1</a>
+            <a href="#feature2">Fitur 2</a>
+            <a href="#feature3">Fitur 3</a>
+            <a href="#comparison">Perbandingan</a>
+        </div>
+    </div>
+</nav>
+
+<!-- ══════════════ HERO ══════════════ -->
+<header class="hero" id="hero">
+    <div class="hero-content">
+        <div class="hero-badge">📊 Cyclomatic Complexity — McCabe Method</div>
+        <h1>Hasil Analisis White Box Testing</h1>
+        <p>Laporan pengujian struktur internal program menggunakan metode Cyclomatic Complexity pada sistem pemesanan sablon custom.</p>
+        <div class="stats-grid" id="overview">
+            <div class="stat-card fade-up">
+                <div class="stat-value" data-target="11">0</div>
+                <div class="stat-sublabel">Penyimpanan Desain</div>
+                <div class="stat-label">V(G) Fitur 1</div>
+            </div>
+            <div class="stat-card fade-up">
+                <div class="stat-value" data-target="8">0</div>
+                <div class="stat-sublabel">Proses Checkout</div>
+                <div class="stat-label">V(G) Fitur 2</div>
+            </div>
+            <div class="stat-card fade-up">
+                <div class="stat-value" data-target="4">0</div>
+                <div class="stat-sublabel">Autentikasi Login</div>
+                <div class="stat-label">V(G) Fitur 3</div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--              FITUR 1: PENYIMPANAN DESAIN              -->
+<!-- ══════════════════════════════════════════════════════ -->
+<section class="section" id="feature1">
+<div class="section-inner">
+    <div class="section-header fade-up">
+        <span class="section-number blue">Fitur 1 — DesignController@store</span>
+        <h2 class="section-title">Penyimpanan Desain Custom Multi-Sisi</h2>
+        <p class="section-desc">Memproses penyimpanan desain sablon dalam format base64 untuk sisi depan, belakang, kiri, kanan, serta raw assets tambahan. Setiap gambar divalidasi formatnya sebelum disimpan ke storage.</p>
+    </div>
+
+    <!-- Flowchart -->
+    <h3 class="sub-title blue fade-up">a. Flowchart Penyimpanan Desain</h3>
+    <div class="diagram-container fade-up">
+        <pre class="mermaid">
+flowchart TD
+    Start(["Mulai"]):::startEnd --> A["Validasi request<br/>(StoreDesainRequest)"]
+    A --> B{"Format base64<br/>desain depan valid?"}
+    B -->|Ya| C["Decode & simpan<br/>gambar depan"]
+    B -->|Tidak| D{"Desain belakang<br/>diisi?"}
+    C --> D
+    D -->|Ya| E{"Format base64<br/>belakang valid?"}
+    D -->|Tidak| F{"Desain kiri<br/>diisi?"}
+    E -->|Ya| G["Decode & simpan<br/>gambar belakang"]
+    E -->|Tidak| F
+    G --> F
+    F -->|Ya| H{"Format base64<br/>kiri valid?"}
+    F -->|Tidak| I{"Desain kanan<br/>diisi?"}
+    H -->|Ya| J["Decode & simpan<br/>gambar kiri"]
+    H -->|Tidak| I
+    J --> I
+    I -->|Ya| K{"Format base64<br/>kanan valid?"}
+    I -->|Tidak| L{"Raw assets<br/>tersedia?"}
+    K -->|Ya| M["Decode & simpan<br/>gambar kanan"]
+    K -->|Tidak| L
+    M --> L
+    L -->|Ya| N{"Format base64<br/>raw asset valid?"}
+    L -->|Tidak| P["Simpan Desain &<br/>Cart ke database"]
+    N -->|Ya| O["Decode & simpan<br/>raw asset"]
+    N -->|Tidak| Q{"Masih ada<br/>raw asset?"}
+    O --> Q
+    Q -->|Ya| N
+    Q -->|Tidak| P
+    P --> R["Return response<br/>JSON sukses"]
+    R --> End(["Selesai"]):::startEnd
+    classDef startEnd fill:#1e3a5f,stroke:#3b82f6,color:#fff
+        </pre>
+    </div>
+    <p class="sub-caption">Gambar 4.1 Flowchart Penyimpanan Desain</p>
+
+    <!-- Flowgraph -->
+    <h3 class="sub-title blue fade-up">b. Flowgraph Penyimpanan Desain</h3>
+    <div class="diagram-container fade-up">
+        <pre class="mermaid">
+graph TD
+    N1((1)):::nodeStyle -->|a| N2((2)):::predNode
+    N2 -->|b| N3((3)):::nodeStyle
+    N2 -->|c| N4((4)):::predNode
+    N3 -->|d| N4
+    N4 -->|e| N5((5)):::predNode
+    N4 -->|f| N7((7)):::predNode
+    N5 -->|g| N6((6)):::nodeStyle
+    N5 -->|h| N7
+    N6 -->|i| N7
+    N7 -->|j| N8((8)):::predNode
+    N7 -->|k| N10((10)):::predNode
+    N8 -->|l| N9((9)):::nodeStyle
+    N8 -->|m| N10
+    N9 -->|n| N10
+    N10 -->|o| N11((11)):::predNode
+    N10 -->|p| N13((13)):::predNode
+    N11 -->|q| N12((12)):::nodeStyle
+    N11 -->|r| N13
+    N12 -->|s| N13
+    N13 -->|t| N14((14)):::predNode
+    N13 -->|u| N17((17)):::nodeStyle
+    N14 -->|v| N15((15)):::nodeStyle
+    N14 -->|w| N16((16)):::predNode
+    N15 -->|x| N16
+    N16 -->|y| N14
+    N16 -->|z| N17
+    N17 -->|aa| N18((18)):::nodeStyle
+    classDef nodeStyle fill:#1a1a3e,stroke:#3b82f6,color:#e2e8f0
+    classDef predNode fill:#1e3a5f,stroke:#06b6d4,color:#fff,stroke-width:2px
+        </pre>
+    </div>
+    <p class="sub-caption">Gambar 4.2 Flowgraph Penyimpanan Desain — Node biru terang = Predicate Node</p>
+
+    <!-- Keterangan Node -->
+    <div class="card fade-up" style="margin-top:1.5rem">
+        <div class="card-title"><div class="icon blue">📋</div> Keterangan Node</div>
+        <div class="table-wrap">
+            <table class="node-table">
+                <thead><tr><th>Node</th><th>Keterangan</th></tr></thead>
+                <tbody id="nodes-f1"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Cyclomatic Complexity -->
+    <h3 class="sub-title blue fade-up">c. Cyclomatic Complexity Penyimpanan Desain</h3>
+    <div class="formula-card fade-up">
+        <div class="formula-line">V(G) = Edge – Node + 2</div>
+        <div class="formula-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 27 – 18 + 2</div>
+        <div class="formula-line result">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <span class="formula-highlight blue">11</span></div>
+    </div>
+
+    <!-- Independent Path -->
+    <h3 class="sub-title blue fade-up">d. Independent Path Penyimpanan Desain</h3>
+    <div class="path-list fade-up" id="paths-f1"></div>
+
+    <!-- Graph Matrix -->
+    <h3 class="sub-title blue fade-up">e. Matrix Graph Penyimpanan Desain</h3>
+    <div class="card fade-up">
+        <div class="card-title"><div class="icon blue">🔢</div> Tabel 4.1 Matrix Graph Penyimpanan Desain</div>
+        <div class="table-wrap"><table class="matrix-table" id="matrix-f1"></table></div>
+    </div>
+    <div class="formula-card fade-up" style="margin-top:1rem">
+        <div class="formula-line" style="color:var(--text-muted);">Berdasarkan tabel diatas:</div>
+        <div class="formula-line">V(G) = Jumlah Predikat Node + 1</div>
+        <div class="formula-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 10 + 1</div>
+        <div class="formula-line result">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <span class="formula-highlight blue">11</span></div>
+    </div>
+
+    <!-- Test Case -->
+    <h3 class="sub-title blue fade-up">f. Tabel Test Case Penyimpanan Desain</h3>
+    <div class="card fade-up">
+        <div class="card-title"><div class="icon blue">🧪</div> Tabel 4.2 Test Case Penyimpanan Desain</div>
+        <div class="table-wrap"><table class="tc-table" id="tc-f1"></table></div>
+    </div>
+</div>
+</section>
+<div class="feature-divider"></div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--              FITUR 2: PROSES CHECKOUT                 -->
+<!-- ══════════════════════════════════════════════════════ -->
+<section class="section" id="feature2">
+<div class="section-inner">
+    <div class="section-header fade-up">
+        <span class="section-number purple">Fitur 2 — CheckoutController@store</span>
+        <h2 class="section-title">Proses Checkout dan Pembuatan Order</h2>
+        <p class="section-desc">Memproses keranjang belanja menjadi pesanan dengan validasi input, perhitungan harga dinamis berdasarkan desain, upload bukti pembayaran, dan pembuatan order secara atomik menggunakan database transaction.</p>
+    </div>
+
+    <!-- Flowchart -->
+    <h3 class="sub-title purple fade-up">a. Flowchart Proses Checkout</h3>
+    <div class="diagram-container fade-up">
+        <pre class="mermaid">
+flowchart TD
+    Start(["Mulai"]):::startEnd --> A["Ambil ID customer<br/>& cart_ids"]
+    A --> B{"cart_ids valid<br/>& berbentuk array?"}
+    B -->|Tidak| C["Redirect ke keranjang<br/>pesan error"]
+    B -->|Ya| D["Query data cart<br/>dari database"]
+    D --> E{"Cart kosong?"}
+    E -->|Ya| F["Redirect ke keranjang<br/>pesan error"]
+    E -->|Tidak| G{"Cart item memiliki<br/>desain custom?"}
+    G -->|Ya| H["hargaDesain =<br/>harga_desain"]
+    G -->|Tidak| I["hargaDesain = 0"]
+    H --> J["totalHarga +=<br/>(harga_dasar + hargaDesain)<br/>× quantity"]
+    I --> J
+    J --> K{"Masih ada<br/>cart item?"}
+    K -->|Ya| G
+    K -->|Tidak| L{"Ada file bukti<br/>pembayaran?"}
+    L -->|Ya| M["Upload & simpan<br/>bukti pembayaran"]
+    L -->|Tidak| N["Buat Order induk<br/>(DB Transaction)"]
+    M --> N
+    N --> O{"Cart item memiliki<br/>desain custom?"}
+    O -->|Ya| P["Buat OrderDetail<br/>status = pending"]
+    O -->|Tidak| Q["Buat OrderDetail<br/>status = disetujui"]
+    P --> R{"Masih ada<br/>cart item?"}
+    Q --> R
+    R -->|Ya| O
+    R -->|Tidak| S["Hapus cart items<br/>Redirect sukses"]
+    S --> End(["Selesai"]):::startEnd
+    C --> End
+    F --> End
+    classDef startEnd fill:#2d1b69,stroke:#8b5cf6,color:#fff
+        </pre>
+    </div>
+    <p class="sub-caption">Gambar 4.3 Flowchart Proses Checkout</p>
+
+    <!-- Flowgraph -->
+    <h3 class="sub-title purple fade-up">b. Flowgraph Proses Checkout</h3>
+    <div class="diagram-container fade-up">
+        <pre class="mermaid">
+graph TD
+    N1((1)):::nodeStyle2 -->|a| N2((2)):::predNode2
+    N2 -->|b| N3((3)):::nodeStyle2
+    N2 -->|c| N4((4)):::nodeStyle2
+    N3 -->|d| N19((19)):::nodeStyle2
+    N4 -->|e| N5((5)):::predNode2
+    N5 -->|f| N6((6)):::nodeStyle2
+    N5 -->|g| N7((7)):::predNode2
+    N6 -->|h| N19
+    N7 -->|i| N8((8)):::nodeStyle2
+    N7 -->|j| N9((9)):::nodeStyle2
+    N8 -->|k| N10((10)):::predNode2
+    N9 -->|l| N10
+    N10 -->|m| N7
+    N10 -->|n| N11((11)):::predNode2
+    N11 -->|o| N12((12)):::nodeStyle2
+    N11 -->|p| N13((13)):::nodeStyle2
+    N12 -->|q| N13
+    N13 -->|r| N14((14)):::predNode2
+    N14 -->|s| N15((15)):::nodeStyle2
+    N14 -->|t| N16((16)):::nodeStyle2
+    N15 -->|u| N17((17)):::predNode2
+    N16 -->|v| N17
+    N17 -->|w| N14
+    N17 -->|x| N18((18)):::nodeStyle2
+    N18 -->|y| N19
+    classDef nodeStyle2 fill:#1a1a3e,stroke:#8b5cf6,color:#e2e8f0
+    classDef predNode2 fill:#2d1b69,stroke:#a78bfa,color:#fff,stroke-width:2px
+        </pre>
+    </div>
+    <p class="sub-caption">Gambar 4.4 Flowgraph Proses Checkout — Node ungu terang = Predicate Node</p>
+
+    <!-- Keterangan Node -->
+    <div class="card fade-up" style="margin-top:1.5rem">
+        <div class="card-title"><div class="icon purple">📋</div> Keterangan Node</div>
+        <div class="table-wrap">
+            <table class="node-table">
+                <thead><tr><th>Node</th><th>Keterangan</th></tr></thead>
+                <tbody id="nodes-f2"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Cyclomatic Complexity -->
+    <h3 class="sub-title purple fade-up">c. Cyclomatic Complexity Proses Checkout</h3>
+    <div class="formula-card fade-up">
+        <div class="formula-line">V(G) = Edge – Node + 2</div>
+        <div class="formula-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 25 – 19 + 2</div>
+        <div class="formula-line result">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <span class="formula-highlight purple">8</span></div>
+    </div>
+
+    <!-- Independent Path -->
+    <h3 class="sub-title purple fade-up">d. Independent Path Proses Checkout</h3>
+    <div class="path-list fade-up" id="paths-f2"></div>
+
+    <!-- Graph Matrix -->
+    <h3 class="sub-title purple fade-up">e. Matrix Graph Proses Checkout</h3>
+    <div class="card fade-up">
+        <div class="card-title"><div class="icon purple">🔢</div> Tabel 4.3 Matrix Graph Proses Checkout</div>
+        <div class="table-wrap"><table class="matrix-table" id="matrix-f2"></table></div>
+    </div>
+    <div class="formula-card fade-up" style="margin-top:1rem">
+        <div class="formula-line" style="color:var(--text-muted);">Berdasarkan tabel diatas:</div>
+        <div class="formula-line">V(G) = Jumlah Predikat Node + 1</div>
+        <div class="formula-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 7 + 1</div>
+        <div class="formula-line result">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <span class="formula-highlight purple">8</span></div>
+    </div>
+
+    <!-- Test Case -->
+    <h3 class="sub-title purple fade-up">f. Tabel Test Case Proses Checkout</h3>
+    <div class="card fade-up">
+        <div class="card-title"><div class="icon purple">🧪</div> Tabel 4.4 Test Case Proses Checkout</div>
+        <div class="table-wrap"><table class="tc-table" id="tc-f2"></table></div>
+    </div>
+</div>
+</section>
+<div class="feature-divider"></div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--              FITUR 3: AUTENTIKASI LOGIN               -->
+<!-- ══════════════════════════════════════════════════════ -->
+<section class="section" id="feature3">
+<div class="section-inner">
+    <div class="section-header fade-up">
+        <span class="section-number green">Fitur 3 — LoginRequest@authenticate</span>
+        <h2 class="section-title">Autentikasi Login Multi-Guard</h2>
+        <p class="section-desc">Menangani proses login dengan pengecekan rate limiting dan autentikasi multi-guard (customer dan admin/owner). Sistem memiliki mekanisme keamanan berlapis untuk melindungi dari brute-force attack.</p>
+    </div>
+
+    <!-- Flowchart -->
+    <h3 class="sub-title green fade-up">a. Flowchart Login</h3>
+    <div class="diagram-container fade-up">
+        <pre class="mermaid">
+flowchart TD
+    Start(["Mulai"]):::startEnd3 --> A["Panggil<br/>ensureIsNotRateLimited()"]
+    A --> B{"Jumlah percobaan<br/>> 5 kali?"}
+    B -->|Ya| C["Event Lockout<br/>Throw exception throttle"]
+    B -->|Tidak| D{"Login sebagai<br/>customer berhasil?"}
+    D -->|Ya| E["Clear rate limiter<br/>Return — login customer"]
+    D -->|Tidak| F{"Login sebagai<br/>admin berhasil?"}
+    F -->|Ya| G["Clear rate limiter<br/>Return — login admin"]
+    F -->|Tidak| H["Hit rate limiter<br/>Throw exception failed"]
+    C --> End(["Selesai"]):::startEnd3
+    E --> End
+    G --> End
+    H --> End
+    classDef startEnd3 fill:#0d3320,stroke:#10b981,color:#fff
+        </pre>
+    </div>
+    <p class="sub-caption">Gambar 4.5 Flowchart Login</p>
+
+    <!-- Flowgraph -->
+    <h3 class="sub-title green fade-up">b. Flowgraph Login</h3>
+    <div class="diagram-container fade-up">
+        <pre class="mermaid">
+graph TD
+    N1((1)):::nodeStyle3 -->|a| N2((2)):::predNode3
+    N2 -->|b| N3((3)):::nodeStyle3
+    N2 -->|c| N4((4)):::predNode3
+    N3 -->|d| N9((9)):::nodeStyle3
+    N4 -->|e| N5((5)):::nodeStyle3
+    N4 -->|f| N6((6)):::predNode3
+    N5 -->|g| N9
+    N6 -->|h| N7((7)):::nodeStyle3
+    N6 -->|i| N8((8)):::nodeStyle3
+    N7 -->|j| N9
+    N8 -->|k| N9
+    classDef nodeStyle3 fill:#0d3320,stroke:#10b981,color:#e2e8f0
+    classDef predNode3 fill:#064e3b,stroke:#34d399,color:#fff,stroke-width:2px
+        </pre>
+    </div>
+    <p class="sub-caption">Gambar 4.6 Flowgraph Login — Node hijau terang = Predicate Node</p>
+
+    <!-- Keterangan Node -->
+    <div class="card fade-up" style="margin-top:1.5rem">
+        <div class="card-title"><div class="icon green">📋</div> Keterangan Node</div>
+        <div class="table-wrap">
+            <table class="node-table">
+                <thead><tr><th>Node</th><th>Keterangan</th></tr></thead>
+                <tbody id="nodes-f3"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Cyclomatic Complexity -->
+    <h3 class="sub-title green fade-up">c. Cyclomatic Complexity Login</h3>
+    <div class="formula-card fade-up">
+        <div class="formula-line">V(G) = Edge – Node + 2</div>
+        <div class="formula-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 11 – 9 + 2</div>
+        <div class="formula-line result">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <span class="formula-highlight green">4</span></div>
+    </div>
+
+    <!-- Independent Path -->
+    <h3 class="sub-title green fade-up">d. Independent Path Login</h3>
+    <div class="path-list fade-up" id="paths-f3"></div>
+
+    <!-- Graph Matrix -->
+    <h3 class="sub-title green fade-up">e. Matrix Graph Login</h3>
+    <div class="card fade-up">
+        <div class="card-title"><div class="icon green">🔢</div> Tabel 4.5 Matrix Graph Login</div>
+        <div class="table-wrap"><table class="matrix-table" id="matrix-f3"></table></div>
+    </div>
+    <div class="formula-card fade-up" style="margin-top:1rem">
+        <div class="formula-line" style="color:var(--text-muted);">Berdasarkan tabel diatas:</div>
+        <div class="formula-line">V(G) = Jumlah Predikat Node + 1</div>
+        <div class="formula-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 3 + 1</div>
+        <div class="formula-line result">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <span class="formula-highlight green">4</span></div>
+    </div>
+
+    <!-- Test Case -->
+    <h3 class="sub-title green fade-up">f. Tabel Test Case Login</h3>
+    <div class="card fade-up">
+        <div class="card-title"><div class="icon green">🧪</div> Tabel 4.6 Test Case Login</div>
+        <div class="table-wrap"><table class="tc-table" id="tc-f3"></table></div>
+    </div>
+</div>
+</section>
+<div class="feature-divider"></div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--                   PERBANDINGAN                        -->
+<!-- ══════════════════════════════════════════════════════ -->
+<section class="section" id="comparison">
+<div class="section-inner">
+    <div class="section-header fade-up">
+        <span class="section-number" style="color:var(--accent-amber)">Ringkasan & Kesimpulan</span>
+        <h2 class="section-title">Perbandingan Kompleksitas Antar Fitur</h2>
+        <p class="section-desc">Ringkasan hasil analisis Cyclomatic Complexity dari ketiga fitur yang diuji serta interpretasi tingkat risikonya.</p>
+    </div>
+
+    <div class="comparison-grid fade-up">
+        <!-- Card 1 -->
+        <div class="card compare-card">
+            <div class="card-title"><div class="icon blue">📐</div> Penyimpanan Desain Custom</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div style="font-size:2.5rem;font-weight:900;font-family:'JetBrains Mono',monospace;color:var(--accent-blue);">11</div>
+                <span class="risk-badge risk-medium">Risiko Sedang</span>
+            </div>
+            <div class="complexity-bar"><div class="complexity-fill" style="width:0%;background:linear-gradient(90deg,var(--accent-blue),var(--accent-cyan));" data-width="55"></div></div>
+            <div class="meta-row"><span class="meta-label">File</span><span class="meta-value">DesignController.php</span></div>
+            <div class="meta-row"><span class="meta-label">Method</span><span class="meta-value">store()</span></div>
+            <div class="meta-row"><span class="meta-label">Node / Edge / Predicate</span><span class="meta-value">18 / 27 / 10</span></div>
+            <div class="meta-row"><span class="meta-label">Jalur Independent</span><span class="meta-value">11 jalur</span></div>
+            <div class="meta-row"><span class="meta-label">Test Case</span><span class="meta-value">11 test case</span></div>
+        </div>
+        <!-- Card 2 -->
+        <div class="card compare-card">
+            <div class="card-title"><div class="icon purple">🛒</div> Proses Checkout</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div style="font-size:2.5rem;font-weight:900;font-family:'JetBrains Mono',monospace;color:var(--accent-purple);">8</div>
+                <span class="risk-badge risk-low">Risiko Rendah</span>
+            </div>
+            <div class="complexity-bar"><div class="complexity-fill" style="width:0%;background:linear-gradient(90deg,var(--accent-purple),var(--accent-violet));" data-width="40"></div></div>
+            <div class="meta-row"><span class="meta-label">File</span><span class="meta-value">CheckoutController.php</span></div>
+            <div class="meta-row"><span class="meta-label">Method</span><span class="meta-value">store()</span></div>
+            <div class="meta-row"><span class="meta-label">Node / Edge / Predicate</span><span class="meta-value">19 / 25 / 7</span></div>
+            <div class="meta-row"><span class="meta-label">Jalur Independent</span><span class="meta-value">8 jalur</span></div>
+            <div class="meta-row"><span class="meta-label">Test Case</span><span class="meta-value">8 test case</span></div>
+        </div>
+        <!-- Card 3 -->
+        <div class="card compare-card">
+            <div class="card-title"><div class="icon green">🔐</div> Autentikasi Login</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div style="font-size:2.5rem;font-weight:900;font-family:'JetBrains Mono',monospace;color:var(--accent-green);">4</div>
+                <span class="risk-badge risk-low">Risiko Rendah</span>
+            </div>
+            <div class="complexity-bar"><div class="complexity-fill" style="width:0%;background:linear-gradient(90deg,var(--accent-green),var(--accent-emerald));" data-width="20"></div></div>
+            <div class="meta-row"><span class="meta-label">File</span><span class="meta-value">LoginRequest.php</span></div>
+            <div class="meta-row"><span class="meta-label">Method</span><span class="meta-value">authenticate()</span></div>
+            <div class="meta-row"><span class="meta-label">Node / Edge / Predicate</span><span class="meta-value">9 / 11 / 3</span></div>
+            <div class="meta-row"><span class="meta-label">Jalur Independent</span><span class="meta-value">4 jalur</span></div>
+            <div class="meta-row"><span class="meta-label">Test Case</span><span class="meta-value">4 test case</span></div>
+        </div>
+    </div>
+
+    <!-- Summary Table -->
+    <div class="card fade-up" style="margin-top:2.5rem">
+        <div class="card-title"><div class="icon amber">📊</div> Tabel 4.7 Ringkasan Hasil Analisis</div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>No</th><th>Fitur</th><th>File</th><th>Method</th><th>N</th><th>E</th><th>P</th><th>V(G)</th><th>Jalur</th><th>Test Case</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>1</td><td>Penyimpanan Desain Custom</td><td style="font-family:'JetBrains Mono',monospace;font-size:0.75rem">DesignController.php</td><td style="font-family:'JetBrains Mono',monospace">store()</td><td>18</td><td>27</td><td>10</td><td style="color:var(--accent-blue);font-weight:700">11</td><td>11</td><td>11</td></tr>
+                    <tr><td>2</td><td>Proses Checkout</td><td style="font-family:'JetBrains Mono',monospace;font-size:0.75rem">CheckoutController.php</td><td style="font-family:'JetBrains Mono',monospace">store()</td><td>19</td><td>25</td><td>7</td><td style="color:var(--accent-purple);font-weight:700">8</td><td>8</td><td>8</td></tr>
+                    <tr><td>3</td><td>Autentikasi Login</td><td style="font-family:'JetBrains Mono',monospace;font-size:0.75rem">LoginRequest.php</td><td style="font-family:'JetBrains Mono',monospace">authenticate()</td><td>9</td><td>11</td><td>3</td><td style="color:var(--accent-green);font-weight:700">4</td><td>4</td><td>4</td></tr>
+                    <tr style="background:rgba(255,255,255,0.03);font-weight:700"><td></td><td colspan="6" style="text-align:right;color:var(--text-primary)">Total</td><td style="color:var(--accent-amber)">23</td><td style="color:var(--accent-amber)">23</td><td style="color:var(--accent-amber)">23</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Interpretation -->
+    <div class="card fade-up" style="margin-top:1.5rem">
+        <div class="card-title"><div class="icon rose">📈</div> Interpretasi Tingkat Risiko (McCabe)</div>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Nilai V(G)</th><th>Tingkat Risiko</th><th>Keterangan</th><th>Fitur pada Sistem</th></tr></thead>
+                <tbody>
+                    <tr><td>1–10</td><td><span class="risk-badge risk-low">Rendah</span></td><td>Sederhana, mudah diuji & dipelihara</td><td>Checkout (8), Login (4)</td></tr>
+                    <tr><td>11–20</td><td><span class="risk-badge risk-medium">Sedang</span></td><td>Kompleks moderat, perlu perhatian khusus</td><td>Penyimpanan Desain (11)</td></tr>
+                    <tr><td>21–50</td><td><span class="risk-badge" style="background:rgba(244,63,94,0.12);color:var(--accent-rose);">Tinggi</span></td><td>Sangat kompleks, sulit diuji</td><td>—</td></tr>
+                    <tr><td>&gt; 50</td><td><span class="risk-badge" style="background:rgba(244,63,94,0.2);color:#ff6b8a;">Sangat Tinggi</span></td><td>Tidak terstruktur, perlu refactoring</td><td>—</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Conclusion -->
+    <div class="card fade-up" style="margin-top:1.5rem">
+        <div class="card-title"><div class="icon green">✅</div> Kesimpulan</div>
+        <div style="color:var(--text-secondary);font-size:0.9rem;line-height:1.8">
+            <p>Berdasarkan hasil analisis White Box Testing menggunakan metode Cyclomatic Complexity terhadap tiga fitur utama sistem, diperoleh kesimpulan sebagai berikut:</p>
+            <ul style="margin:1rem 0 1rem 1.5rem;">
+                <li>Seluruh fitur yang diuji memiliki nilai V(G) dalam rentang <strong>4 hingga 11</strong>, yang berarti berada pada kategori <strong>risiko rendah sampai sedang</strong> menurut skala McCabe.</li>
+                <li>Fitur dengan kompleksitas tertinggi adalah <strong>Penyimpanan Desain Custom</strong> (V(G) = 11) karena mengandung banyak percabangan nested untuk memproses gambar multi-sisi.</li>
+                <li>Perhitungan menggunakan dua rumus <strong>V(G) = E − N + 2</strong> dan <strong>V(G) = P + 1</strong> menghasilkan nilai yang <strong>identik</strong> pada setiap fitur, membuktikan konsistensi analisis.</li>
+                <li>Total <strong>23 test case</strong> telah disusun berdasarkan seluruh independent path yang teridentifikasi, memastikan setiap jalur eksekusi program telah tercakup dalam pengujian.</li>
+                <li>Seluruh flowchart, flowgraph, graph matrix, dan test case <strong>konsisten</strong> satu sama lain serta sesuai dengan implementasi source code yang sebenarnya.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+</section>
+
+<footer>
+    <p>White Box Testing Analysis — Cyclomatic Complexity (McCabe Method)</p>
+    <p style="margin-top:0.3rem">Sistem Pemesanan Sablon Custom • Dibuat: 12 Juni 2026</p>
+</footer>
+
+<button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Scroll to top">↑</button>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--                     JAVASCRIPT                        -->
+<!-- ══════════════════════════════════════════════════════ -->
+<script>
+// ── MERMAID INIT ────────────────────────────────────────
+mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    securityLevel: 'loose',
+    fontFamily: 'Inter, sans-serif',
+    flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis', padding: 15 },
+    themeVariables: {
+        darkMode: true,
+        background: '#0a0e1a',
+        primaryColor: '#1e3a5f',
+        primaryTextColor: '#e2e8f0',
+        primaryBorderColor: '#3b82f6',
+        lineColor: '#475569',
+        secondaryColor: '#1e293b',
+        tertiaryColor: '#0f172a',
+        fontSize: '13px'
+    }
+});
+
+// ── DATA ────────────────────────────────────────────────
+
+const DATA = {
+    f1: {
+        color: 'blue', totalNodes: 18,
+        nodes: [
+            [1, 'Start — Validasi request'],
+            [2, 'Keputusan: Format base64 desain depan valid? (preg_match)'],
+            [3, 'Decode & simpan gambar depan ke storage'],
+            [4, 'Keputusan: Field desain belakang diisi? ($request→filled)'],
+            [5, 'Keputusan: Format base64 belakang valid? (preg_match)'],
+            [6, 'Decode & simpan gambar belakang ke storage'],
+            [7, 'Keputusan: Field desain kiri diisi? ($request→filled)'],
+            [8, 'Keputusan: Format base64 kiri valid? (preg_match)'],
+            [9, 'Decode & simpan gambar kiri ke storage'],
+            [10, 'Keputusan: Field desain kanan diisi? ($request→filled)'],
+            [11, 'Keputusan: Format base64 kanan valid? (preg_match)'],
+            [12, 'Decode & simpan gambar kanan ke storage'],
+            [13, 'Keputusan: Raw assets tersedia & berbentuk array?'],
+            [14, 'Keputusan: Format base64 raw asset valid? (preg_match) — dalam loop'],
+            [15, 'Decode & simpan raw asset ke storage'],
+            [16, 'Keputusan: Masih ada raw asset? (loop)'],
+            [17, 'Simpan record Desain & Cart ke database'],
+            [18, 'Return response JSON — End'],
+        ],
+        matrix: {
+            1:{2:'a'}, 2:{3:'b',4:'c'}, 3:{4:'d'}, 4:{5:'e',7:'f'}, 5:{6:'g',7:'h'},
+            6:{7:'i'}, 7:{8:'j',10:'k'}, 8:{9:'l',10:'m'}, 9:{10:'n'}, 10:{11:'o',13:'p'},
+            11:{12:'q',13:'r'}, 12:{13:'s'}, 13:{14:'t',17:'u'}, 14:{15:'v',16:'w'},
+            15:{16:'x'}, 16:{14:'y',17:'z'}, 17:{18:'aa'}, 18:{}
+        },
+        paths: [
+            '1–2–3–4–5–6–7–8–9–10–11–12–13–14–15–16–17–18',
+            '1–2–4–5–6–7–8–9–10–11–12–13–14–15–16–17–18',
+            '1–2–3–4–7–8–9–10–11–12–13–14–15–16–17–18',
+            '1–2–3–4–5–7–8–9–10–11–12–13–14–15–16–17–18',
+            '1–2–3–4–5–6–7–10–11–12–13–14–15–16–17–18',
+            '1–2–3–4–5–6–7–8–10–11–12–13–14–15–16–17–18',
+            '1–2–3–4–5–6–7–8–9–10–13–14–15–16–17–18',
+            '1–2–3–4–5–6–7–8–9–10–11–13–14–15–16–17–18',
+            '1–2–3–4–5–6–7–8–9–10–11–12–13–17–18',
+            '1–2–3–4–5–6–7–8–9–10–11–12–13–14–16–17–18',
+            '1–2–3–4–5–6–7–8–9–10–11–12–13–14–15–16–14–15–16–17–18',
+        ],
+        testCases: [
+            ['Jalur 1','Simpan desain lengkap semua sisi beserta raw assets','file_desain = base64 valid, belakang/kiri/kanan = base64 valid, raw_assets = [base64 valid]','Semua gambar tersimpan, record Desain & Cart dibuat, response JSON success: true'],
+            ['Jalur 2','Simpan desain dengan format base64 depan tidak valid','file_desain = string bukan base64','Proses decode depan di-skip, alur lanjut ke pengecekan sisi lain'],
+            ['Jalur 3','Simpan desain tanpa mengisi desain belakang','file_desain = base64 valid, file_desain_belakang = kosong','Gambar depan tersimpan, proses belakang di-skip, lanjut ke pengecekan kiri'],
+            ['Jalur 4','Desain belakang diisi tapi format base64 tidak valid','file_desain = base64 valid, file_desain_belakang = string non-base64','Gambar depan tersimpan, gambar belakang di-skip karena preg_match gagal'],
+            ['Jalur 5','Simpan desain tanpa mengisi desain kiri','Depan & belakang = base64 valid, file_desain_kiri = kosong','Gambar depan & belakang tersimpan, proses kiri di-skip'],
+            ['Jalur 6','Desain kiri diisi tapi format base64 tidak valid','Semua sisi diisi, file_desain_kiri = string non-base64','Gambar depan & belakang tersimpan, gambar kiri di-skip'],
+            ['Jalur 7','Simpan desain tanpa mengisi desain kanan','Depan, belakang, kiri = base64 valid, file_desain_kanan = kosong','Gambar depan, belakang, kiri tersimpan, proses kanan di-skip'],
+            ['Jalur 8','Desain kanan diisi tapi format base64 tidak valid','Semua sisi diisi, file_desain_kanan = string non-base64','Gambar depan, belakang, kiri tersimpan, gambar kanan di-skip'],
+            ['Jalur 9','Simpan desain tanpa raw assets','Semua sisi = base64 valid, raw_assets = tidak dikirim','Semua gambar sisi tersimpan, raw assets di-skip, record dibuat'],
+            ['Jalur 10','Raw assets ada tapi format base64 tidak valid','Semua sisi valid, raw_assets = [string non-base64]','Semua gambar sisi tersimpan, raw asset di-skip, record dibuat'],
+            ['Jalur 11','Raw assets ada dengan lebih dari 1 item valid (loop)','Semua sisi valid, raw_assets = [base64 valid, base64 valid]','Semua gambar + 2 raw asset tersimpan, record dibuat dengan array path'],
+        ]
+    },
+    f2: {
+        color: 'purple', totalNodes: 19,
+        nodes: [
+            [1, 'Start — Ambil ID customer & cart_ids'],
+            [2, 'Keputusan: cart_ids valid & berbentuk array?'],
+            [3, 'Redirect error — cart_ids tidak valid'],
+            [4, 'Query data cart dari database'],
+            [5, 'Keputusan: Cart kosong?'],
+            [6, 'Redirect error — keranjang kosong'],
+            [7, 'Keputusan: Cart item memiliki desain? (loop hitung harga)'],
+            [8, 'hargaDesain = harga_desain'],
+            [9, 'hargaDesain = 0'],
+            [10, 'Akumulasi totalHarga, Keputusan: Masih ada item? (loop)'],
+            [11, 'Keputusan: Ada file bukti pembayaran?'],
+            [12, 'Upload & simpan bukti pembayaran'],
+            [13, 'Buat Order induk (DB Transaction)'],
+            [14, 'Keputusan: Cart item memiliki desain? (loop order detail)'],
+            [15, 'Buat OrderDetail — status_desain = \'pending\''],
+            [16, 'Buat OrderDetail — status_desain = \'disetujui\''],
+            [17, 'Keputusan: Masih ada cart item? (loop detail)'],
+            [18, 'Hapus cart items, redirect sukses'],
+            [19, 'End'],
+        ],
+        matrix: {
+            1:{2:'a'}, 2:{3:'b',4:'c'}, 3:{19:'d'}, 4:{5:'e'}, 5:{6:'f',7:'g'},
+            6:{19:'h'}, 7:{8:'i',9:'j'}, 8:{10:'k'}, 9:{10:'l'}, 10:{7:'m',11:'n'},
+            11:{12:'o',13:'p'}, 12:{13:'q'}, 13:{14:'r'}, 14:{15:'s',16:'t'},
+            15:{17:'u'}, 16:{17:'v'}, 17:{14:'w',18:'x'}, 18:{19:'y'}, 19:{}
+        },
+        paths: [
+            '1–2–4–5–7–8–10–11–12–13–14–15–17–18–19',
+            '1–2–3–19',
+            '1–2–4–5–6–19',
+            '1–2–4–5–7–9–10–11–12–13–14–15–17–18–19',
+            '1–2–4–5–7–8–10–7–8–10–11–12–13–14–15–17–18–19',
+            '1–2–4–5–7–8–10–11–13–14–15–17–18–19',
+            '1–2–4–5–7–8–10–11–12–13–14–16–17–18–19',
+            '1–2–4–5–7–8–10–11–12–13–14–15–17–14–15–17–18–19',
+        ],
+        testCases: [
+            ['Jalur 1','Checkout 1 produk dengan desain custom dan bukti pembayaran','cart_ids = [1] (id_desain ≠ null), bukti_pembayaran = file JPG valid','Order dibuat, harga_desain dihitung, status_desain = pending, bukti tersimpan, cart dihapus'],
+            ['Jalur 2','Checkout tanpa memilih item apapun','cart_ids = null atau bukan array','Redirect ke halaman keranjang dengan pesan error "Silakan pilih minimal 1 item"'],
+            ['Jalur 3','Checkout dengan cart_ids tidak ditemukan di database','cart_ids = [999] (ID tidak ada)','Query cart kosong, redirect error "Keranjang Anda kosong"'],
+            ['Jalur 4','Checkout 1 produk jadi (tanpa desain custom)','cart_ids = [1] (id_desain = null), bukti = file valid','Order dibuat, harga_desain = 0, status_desain = disetujui'],
+            ['Jalur 5','Checkout 2 produk (menguji loop perhitungan harga)','cart_ids = [1, 2] (keduanya desain+), bukti = file valid','Total harga akumulasi 2 item, 2 OrderDetail dibuat, cart dihapus'],
+            ['Jalur 6','Checkout tanpa mengunggah bukti pembayaran','cart_ids = [1] (desain+), bukti_pembayaran = tidak ada','Order dibuat dengan bukti_pembayaran = null'],
+            ['Jalur 7','Checkout produk tanpa desain (status otomatis disetujui)','cart_ids = [1] (desain null), bukti = file valid','OrderDetail dibuat, status_desain = disetujui, harga_desain = 0'],
+            ['Jalur 8','Checkout 2 produk (menguji loop pembuatan order detail)','cart_ids = [1, 2] (desain+), bukti = file valid','2 OrderDetail dibuat, keduanya status pending, loop detail 2 kali'],
+        ]
+    },
+    f3: {
+        color: 'green', totalNodes: 9,
+        nodes: [
+            [1, 'Start — Panggil ensureIsNotRateLimited()'],
+            [2, 'Keputusan: Jumlah percobaan melebihi batas (5 kali)?'],
+            [3, 'Event Lockout, throw ValidationException (throttle)'],
+            [4, 'Keputusan: Auth::guard(\'customer\')→attempt() berhasil?'],
+            [5, 'Clear rate limiter, return — login sebagai customer'],
+            [6, 'Keputusan: Auth::guard(\'admin\')→attempt() berhasil?'],
+            [7, 'Clear rate limiter, return — login sebagai admin/owner'],
+            [8, 'Hit rate limiter, throw ValidationException (auth.failed)'],
+            [9, 'End'],
+        ],
+        matrix: {
+            1:{2:'a'}, 2:{3:'b',4:'c'}, 3:{9:'d'}, 4:{5:'e',6:'f'},
+            5:{9:'g'}, 6:{7:'h',8:'i'}, 7:{9:'j'}, 8:{9:'k'}, 9:{}
+        },
+        paths: [
+            '1–2–3–9',
+            '1–2–4–5–9',
+            '1–2–4–6–7–9',
+            '1–2–4–6–8–9',
+        ],
+        testCases: [
+            ['Jalur 1','Login saat akun terkunci (rate limited)','Email: test@mail.com, Password: sembarang, percobaan ke-6+','Event Lockout, pesan "Too many login attempts. Please try again in X seconds."'],
+            ['Jalur 2','Login berhasil sebagai customer','Email: customer@mail.com (terdaftar), Password: benar, percobaan < 5','Guard customer berhasil, rate limiter clear, redirect dashboard customer'],
+            ['Jalur 3','Login berhasil sebagai admin/owner','Email: admin@dailyco.com (terdaftar), Password: benar, percobaan < 5','Guard customer gagal, guard admin berhasil, redirect dashboard admin'],
+            ['Jalur 4','Login gagal — email atau password salah','Email: salah@mail.com, Password: salah, percobaan < 5','Kedua guard gagal, rate limiter hit, pesan "credentials do not match"'],
+        ]
+    }
+};
+
+// ── RENDER FUNCTIONS ────────────────────────────────────
+
+function renderNodeTable(containerId, data) {
+    const tbody = document.getElementById(containerId);
+    tbody.innerHTML = data.nodes.map(([n, desc]) =>
+        `<tr><td>${n}</td><td style="white-space:normal">${desc}</td></tr>`
+    ).join('');
+}
+
+function renderMatrix(tableId, data) {
+    const table = document.getElementById(tableId);
+    const n = data.totalNodes;
+    const matrix = data.matrix;
+    const color = data.color;
+
+    // Header
+    let html = '<thead><tr><th class="node-col">Node</th>';
+    for (let i = 1; i <= n; i++) html += `<th>${i}</th>`;
+    html += '<th style="min-width:110px">Σ Koneksi (−1)</th></tr></thead><tbody>';
+
+    let totalPred = 0;
+    for (let row = 1; row <= n; row++) {
+        const conns = matrix[row] || {};
+        const count = Object.keys(conns).length;
+        const minus1 = count > 0 ? count - 1 : 0;
+        if (count > 1) totalPred += minus1;
+
+        html += `<tr><td class="node-col">${row}</td>`;
+        for (let col = 1; col <= n; col++) {
+            html += conns[col]
+                ? `<td class="edge-label">${conns[col]}</td>`
+                : '<td></td>';
+        }
+        html += `<td class="sum-col">${count > 0 ? count + '−1=' + minus1 : '—'}</td></tr>`;
+    }
+
+    // Summary rows
+    html += `<tr class="summary-row"><td class="node-col" colspan="${n + 1}" style="text-align:right;font-size:0.78rem">Jumlah Predikat Node</td><td class="sum-col" style="font-weight:900;color:var(--accent-${color})">${totalPred}</td></tr>`;
+    html += `<tr class="summary-row"><td class="node-col" colspan="${n + 1}" style="text-align:right;font-size:0.78rem">Cyclomatic Complexity</td><td class="sum-col" style="font-weight:900;color:var(--accent-${color})">${totalPred}+1=${totalPred + 1}</td></tr>`;
+
+    html += '</tbody>';
+    table.innerHTML = html;
+}
+
+function renderPaths(containerId, data) {
+    const el = document.getElementById(containerId);
+    el.innerHTML = data.paths.map((p, i) =>
+        `<div class="path-item">
+            <span class="path-badge ${data.color}">Jalur ${i + 1}</span>
+            <span class="path-nodes">${p}</span>
+        </div>`
+    ).join('');
+}
+
+function renderTestCases(tableId, data) {
+    const table = document.getElementById(tableId);
+    let html = '<thead><tr><th>No</th><th>Jalur</th><th>Prosedur Pengujian</th><th>Input</th><th>Output yang Diharapkan</th><th>Hasil</th></tr></thead><tbody>';
+    data.testCases.forEach((tc, i) => {
+        html += `<tr>
+            <td>${i + 1}</td>
+            <td>${tc[0]}</td>
+            <td>${tc[1]}</td>
+            <td style="font-size:0.75rem">${tc[2]}</td>
+            <td style="font-size:0.75rem">${tc[3]}</td>
+            <td><span class="status">Sesuai</span></td>
+        </tr>`;
+    });
+    html += '</tbody>';
+    table.innerHTML = html;
+}
+
+// ── RENDER ALL ──────────────────────────────────────────
+['f1','f2','f3'].forEach(key => {
+    renderNodeTable('nodes-' + key, DATA[key]);
+    renderMatrix('matrix-' + key, DATA[key]);
+    renderPaths('paths-' + key, DATA[key]);
+    renderTestCases('tc-' + key, DATA[key]);
+});
+
+// ── SCROLL EFFECTS ──────────────────────────────────────
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+// Scroll progress
+window.addEventListener('scroll', () => {
+    const h = document.documentElement;
+    const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+    document.getElementById('scroll-progress').style.width = pct + '%';
+
+    // Nav style
+    document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 50);
+
+    // Scroll-to-top button
+    document.getElementById('scroll-top').classList.toggle('visible', window.scrollY > 600);
+});
+
+// Active nav link
+const sections = document.querySelectorAll('section[id], header[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+const sectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const id = entry.target.id || entry.target.querySelector('[id]')?.id;
+            navLinks.forEach(a => {
+                a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+            });
+        }
+    });
+}, { threshold: 0.2 });
+sections.forEach(s => sectionObserver.observe(s));
+
+// Animate stat counters
+const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const el = entry.target;
+            const target = parseInt(el.dataset.target);
+            let current = 0;
+            const step = Math.max(1, Math.floor(target / 30));
+            const timer = setInterval(() => {
+                current += step;
+                if (current >= target) { current = target; clearInterval(timer); }
+                el.textContent = current;
+            }, 40);
+            counterObserver.unobserve(el);
+        }
+    });
+}, { threshold: 0.5 });
+document.querySelectorAll('.stat-value[data-target]').forEach(el => counterObserver.observe(el));
+
+// Animate complexity bars
+const barObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const fill = entry.target.querySelector('.complexity-fill');
+            if (fill) {
+                setTimeout(() => { fill.style.width = fill.dataset.width + '%'; }, 300);
+            }
+            barObserver.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.3 });
+document.querySelectorAll('.compare-card').forEach(el => barObserver.observe(el));
+
+// Close mobile menu on link click
+document.querySelectorAll('.nav-links a').forEach(a => {
+    a.addEventListener('click', () => {
+        document.querySelector('.nav-links').classList.remove('open');
+    });
+});
+</script>
+</body>
+</html>

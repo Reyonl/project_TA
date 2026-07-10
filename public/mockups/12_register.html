@@ -34,6 +34,15 @@
                 <div class="absolute -bottom-3 -left-3 w-6 h-6 bg-gray-200 wf-border rotate-45"></div>
                 
                 <div class="flex flex-col items-center mb-6">
+                    <div class="relative border-2 border-black bg-white mb-4" style="width: 120px; height: 60px;">
+                        <svg class="absolute inset-0 w-full h-full text-gray-300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                            <line x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="1" />
+                            <line x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="1" />
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center font-bold text-base z-10">
+                            <span class="bg-white px-1">Logo</span>
+                        </div>
+                    </div>
                     <h2 class="text-2xl font-bold uppercase tracking-wider text-center">Buat Akun Baru</h2>
                     <p class="text-gray-500 text-sm mt-2 text-center">Lengkapi data diri Anda untuk mendaftar sebagai Pelanggan.</p>
                 </div>
@@ -41,32 +50,32 @@
                 <div class="flex flex-col gap-4">
                     <div>
                         <label class="block font-bold mb-1">Nama Lengkap</label>
-                        <input type="text" class="wf-input" placeholder="Budi Santoso">
+                        <input type="text" class="wf-input" placeholder="masukan nama lengkap">
                     </div>
 
                     <div>
                         <label class="block font-bold mb-1">Email</label>
-                        <input type="email" class="wf-input" placeholder="contoh@email.com">
+                        <input type="email" class="wf-input" placeholder="masukan email">
                     </div>
 
                     <div>
                         <label class="block font-bold mb-1">Nomor Telepon / WhatsApp</label>
-                        <input type="text" class="wf-input" placeholder="08123456789">
+                        <input type="text" class="wf-input" placeholder="masukan nomor telepon / WhatsApp">
                     </div>
                     
                     <div>
                         <label class="block font-bold mb-1">Alamat Lengkap</label>
-                        <textarea class="wf-input" rows="3" placeholder="Jl. Contoh Alamat No. 123..."></textarea>
+                        <textarea class="wf-input" rows="3" placeholder="masukan alamat lengkap"></textarea>
                     </div>
                     
                     <div>
                         <label class="block font-bold mb-1">Password</label>
-                        <input type="password" class="wf-input" placeholder="********">
+                        <input type="password" class="wf-input" placeholder="masukan password">
                     </div>
                     
                     <div>
                         <label class="block font-bold mb-1">Konfirmasi Password</label>
-                        <input type="password" class="wf-input" placeholder="********">
+                        <input type="password" class="wf-input" placeholder="masukan konfirmasi password">
                     </div>
 
                     <button class="wf-btn mt-6 text-lg" style="background-color: #000; color: #fff;">Daftar Akun</button>
