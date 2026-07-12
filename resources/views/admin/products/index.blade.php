@@ -34,6 +34,7 @@
                                     <th class="p-4 font-bold rounded-tl-lg">Info Produk</th>
                                     <th class="p-4 font-bold">Kategori</th>
                                     <th class="p-4 font-bold">Tipe Produk</th>
+                                    <th class="p-4 font-bold">Ukuran</th>
                                     <th class="p-4 font-bold">Harga Dasar</th>
                                     <th class="p-4 font-bold text-right rounded-tr-lg">Aksi</th>
                                 </tr>
@@ -71,6 +72,21 @@
                                                 <span class="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-md uppercase border border-indigo-200">Kustom</span>
                                             @endif
                                         </td>
+                                        <td class="p-4">
+                                            @php
+                                                $sizes = $produk->ukuran_tersedia;
+                                                if (is_string($sizes)) $sizes = json_decode($sizes, true);
+                                            @endphp
+                                            @if(!empty($sizes))
+                                                <div class="flex flex-wrap gap-1">
+                                                    @foreach($sizes as $s)
+                                                        <span class="px-1.5 py-0.5 bg-amber-50 text-amber-700 text-[10px] font-bold rounded border border-amber-200">{{ $s }}</span>
+                                                    @endforeach
+                                                </div>
+                                            @else
+                                                <span class="text-xs text-slate-400 italic">Belum diatur</span>
+                                            @endif
+                                        </td>
                                         <td class="p-4 font-bold text-slate-700">
                                             Rp {{ number_format($produk->harga_dasar, 0, ',', '.') }}
                                         </td>
@@ -91,7 +107,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5" class="p-8 text-center text-slate-500 font-medium border-t border-slate-100">
+                                        <td colspan="6" class="p-8 text-center text-slate-500 font-medium border-t border-slate-100">
                                             Belum ada produk yang ditambahkan.
                                         </td>
                                     </tr>

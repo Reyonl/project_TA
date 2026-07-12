@@ -292,7 +292,12 @@
                             <a href="#" class="text-xs text-indigo-600 font-semibold hover:underline border-b border-indigo-200">Size guide</a>
                         </div>
                         <div class="flex flex-wrap gap-2">
-                            @foreach(['XS','S','M','L','XL','2XL','3XL','4XL'] as $size)
+                            @php
+                                $availableSizes = $produk->ukuran_tersedia;
+                                if (is_string($availableSizes)) $availableSizes = json_decode($availableSizes, true);
+                                if (empty($availableSizes)) $availableSizes = ['XS','S','M','L','XL','2XL','3XL','4XL'];
+                            @endphp
+                            @foreach($availableSizes as $size)
                                 <button x-on:click="selectedSize = '{{ $size }}'"
                                         x-bind:class="{ 'border-slate-900 text-slate-900 font-bold bg-slate-50': selectedSize === '{{ $size }}', 'border-slate-200 text-slate-600 bg-white hover:border-slate-400': selectedSize !== '{{ $size }}' }"
                                         class="w-10 h-10 sm:w-11 sm:h-11 rounded border flex items-center justify-center text-sm transition">

@@ -53,11 +53,12 @@
                         </div>
 
                         <div>
-                            <label for="tipe_produk" class="block text-sm font-bold text-slate-700 mb-1">Tipe Penjualan <span class="text-red-500">*</span></label>
-                            <select name="tipe_produk" id="tipe_produk" class="w-full rounded-xl border-slate-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm transition">
-                                <option value="kustom" {{ (old('tipe_produk', $product->tipe_produk) == 'kustom') ? 'selected' : '' }}>Produk Kustom (Pelanggan Buat Desain)</option>
-                                <option value="jadi" {{ (old('tipe_produk', $product->tipe_produk) == 'jadi') ? 'selected' : '' }}>Produk Jadi (Beli Langsung)</option>
-                            </select>
+                            <label class="block text-sm font-bold text-slate-700 mb-1">Tipe Penjualan</label>
+                            <input type="hidden" name="tipe_produk" value="jadi">
+                            <div class="w-full rounded-xl border border-emerald-200 bg-emerald-50 shadow-sm px-4 py-2.5 flex items-center gap-2">
+                                <div class="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs font-bold">✓</div>
+                                <span class="text-sm font-bold text-emerald-700">Produk Jadi (Beli Langsung)</span>
+                            </div>
                         </div>
                     </div>
 
@@ -74,6 +75,34 @@
                     <div>
                         <label for="deskripsi" class="block text-sm font-bold text-slate-700 mb-1">Deskripsi Produk</label>
                         <textarea name="deskripsi" id="deskripsi" rows="3" class="w-full rounded-xl border-slate-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm transition">{{ old('deskripsi', $product->deskripsi) }}</textarea>
+                    </div>
+
+                    {{-- Ukuran Baju --}}
+                    <div class="bg-amber-50/50 p-5 rounded-xl border border-amber-200">
+                        <label class="block text-sm font-bold text-slate-800 mb-1">Ukuran Baju Tersedia <span class="text-red-500">*</span></label>
+                        <p class="text-xs text-slate-500 font-medium mb-4">Centang ukuran yang tersedia untuk produk ini.</p>
+                        @error('ukuran_tersedia')<p class="text-red-500 text-xs mb-2">{{ $message }}</p>@enderror
+                        @php
+                            $savedSizes = old('ukuran_tersedia', $product->ukuran_tersedia ?? []);
+                            if (is_string($savedSizes)) $savedSizes = json_decode($savedSizes, true) ?? [];
+                        @endphp
+                        <div class="grid grid-cols-4 sm:grid-cols-8 gap-2">
+                            @foreach(['XS','S','M','L','XL','2XL','3XL','4XL'] as $size)
+                                <label class="relative cursor-pointer group">
+                                    <input type="checkbox" name="ukuran_tersedia[]" value="{{ $size }}" 
+                                           class="peer sr-only"
+                                           {{ is_array($savedSizes) && in_array($size, $savedSizes) ? 'checked' : '' }}>
+                                    <div class="flex items-center justify-center h-11 rounded-xl border-2 border-slate-200 bg-white text-slate-600 text-sm font-bold transition-all
+                                                peer-checked:border-indigo-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 peer-checked:ring-2 peer-checked:ring-indigo-200
+                                                group-hover:border-indigo-300 group-hover:shadow-sm">
+                                        {{ $size }}
+                                    </div>
+                                    <div class="absolute -top-1 -right-1 w-4 h-4 bg-indigo-500 rounded-full items-center justify-center text-white text-[10px] hidden peer-checked:flex shadow">
+                                        ✓
+                                    </div>
+                                </label>
+                            @endforeach
+                        </div>
                     </div>
 
                     <div class="bg-indigo-50/50 p-5 rounded-xl border border-indigo-100 border-dashed">

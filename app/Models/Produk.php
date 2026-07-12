@@ -16,6 +16,11 @@ class Produk extends Model
         'deskripsi',
         'tipe_produk',
         'gambar_produk',
+        'ukuran_tersedia',
+    ];
+
+    protected $casts = [
+        'ukuran_tersedia' => 'array',
     ];
 
     public function orderDetails()

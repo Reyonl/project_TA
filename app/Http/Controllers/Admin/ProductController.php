@@ -28,10 +28,13 @@ class ProductController extends Controller
             'tipe_produk' => 'required|in:kustom,jadi',
             'harga_dasar' => 'required|numeric|min:0',
             'deskripsi' => 'nullable|string',
-            'gambar_produk' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            'gambar_produk' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'ukuran_tersedia' => 'nullable|array',
+            'ukuran_tersedia.*' => 'string|in:XS,S,M,L,XL,2XL,3XL,4XL'
         ]);
 
-        $data = $request->except('gambar_produk');
+        $data = $request->except(['gambar_produk', 'ukuran_tersedia']);
+        $data['ukuran_tersedia'] = json_encode($request->input('ukuran_tersedia', []));
 
         if ($request->hasFile('gambar_produk')) {
             $data['gambar_produk'] = $request->file('gambar_produk')->store('products', 'public');
@@ -55,10 +58,13 @@ class ProductController extends Controller
             'tipe_produk' => 'required|in:kustom,jadi',
             'harga_dasar' => 'required|numeric|min:0',
             'deskripsi' => 'nullable|string',
-            'gambar_produk' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            'gambar_produk' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'ukuran_tersedia' => 'nullable|array',
+            'ukuran_tersedia.*' => 'string|in:XS,S,M,L,XL,2XL,3XL,4XL'
         ]);
 
-        $data = $request->except('gambar_produk');
+        $data = $request->except(['gambar_produk', 'ukuran_tersedia']);
+        $data['ukuran_tersedia'] = json_encode($request->input('ukuran_tersedia', []));
 
         if ($request->hasFile('gambar_produk')) {
             if ($product->gambar_produk) {
