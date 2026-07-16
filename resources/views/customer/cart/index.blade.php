@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-12 pb-32 lg:pb-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
             @if(session('success'))
@@ -33,15 +33,16 @@
                             </div>
 
                             @forelse($carts as $cart)
-                                <div class="flex flex-col sm:flex-row gap-6 p-4 bg-slate-50 border border-slate-100 rounded-xl mb-4 relative group hover:shadow-md transition">
+                                <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 p-4 bg-slate-50 border border-slate-100 rounded-xl mb-4 relative group hover:shadow-md transition">
                                     
-                                    <!-- Checkbox Select Item -->
-                                    <div class="flex items-center justify-center pr-2">
-                                        <input type="checkbox" name="cart_ids[]" value="{{ $cart->id_cart }}" form="cartForm" checked class="cart-item-checkbox w-6 h-6 accent-indigo-600 cursor-pointer" data-price="{{ ($cart->produk->harga_dasar + ($cart->desain ? $cart->desain->harga_desain : 0)) * $cart->quantity }}">
-                                    </div>
-                                    
-                                    <!-- Thumbnail Desain -->
-                                    <div class="w-full sm:w-32 aspect-[3/4] bg-white rounded-lg shadow-inner overflow-hidden flex items-center justify-center relative flex-shrink-0">
+                                    <div class="flex items-start sm:items-center gap-4">
+                                        <!-- Checkbox Select Item -->
+                                        <div class="flex items-center justify-center pt-2 sm:pt-0 sm:pr-2">
+                                            <input type="checkbox" name="cart_ids[]" value="{{ $cart->id_cart }}" form="cartForm" checked class="cart-item-checkbox w-6 h-6 accent-indigo-600 cursor-pointer" data-price="{{ ($cart->produk->harga_dasar + ($cart->desain ? $cart->desain->harga_desain : 0)) * $cart->quantity }}">
+                                        </div>
+                                        
+                                        <!-- Thumbnail Desain -->
+                                        <div class="w-24 sm:w-32 aspect-[3/4] bg-white rounded-lg shadow-inner overflow-hidden flex items-center justify-center relative flex-shrink-0">
                                         @if($cart->desain)
                                             @php
                                                 $bajuType = $cart->produk->jenis_produk;
@@ -93,6 +94,7 @@
                                                 @endif
                                             </div>
                                         @endif
+                                        </div>
                                     </div>
 
                                     <!-- Detail Info -->
@@ -166,11 +168,11 @@
                 </div>
 
                 <!-- Ringkasan Checkout -->
-                <div class="lg:w-1/3 mt-8 lg:mt-0 @if(count($carts) === 0) hidden @endif">
-                    <div class="bg-indigo-50 border border-indigo-100 p-6 rounded-2xl sticky top-8 shadow-sm">
-                        <h3 class="text-xl font-bold text-indigo-900 mb-6 border-b border-indigo-200 pb-4">Ringkasan Pesanan</h3>
+                <div class="lg:w-1/3 mt-8 lg:mt-0 @if(count($carts) === 0) hidden @endif fixed bottom-0 left-0 w-full lg:static z-40">
+                    <div class="bg-white/95 lg:bg-indigo-50 backdrop-blur-md border-t lg:border border-indigo-100 p-4 sm:p-6 rounded-t-2xl lg:rounded-2xl lg:sticky lg:top-8 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.1)] lg:shadow-sm">
+                        <h3 class="hidden lg:block text-xl font-bold text-indigo-900 mb-6 border-b border-indigo-200 pb-4">Ringkasan Pesanan</h3>
                         
-                        <div class="space-y-4 mb-6">
+                        <div class="hidden lg:block space-y-4 mb-6">
                             @php $netTotal = 0; @endphp
                             @foreach($carts as $c)
                                 @php 
@@ -185,17 +187,19 @@
                             @endforeach
                         </div>
                         
-                        <div class="border-t border-indigo-200 border-dashed pt-4 mb-8">
-                            <div class="flex justify-between items-center text-lg">
-                                <span class="font-bold text-indigo-900">Total Pembayaran</span>
-                                <span class="font-black text-indigo-600 text-xl tracking-tight" id="totalHargaVal">Rp {{ number_format($netTotal, 0, ',', '.') }}</span>
+                        <div class="flex flex-row lg:flex-col lg:border-t lg:border-indigo-200 lg:border-dashed lg:pt-4 mb-4 lg:mb-8 items-center lg:items-stretch justify-between gap-4">
+                            <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center text-lg">
+                                <span class="font-bold text-indigo-900 text-sm lg:text-lg">Total Pembayaran</span>
+                                <span class="font-black text-indigo-600 text-lg lg:text-xl tracking-tight" id="totalHargaVal">Rp {{ number_format($netTotal ?? 0, 0, ',', '.') }}</span>
                             </div>
-                            <p class="text-xs text-indigo-400 mt-2">*Belum termasuk ongkir.</p>
+                            <p class="hidden lg:block text-xs text-indigo-400 mt-2">*Belum termasuk ongkir.</p>
+                            
+                            <div class="w-1/2 lg:w-full lg:mt-6">
+                                <button type="submit" form="cartForm" id="checkoutBtn" class="w-full block text-center py-3 lg:py-4 bg-indigo-600 hover:bg-indigo-700 text-white text-base lg:text-lg font-bold rounded-xl shadow-lg shadow-indigo-200 transition transform hover:-translate-y-0.5 whitespace-nowrap">
+                                    Checkout (<span id="selectedCount">{{ count($carts) }}</span>)
+                                </button>
+                            </div>
                         </div>
-
-                        <button type="submit" form="cartForm" id="checkoutBtn" class="w-full block text-center py-4 bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-bold rounded-xl shadow-lg shadow-indigo-200 transition transform hover:-translate-y-0.5">
-                            Checkout Sekarang (<span id="selectedCount">{{ count($carts) }}</span>)
-                        </button>
                     </div>
                 </div>
 

@@ -25,7 +25,7 @@
         <!-- Navbar -->
         <nav class="w-full py-4 px-4 sm:px-6 lg:px-8 border-b border-slate-200 sticky top-0 bg-white/80 backdrop-blur-md z-[100]">
             <div class="max-w-[1400px] mx-auto flex justify-between items-center">
-                <div class="flex items-center gap-12">
+                <div class="flex items-center gap-4 lg:gap-12">
                     <a href="{{ route('home') }}" class="hover:opacity-80 transition duration-300">
                         <img src="{{ asset('images/logo-dailyco.png') }}" class="h-12 w-auto" alt="DAILY.CO Logo">
                     </a>
@@ -36,16 +36,16 @@
                         <span class="text-slate-600">{{ $produk->nama_produk }}</span>
                     </div>
                 </div>
-                <div class="flex gap-6 items-center">
+                <div class="flex gap-3 sm:gap-6 items-center">
                     @auth('customer')
-                        <a href="{{ route('customer.dashboard') }}" class="text-xs font-bold text-slate-600 hover:text-red-600 transition uppercase tracking-widest">Dashboard</a>
+                        <a href="{{ route('customer.dashboard') }}" class="text-[10px] sm:text-xs font-bold text-slate-600 hover:text-red-600 transition uppercase tracking-widest">Dashboard</a>
                     @else
                         @auth('admin')
-                            <a href="{{ route('admin.dashboard') }}" class="text-xs font-bold text-slate-600 hover:text-red-600 transition uppercase tracking-widest">Admin Panel</a>
+                            <a href="{{ route('admin.dashboard') }}" class="text-[10px] sm:text-xs font-bold text-slate-600 hover:text-red-600 transition uppercase tracking-widest">Admin Panel</a>
                         @else
-                            <a href="{{ route('login') }}" class="text-xs font-bold text-slate-600 hover:text-red-600 transition uppercase tracking-widest">Masuk</a>
+                            <a href="{{ route('login') }}" class="text-[10px] sm:text-xs font-bold text-slate-600 hover:text-red-600 transition uppercase tracking-widest">Masuk</a>
                             @if (Route::has('register'))
-                                <a href="{{ route('register') }}" class="text-xs font-black bg-red-600 text-white px-5 py-2.5 rounded-xl hover:bg-red-500 transition shadow-lg shadow-red-100 uppercase tracking-widest">Mulai Desain</a>
+                                <a href="{{ route('register') }}" class="text-[10px] sm:text-xs font-black bg-red-600 text-white px-3 py-2 sm:px-5 sm:py-2.5 rounded-xl hover:bg-red-500 transition shadow-lg shadow-red-100 uppercase tracking-widest">Mulai Desain</a>
                             @endif
                         @endauth
                     @endauth
@@ -70,7 +70,7 @@
               }">
             
             <!-- Left Side: Gallery Viewer -->
-            <div class="w-full lg:w-[60%] flex gap-4 xl:gap-6 sticky top-24 h-fit">
+            <div class="w-full lg:w-[60%] flex gap-4 xl:gap-6 lg:sticky lg:top-24 h-fit">
                 @if($produk->tipe_produk == 'jadi' && $produk->gambar_produk)
                     <!-- Single Main Image for Ready-Made Products -->
                     <div class="flex-1 bg-white rounded-[3rem] overflow-hidden relative flex items-center justify-center p-4 border border-slate-200 min-h-[400px] lg:min-h-[600px] group shadow-sm">
@@ -271,7 +271,7 @@
                             @foreach($colors as $name => $class)
                                 <button x-on:click="selectedColor = '{{ $name }}'"
                                         x-bind:class="{ 'ring-2 ring-indigo-600 scale-110 z-10': selectedColor === '{{ $name }}', 'ring-1 ring-slate-200': selectedColor !== '{{ $name }}' }"
-                                        class="w-6 h-6 sm:w-8 sm:h-8 rounded {{ $class }} hover:scale-110 transition cursor-pointer shadow-sm relative group"
+                                        class="w-11 h-11 sm:w-10 sm:h-10 rounded {{ $class }} hover:scale-110 transition cursor-pointer shadow-sm relative group"
                                         title="{{ $name }}">
                                     <!-- Tooltip hover -->
                                     <div class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition whitespace-nowrap z-20">
@@ -295,7 +295,7 @@
                             @foreach(['XS','S','M','L','XL','2XL','3XL','4XL'] as $size)
                                 <button x-on:click="selectedSize = '{{ $size }}'"
                                         x-bind:class="{ 'border-slate-900 text-slate-900 font-bold bg-slate-50': selectedSize === '{{ $size }}', 'border-slate-200 text-slate-600 bg-white hover:border-slate-400': selectedSize !== '{{ $size }}' }"
-                                        class="w-10 h-10 sm:w-11 sm:h-11 rounded border flex items-center justify-center text-sm transition">
+                                        class="w-11 h-11 rounded border flex items-center justify-center text-sm transition">
                                     {{ $size }}
                                 </button>
                             @endforeach

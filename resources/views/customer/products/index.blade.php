@@ -13,35 +13,35 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
                     <!-- Greeting Text -->
-                    <div class="text-white">
-                        <h1 class="text-4xl sm:text-5xl font-black tracking-tight mb-3">
+                    <div class="text-white w-full">
+                        <h1 class="text-3xl sm:text-5xl font-black tracking-tight mb-3">
                             Selamat Datang, 
                             <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 to-pink-200">
                                 {{ Auth::guard('customer')->user()->nama_customer ?? 'Sobat' }}!
                             </span>
                         </h1>
-                        <p class="text-indigo-200 text-lg sm:text-xl font-medium max-w-xl">
+                        <p class="text-indigo-200 text-base sm:text-xl font-medium max-w-xl">
                             Wujudkan ide kreatifmu menjadi nyata. Mulai custom desain pakaian berkualitas tinggi secara instan di DAILY.CO.
                         </p>
                     </div>
 
                     <!-- Quick Stats Cards (Glassmorphism) -->
-                    <div class="flex gap-4">
-                        <a href="{{ route('customer.orders.index') }}" class="group bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-2xl p-5 w-40 transition-all duration-300 hover:-translate-y-1">
+                    <div class="grid grid-cols-2 gap-3 w-full sm:flex sm:w-auto sm:gap-4 mt-6 md:mt-0">
+                        <a href="{{ route('customer.orders.index') }}" class="group bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-2xl p-4 sm:p-5 w-full sm:w-40 transition-all duration-300 hover:-translate-y-1">
                             <div class="flex items-center justify-between mb-2">
                                 <span class="text-2xl">📦</span>
                                 <span class="bg-indigo-500/50 text-indigo-100 text-xs font-bold px-2.5 py-1 rounded-lg min-w-[28px] text-center">{{ $activeOrdersCount }}</span>
                             </div>
-                            <h4 class="text-indigo-100 font-semibold group-hover:text-white transition-colors">Pesanan Aktif</h4>
+                            <h4 class="text-indigo-100 font-semibold text-sm sm:text-base group-hover:text-white transition-colors">Pesanan Aktif</h4>
                             <p class="text-indigo-300 text-xs mt-1">Cek status produksi</p>
                         </a>
                         
-                        <a href="{{ route('customer.cart.index') }}" class="group bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-2xl p-5 w-40 transition-all duration-300 hover:-translate-y-1">
+                        <a href="{{ route('customer.cart.index') }}" class="group bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-2xl p-4 sm:p-5 w-full sm:w-40 transition-all duration-300 hover:-translate-y-1">
                             <div class="flex items-center justify-between mb-2">
                                 <span class="text-2xl">🛒</span>
                                 <span class="bg-pink-500/50 text-pink-100 text-xs font-bold px-2.5 py-1 rounded-lg min-w-[28px] text-center">{{ $cartCount }}</span>
                             </div>
-                            <h4 class="text-indigo-100 font-semibold group-hover:text-white transition-colors">Keranjang</h4>
+                            <h4 class="text-indigo-100 font-semibold text-sm sm:text-base group-hover:text-white transition-colors">Keranjang</h4>
                             <p class="text-indigo-300 text-xs mt-1">Lanjutkan checkout</p>
                         </a>
                     </div>

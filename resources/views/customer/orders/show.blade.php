@@ -23,29 +23,29 @@
                 <div class="absolute -top-10 -right-10 w-40 h-40 bg-red-50 rounded-full blur-3xl opacity-50 group-hover:scale-150 transition-transform duration-1000"></div>
  
                 <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
-                    <div class="flex items-center gap-6">
-                        <div class="w-16 h-16 bg-red-600 rounded-2xl flex items-center justify-center text-3xl shadow-xl shadow-red-100 animate-pulse">📦</div>
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+                        <div class="w-16 h-16 bg-red-600 rounded-2xl flex items-center justify-center text-3xl shadow-xl shadow-red-100 animate-pulse shrink-0">📦</div>
                         <div>
                             <h3 class="text-2xl font-black text-slate-900 font-outfit uppercase tracking-tight">Status: <span class="text-red-600 uppercase">{{ str_replace('_', ' ', $order->status_order) }}</span></h3>
                             <p class="text-slate-500 font-medium italic mt-1">Terakhir diperbarui: {{ $order->updated_at->diffForHumans() }}</p>
                         </div>
                     </div>
-                    <div class="flex gap-4">
-                        <a href="{{ route('customer.orders.index') }}" class="px-6 py-3 bg-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-600 rounded-xl hover:bg-slate-200 transition shadow-sm">Kembali Ke List</a>
+                    <div class="flex flex-col w-full md:w-auto gap-4">
+                        <a href="{{ route('customer.orders.index') }}" class="w-full md:w-auto text-center px-6 py-3 bg-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-600 rounded-xl hover:bg-slate-200 transition shadow-sm">Kembali Ke List</a>
                     </div>
                 </div>
             </div>
 
             @if(!$isCancelled)
             <div class="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8 relative overflow-hidden">
-                <div class="flex items-center justify-between relative z-10">
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between relative z-10 gap-8 md:gap-0">
                     @foreach($steps as $step)
                         @php 
                             $isCompleted = array_search($order->status_order, $statusOrder) >= array_search($step['status'], $statusOrder);
                             $isActive = $order->status_order === $step['status'];
                         @endphp
-                        <div class="flex flex-col items-center relative z-10 w-full group/step">
-                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-4 transition-all duration-500 shadow-xl border-2 {{ $isActive ? 'bg-red-600 text-white border-red-200 scale-125' : ($isCompleted ? 'bg-red-100 text-red-600 border-red-200' : 'bg-slate-50 text-slate-300 border-slate-100 group-hover/step:border-red-100 hover:scale-110') }}">
+                        <div class="flex flex-row md:flex-col items-center justify-start relative z-10 w-full group/step gap-4 md:gap-0">
+                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center md:mb-4 transition-all duration-500 shadow-xl border-2 {{ $isActive ? 'bg-red-600 text-white border-red-200 scale-125' : ($isCompleted ? 'bg-red-100 text-red-600 border-red-200' : 'bg-slate-50 text-slate-300 border-slate-100 group-hover/step:border-red-100 hover:scale-110') }} shrink-0">
                                 @if($isCompleted && !$isActive)
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                                 @else
@@ -55,6 +55,7 @@
                             <span class="text-[10px] font-black uppercase tracking-[0.2em] {{ $isActive ? 'text-red-600' : ($isCompleted ? 'text-slate-800' : 'text-slate-400') }}">{{ $step['label'] }}</span>
                             @if(!$loop->last)
                                 <div class="absolute top-6 left-[60%] w-[80%] h-0.5 {{ $isCompleted ? 'bg-red-200' : 'bg-slate-100' }} -z-10 hidden md:block"></div>
+                                <div class="absolute top-12 left-6 w-0.5 h-12 {{ $isCompleted ? 'bg-red-200' : 'bg-slate-100' }} -z-10 block md:hidden"></div>
                             @endif
                         </div>
                     @endforeach
@@ -65,7 +66,7 @@
             {{-- ===== Info Order ===== --}}
             <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
                 <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">Informasi Transaksi</h3>
-                <dl class="grid grid-cols-2 gap-y-6 gap-x-8 text-sm">
+                <dl class="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-8 text-sm">
                     <div>
                         <dt class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">ID Pesanan</dt>
                         <dd class="font-black text-slate-800 text-lg font-outfit uppercase tracking-tight">#{{ str_pad($order->id_order, 5, '0', STR_PAD_LEFT) }}</dd>
@@ -104,7 +105,8 @@
                 <h3 class="text-sm font-bold text-slate-600 uppercase tracking-wider mb-4">Item Pesanan</h3>
                 <div class="space-y-4">
                     @foreach($order->orderDetails as $detail)
-                        <div class="flex items-start gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100">
+                        <div class="flex flex-col sm:flex-row items-start gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100 w-full">
+                            <div class="flex flex-row gap-2 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0 hide-scrollbar">
                                 <!-- DESAIN DEPAN -->
                                 <div class="w-[80px] h-[100px] rounded-lg overflow-hidden bg-slate-50 border border-slate-200 shrink-0 flex items-center justify-center relative shadow-inner">
                                     @if($detail->desain && $detail->desain->file_desain)
@@ -197,8 +199,9 @@
                                     </div>
                                 </div>
                                 @endif
+                            </div>
 
-                            <div class="flex-1">
+                            <div class="flex-1 w-full mt-2 sm:mt-0">
                                 <p class="font-bold text-slate-800">{{ $detail->produk->nama_produk ?? 'Produk' }}</p>
                                 <div class="flex items-center gap-2 mt-1">
                                     <span class="px-2 py-0.5 bg-slate-900 text-white text-[9px] font-black uppercase tracking-widest rounded-md">{{ $detail->produk->jenis_produk }}</span>
@@ -235,7 +238,7 @@
                                     </div>
                                     <p class="text-sm text-rose-700/80 font-medium italic animate-pulse">Admin: "{{ $detail->catatan_admin }}"</p>
                                 </div>
-                                <a href="{{ route('customer.designs.editor', ['produk' => $detail->produk->id_produk, 'revisi' => $detail->id_desain]) }}" class="shrink-0 relative z-10 bg-rose-600 hover:bg-rose-500 text-white font-black py-4 px-8 rounded-2xl shadow-xl shadow-rose-200 transition-all transform hover:-translate-y-1 active:scale-95 uppercase tracking-widest text-xs">
+                                <a href="{{ route('customer.designs.editor', ['produk' => $detail->produk->id_produk, 'revisi' => $detail->id_desain]) }}" class="w-full sm:w-auto shrink-0 relative z-10 bg-rose-600 hover:bg-rose-500 text-white font-black py-4 px-8 rounded-2xl shadow-xl shadow-rose-200 transition-all transform hover:-translate-y-1 active:scale-95 uppercase tracking-widest text-xs text-center mt-4 sm:mt-0">
                                     PERBAIKI SEKARANG
                                 </a>
                             </div>

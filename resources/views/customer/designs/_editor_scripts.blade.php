@@ -23,6 +23,38 @@ function initFabricEditor() {
     }
     window.activeCanvas = canvasFront;
 
+    // Mobile Canvas Scaling
+    window.setupMobileCanvasScaler = function() {
+        const mockupContainer = document.getElementById('mockupContainer');
+        const scalerWrapper = document.getElementById('canvasScalerWrapper');
+        if(!mockupContainer || !scalerWrapper) return;
+        
+        if(window.innerWidth >= 768) {
+            mockupContainer.style.transform = 'none';
+            return;
+        }
+        
+        const availableWidth = scalerWrapper.clientWidth - 32;
+        const availableHeight = scalerWrapper.clientHeight - 32;
+        
+        if (availableWidth <= 0 || availableHeight <= 0) return;
+        
+        const scaleW = availableWidth / 480;
+        const scaleH = availableHeight / 600;
+        const scale = Math.min(scaleW, scaleH, 1.0);
+        
+        mockupContainer.style.transform = `scale(${scale})`;
+    };
+    
+    window.addEventListener('resize', window.setupMobileCanvasScaler);
+    window.addEventListener('orientationchange', () => setTimeout(window.setupMobileCanvasScaler, 200));
+    setTimeout(window.setupMobileCanvasScaler, 100);
+    
+    if (window.ResizeObserver) {
+        const wrapper = document.getElementById('canvasScalerWrapper');
+        if(wrapper) new ResizeObserver(() => window.setupMobileCanvasScaler()).observe(wrapper);
+    }
+
     window.switchCanvasSide = function(side) {
         if(window.activeCanvas) { window.activeCanvas.discardActiveObject(); window.activeCanvas.renderAll(); }
         if (typeof hideControls === 'function') hideControls();
@@ -30,6 +62,7 @@ function initFabricEditor() {
         else if(side === 'back') window.activeCanvas = canvasBack;
         else if(side === 'left') window.activeCanvas = canvasLeft;
         else if(side === 'right') window.activeCanvas = canvasRight;
+        if (typeof window.renderLayersList === 'function') window.renderLayersList();
     };
 
     // Generate preview thumbnails for Step 4
@@ -157,8 +190,10 @@ function initFabricEditor() {
     fabric.Object.prototype.cornerColor = '#ffffff';
     fabric.Object.prototype.cornerStrokeColor = '#bae6fd';
     fabric.Object.prototype.borderColor = '#0284c7';
-    fabric.Object.prototype.cornerSize = 14;
-    fabric.Object.prototype.padding = 10;
+    fabric.Object.prototype.cornerSize = window.innerWidth < 768 ? 24 : 14;
+    fabric.Object.prototype.touchCornerSize = 32;
+    fabric.Object.prototype.cornerStyle = 'circle';
+    fabric.Object.prototype.padding = window.innerWidth < 768 ? 16 : 10;
     fabric.Object.prototype.borderDashArray = [4, 4];
     fabric.Object.prototype.objectCaching = false;
     fabric.Image.prototype.objectCaching = false;
@@ -540,6 +575,78 @@ function initFabricEditor() {
         if (topOffset !== 0) obj.set('top', obj.top + topOffset);
     }
 
+    window.renderLayersList = function() {
+        const container = document.getElementById('layersListContainer');
+        if(!container) return;
+        
+        let canvas = window.activeCanvas;
+        if(!canvas) return;
+        
+        const objects = canvas.getObjects();
+        if(objects.length === 0) {
+            container.innerHTML = '<div class="text-center text-xs text-slate-400 py-4 italic tracking-widest">Belum ada objek.</div>';
+            return;
+        }
+        
+        let html = '';
+        for(let i = objects.length - 1; i >= 0; i--) {
+            const obj = objects[i];
+            let typeLabel = 'Objek';
+            let iconSvg = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>';
+            
+            if(obj.type === 'i-text') {
+                typeLabel = 'Teks: ' + (obj.text ? obj.text.substring(0, 10) : '');
+                iconSvg = '<svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>';
+            } else if(obj.customType === 'custom-svg') {
+                typeLabel = 'Stiker';
+                iconSvg = '<svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+            } else if(obj.type === 'image') {
+                typeLabel = 'Gambar Upload';
+                iconSvg = '<svg class="w-4 h-4 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>';
+            }
+            
+            const isActive = canvas.getActiveObject() === obj;
+            const bgClass = isActive ? 'bg-red-50 border-red-200 shadow-sm' : 'bg-white border-slate-200 hover:bg-slate-50';
+            
+            html += `
+            <div class="flex items-center justify-between p-2 rounded-xl border ${bgClass} transition mb-2">
+                <div class="flex items-center gap-3 flex-1 cursor-pointer" onclick="if(typeof window.selectLayerIndex === 'function') window.selectLayerIndex(${i})">
+                    <div class="p-2 bg-slate-100 rounded-lg">${iconSvg}</div>
+                    <div class="flex flex-col overflow-hidden">
+                        <span class="text-xs font-bold text-slate-700 truncate">${typeLabel}</span>
+                        <span class="text-[9px] text-slate-400">Lapisan ${i + 1}</span>
+                    </div>
+                </div>
+                <button onclick="if(typeof window.deleteLayerIndex === 'function') window.deleteLayerIndex(${i})" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition shrink-0" title="Hapus Lapisan">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+            </div>`;
+        }
+        container.innerHTML = html;
+    };
+
+    window.selectLayerIndex = function(i) {
+        if(!window.activeCanvas) return;
+        const objects = window.activeCanvas.getObjects();
+        if(objects[i]) {
+            window.activeCanvas.setActiveObject(objects[i]);
+            window.activeCanvas.requestRenderAll();
+            window.renderLayersList();
+        }
+    };
+
+    window.deleteLayerIndex = function(i) {
+        if(!window.activeCanvas) return;
+        const objects = window.activeCanvas.getObjects();
+        if(objects[i]) {
+            window.activeCanvas.remove(objects[i]);
+            window.activeCanvas.discardActiveObject();
+            window.activeCanvas.requestRenderAll();
+            window.renderLayersList();
+            window.recalculateTotalPrice();
+        }
+    };
+
     canvasesToHandle.forEach(c => { 
         c.on('selection:created', showControls); 
         c.on('selection:updated', showControls); 
@@ -551,15 +658,44 @@ function initFabricEditor() {
                 window.resizeObjectToSablonSize(obj, size);
             }
             window.recalculateTotalPrice();
+            if(typeof window.renderLayersList === 'function') window.renderLayersList();
         });
-        c.on('object:removed', window.recalculateTotalPrice);
+        c.on('object:removed', function(e) {
+            window.recalculateTotalPrice();
+            if(typeof window.renderLayersList === 'function') window.renderLayersList();
+        });
+        c.on('object:modified', function(e) {
+            if(typeof window.renderLayersList === 'function') window.renderLayersList();
+        });
         c.on('object:moving', constrainObjectBounds);
         c.on('object:scaling', constrainObjectBounds);
     });
 
-    function showControls(e) {
+    window.toggleMobileProperties = function() {
         if(!editorControls) return;
-        editorControls.classList.remove('hidden'); editorControls.classList.add('flex');
+        if(editorControls.classList.contains('hidden')) {
+            editorControls.classList.remove('hidden'); editorControls.classList.add('flex');
+            const backdrop = document.getElementById('editorControlsBackdrop');
+            if(backdrop) { backdrop.classList.remove('hidden'); backdrop.classList.add('block'); }
+        } else {
+            editorControls.classList.add('hidden'); editorControls.classList.remove('flex');
+            const backdrop = document.getElementById('editorControlsBackdrop');
+            if(backdrop) { backdrop.classList.add('hidden'); backdrop.classList.remove('block'); }
+        }
+    };
+
+    function showControls(e) {
+        if(typeof window.renderLayersList === 'function') window.renderLayersList();
+        if(!editorControls) return;
+        const mobileEditBtn = document.getElementById('mobileEditBtn');
+        if(mobileEditBtn) mobileEditBtn.classList.remove('hidden');
+        
+        if(window.innerWidth >= 768) {
+            editorControls.classList.remove('hidden'); editorControls.classList.add('flex');
+            const backdrop = document.getElementById('editorControlsBackdrop');
+            if(backdrop) { backdrop.classList.remove('hidden'); backdrop.classList.add('block'); }
+        }
+
         const activeObj = (e && e.selected) ? e.selected[0] : window.activeCanvas.getActiveObject();
         if(!activeObj) return;
         textControls.classList.add('hidden'); textControls.classList.remove('flex');
@@ -575,6 +711,8 @@ function initFabricEditor() {
 
         if(activeObj.type === 'i-text') {
             textControls.classList.remove('hidden'); textControls.classList.add('flex');
+            const textValueControl = document.getElementById('textValueControl');
+            if(textValueControl) textValueControl.value = activeObj.text || '';
             fontFamilyControl.value = activeObj.fontFamily.replace(/["']/g, "");
             
             let fillHex = '#000000';
@@ -653,8 +791,26 @@ function initFabricEditor() {
         }
     });
 
-    function hideControls() { if(editorControls) { editorControls.classList.add('hidden'); editorControls.classList.remove('flex'); } }
+    function hideControls() { 
+        if(typeof window.renderLayersList === 'function') window.renderLayersList();
+        if(editorControls) { editorControls.classList.add('hidden'); editorControls.classList.remove('flex'); } 
+        const backdrop = document.getElementById('editorControlsBackdrop');
+        if(backdrop) { backdrop.classList.add('hidden'); backdrop.classList.remove('block'); }
+        const mobileEditBtn = document.getElementById('mobileEditBtn');
+        if(mobileEditBtn) mobileEditBtn.classList.add('hidden');
+    }
     if(deleteObjBtn) deleteObjBtn.addEventListener('click', function() { const o = window.activeCanvas.getActiveObject(); if(o) { window.activeCanvas.remove(o); hideControls(); } });
+
+    const textValueControl = document.getElementById('textValueControl');
+    if(textValueControl) {
+        textValueControl.addEventListener('input', function() {
+            const o = window.activeCanvas.getActiveObject();
+            if(o && o.type === 'i-text') {
+                o.set('text', this.value);
+                window.activeCanvas.renderAll();
+            }
+        });
+    }
 
     // --- SUBMIT SAVE TO SERVER ---
     const saveBtn = document.getElementById('saveDesignBtn');

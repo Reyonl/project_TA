@@ -5,8 +5,8 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 flex flex-col lg:flex-row gap-8">
+    <div class="py-6 sm:py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row gap-6 sm:gap-8">
             
             <!-- Sisi Kiri: Daftar Keranjang & Upload Bukti Pembayaran -->
             <div class="lg:w-2/3 space-y-6">
@@ -112,7 +112,7 @@
                             <!-- Custom File Input -->
                             <div class="relative group cursor-pointer">
                                 <input type="file" name="bukti_pembayaran" id="buktiInput" accept="image/png, image/jpeg, image/jpg" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="previewFile()">
-                                <div id="dropZone" class="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center bg-slate-50 group-hover:bg-slate-100 group-hover:border-indigo-400 transition duration-200">
+                                <div id="dropZone" class="border-2 border-dashed border-slate-300 rounded-xl p-6 sm:p-8 min-h-[160px] flex flex-col items-center justify-center text-center bg-slate-50 group-hover:bg-slate-100 group-hover:border-indigo-400 transition duration-200">
                                     <div id="previewContainer" class="hidden flex-col items-center">
                                         <img id="imagePreview" class="max-h-40 rounded shadow-md mb-3 object-contain">
                                         <span class="text-xs text-indigo-600 font-bold bg-indigo-100 px-3 py-1 rounded-full cursor-pointer hover:bg-indigo-200 transition">Ubah File</span>

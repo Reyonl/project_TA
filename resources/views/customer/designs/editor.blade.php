@@ -59,7 +59,7 @@
                     <div class="flex items-center {{ $i < 4 ? 'flex-1' : 'flex-none' }}">
                         <div class="flex items-center justify-center w-8 h-8 rounded-full text-xs font-black transition-all duration-300 shrink-0"
                              :class="currentStep >= {{ $i }} ? 'bg-red-600 text-white shadow-lg shadow-red-200' : 'bg-slate-200 text-slate-400'">{{ $i }}</div>
-                        <span class="ml-2 text-xs font-bold hidden sm:inline"
+                        <span class="ml-2 text-xs font-bold hidden md:inline"
                               :class="currentStep >= {{ $i }} ? 'text-red-700' : 'text-slate-400'">{{ $stepNames[$i-1] }}</span>
                         @if($i < 4)
                         <div class="flex-1 h-1 mx-3 rounded-full transition-all duration-500"
@@ -111,10 +111,10 @@
                 {{-- Color Picker --}}
                 <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-8 mb-8">
                     <h3 class="text-sm font-black text-slate-700 uppercase tracking-widest mb-5">Pilih Warna Baju</h3>
-                    <div class="grid grid-cols-5 sm:grid-cols-8 gap-3">
+                    <div class="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-8 gap-4">
                         <template x-for="(hex, name) in colorMap" :key="name">
                             <button @click="baseColor = hex; canvasBackgroundChange(hex)" class="group flex flex-col items-center gap-1.5" :title="name">
-                                <div class="w-10 h-10 rounded-full border-2 transition-all duration-200 shadow-sm"
+                                <div class="w-11 h-11 rounded-full border-2 transition-all duration-200 shadow-sm"
                                      :style="{ backgroundColor: hex }"
                                      :class="baseColor === hex ? 'ring-4 ring-red-400 ring-offset-2 border-red-500 scale-110' : 'border-slate-300 hover:scale-105'"></div>
                                 <span class="text-[9px] font-bold text-slate-400 group-hover:text-slate-600 transition" x-text="name"></span>
@@ -142,16 +142,16 @@
             @include('customer.designs._canvas_editor')
 
             {{-- Navigation Buttons --}}
-            <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between">
-                <button @click="goToStep(currentStep - 1)" class="flex items-center gap-2 bg-white border border-slate-300 text-slate-600 font-bold py-3 px-6 rounded-xl hover:bg-slate-50 transition text-sm">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 py-4 pb-24 md:pb-4 flex flex-col-reverse sm:flex-row justify-between gap-4">
+                <button @click="goToStep(currentStep - 1)" class="flex items-center justify-center gap-2 w-full sm:w-auto bg-white border border-slate-300 text-slate-600 font-bold py-3 px-6 rounded-xl hover:bg-slate-50 transition text-sm">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Kembali
                 </button>
-                <div class="flex gap-3">
+                <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                     {{-- Skip button only on Step 3 --}}
-                    <button x-show="currentStep === 3" @click="goToStep(4)" class="flex items-center gap-2 bg-slate-100 border border-slate-300 text-slate-600 font-bold py-3 px-6 rounded-xl hover:bg-slate-200 transition text-sm">
+                    <button x-show="currentStep === 3" @click="goToStep(4)" class="flex items-center justify-center gap-2 w-full sm:w-auto bg-slate-100 border border-slate-300 text-slate-600 font-bold py-3 px-6 rounded-xl hover:bg-slate-200 transition text-sm">
                         Skip Belakang →
                     </button>
-                    <button @click="goToStep(currentStep + 1)" class="flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-black py-3 px-8 rounded-xl shadow-lg shadow-red-200 transition-all text-sm hover:-translate-y-0.5">
+                    <button @click="goToStep(currentStep + 1)" class="flex items-center justify-center gap-2 w-full sm:w-auto bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-black py-3 px-8 rounded-xl shadow-lg shadow-red-200 transition-all text-sm hover:-translate-y-0.5">
                         <span x-text="currentStep === 2 ? 'Lanjut ke Desain Belakang' : 'Lanjut ke Review'"></span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                     </button>
@@ -167,10 +167,10 @@
                     <p class="text-slate-500">Pastikan semua desain sudah benar sebelum menyimpan</p>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
                     <div class="bg-white rounded-xl border border-slate-200 p-4 text-center shadow-sm">
                         <h4 class="text-xs font-black text-slate-500 uppercase mb-3">Depan</h4>
-                        <div class="bg-slate-50 rounded-lg border border-slate-100 overflow-hidden mx-auto" style="width:200px;height:250px;">
+                        <div class="bg-slate-50 rounded-lg border border-slate-100 overflow-hidden mx-auto w-full max-w-[200px] h-[250px]">
                             <img id="preview-front" src="" alt="Preview Depan" class="w-full h-full object-contain" style="display:none;" onload="this.style.display='block'; this.nextElementSibling.style.display='none';">
                             <div class="flex items-center justify-center h-full text-slate-400 text-xs">
                                 <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
@@ -180,7 +180,7 @@
                     </div>
                     <div class="bg-white rounded-xl border border-slate-200 p-4 text-center shadow-sm">
                         <h4 class="text-xs font-black text-slate-500 uppercase mb-3">Belakang</h4>
-                        <div class="bg-slate-50 rounded-lg border border-slate-100 overflow-hidden mx-auto" style="width:200px;height:250px;">
+                        <div class="bg-slate-50 rounded-lg border border-slate-100 overflow-hidden mx-auto w-full max-w-[200px] h-[250px]">
                             <img id="preview-back" src="" alt="Preview Belakang" class="w-full h-full object-contain" style="display:none;" onload="this.style.display='block'; this.nextElementSibling.style.display='none';">
                             <div class="flex items-center justify-center h-full text-slate-400 text-xs">
                                 <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
@@ -215,11 +215,11 @@
                     </div>
                 </div>
 
-                <div class="flex justify-between">
-                    <button @click="goToStep(3)" class="flex items-center gap-2 bg-white border border-slate-300 text-slate-600 font-bold py-3 px-6 rounded-xl hover:bg-slate-50 transition text-sm">
+                <div class="flex flex-col sm:flex-row justify-between gap-4 mt-6">
+                    <button @click="goToStep(3)" class="flex items-center justify-center gap-2 w-full sm:w-auto bg-white border border-slate-300 text-slate-600 font-bold py-3 px-6 rounded-xl hover:bg-slate-50 transition text-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Kembali
                     </button>
-                    <button id="saveDesignBtn" class="flex items-center gap-2 bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-700 hover:to-emerald-600 text-white font-black py-3 px-8 rounded-xl shadow-lg shadow-green-200 transition-all text-sm hover:-translate-y-0.5">
+                    <button id="saveDesignBtn" class="flex items-center justify-center gap-2 w-full sm:w-auto bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-700 hover:to-emerald-600 text-white font-black py-3 px-8 rounded-xl shadow-lg shadow-green-200 transition-all text-sm hover:-translate-y-0.5">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
                         Simpan & Masukkan ke Keranjang
                     </button>
