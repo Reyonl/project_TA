@@ -61,6 +61,7 @@
                   selectedColor: 'White', 
                   selectedSize: 'L',
                   selectedTechnique: 'sablon',
+                  activeSide: 'front',
                   colorMap: {
                       'Maroon': '#7f1d1d', 'Green': '#14532d', 'Grey': '#94a3b8', 
                       'Army': '#4B5320', 'Yellow': '#facc15', 'White': '#ffffff', 
@@ -83,7 +84,7 @@
                     </div>
                 @else
                     <!-- Thumbnails (Vertical) -->
-                    <div class="hidden md:flex flex-col gap-3 w-20 xl:w-24 shrink-0">
+                    <div class="hidden md:flex flex-col gap-4 w-20 xl:w-24 shrink-0">
                         @php
                             $isPanjang = \Illuminate\Support\Str::contains(strtolower($produk->nama_produk), 'panjang');
                             $baseImg = match($produk->jenis_produk) {
@@ -94,37 +95,45 @@
                                 'seragam' => 'seragam.png',
                                 default => 'kaos.png'
                             };
+                            $baseImgBack = str_replace('.png', '_belakang.png', $baseImg);
+                            $maskUrlFront = asset('images/mockups/'.$baseImg); 
+                            $maskUrlBack = asset('images/mockups/'.$baseImgBack);
                         @endphp
-                        <button class="w-full aspect-square border-2 border-slate-900 rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center relative">
-                            <img src="{{ asset('images/mockups/'.$baseImg) }}" class="w-[85%] object-contain" alt="Front Vew">
-                        </button>
-                        <button class="w-full aspect-square border border-slate-200 rounded-lg overflow-hidden bg-slate-100 hover:border-slate-400 transition flex items-center justify-center opacity-70 hover:opacity-100">
-                            <img src="{{ asset('images/mockups/'.$baseImg) }}" class="w-[85%] object-contain" alt="Pattern" style="filter: hue-rotate(90deg);">
-                        </button>
-                        <button class="w-full aspect-square border border-slate-200 rounded-lg overflow-hidden bg-slate-100 hover:border-slate-400 transition flex items-center justify-center opacity-70 hover:opacity-100">
-                            <img src="{{ asset('images/mockups/'.$baseImg) }}" class="w-[85%] object-contain" alt="Detail" style="transform: scale(1.5);">
-                        </button>
-                        <button class="w-full aspect-square border border-slate-200 rounded-lg overflow-hidden bg-slate-50 hover:border-slate-400 transition flex items-center justify-center opacity-70 hover:opacity-100 text-slate-400">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                        </button>
+                        
+                        <!-- Thumbnail Depan -->
+                        <div class="flex flex-col gap-1 items-center">
+                            <button type="button" @click="activeSide = 'front'" :class="activeSide === 'front' ? 'border-2 border-slate-900 shadow-md opacity-100' : 'border border-slate-200 opacity-60 hover:opacity-100'" class="w-full aspect-square rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center relative transition shadow-sm cursor-pointer">
+                                <img src="{{ $maskUrlFront }}" class="w-[85%] object-contain" alt="Depan">
+                            </button>
+                            <span :class="activeSide === 'front' ? 'text-slate-900 font-extrabold' : 'text-slate-500 font-bold'" class="text-[10px] uppercase tracking-wider transition">Depan</span>
+                        </div>
+                        
+                        <!-- Thumbnail Belakang -->
+                        @if(in_array($produk->jenis_produk, ['kaos', 'hoodie', 'polo', 'seragam']))
+                        <div class="flex flex-col gap-1 items-center mt-1">
+                            <button type="button" @click="activeSide = 'back'" :class="activeSide === 'back' ? 'border-2 border-slate-900 shadow-md opacity-100' : 'border border-slate-200 opacity-60 hover:opacity-100'" class="w-full aspect-square rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center relative transition shadow-sm cursor-pointer">
+                                <img src="{{ $maskUrlBack }}" class="w-[85%] object-contain" alt="Belakang">
+                            </button>
+                            <span :class="activeSide === 'back' ? 'text-slate-900 font-extrabold' : 'text-slate-500 font-bold'" class="text-[10px] uppercase tracking-wider transition">Belakang</span>
+                        </div>
+                        @endif
                     </div>
                     
                     <!-- Main Image -->
                     <div class="flex-1 bg-slate-50/50 rounded-[3rem] overflow-hidden relative flex items-center justify-center p-8 lg:p-12 border border-slate-100 min-h-[400px] lg:min-h-[600px] group shadow-sm">
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-200/20 to-transparent"></div>
                         
-                        @php $maskUrl = asset('images/mockups/'.$baseImg); @endphp
                         <!-- Interactive Tinted Preview -->
                         <div class="relative w-full h-full max-h-[500px] aspect-square flex items-center justify-center group-hover:scale-105 transition-transform duration-700">
                             <!-- Shadow/Texture Layer (Transparent Overlay) -->
-                            <img src="{{ $maskUrl }}" class="absolute w-full h-full object-contain mix-blend-multiply opacity-30 z-20 pointer-events-none">
+                            <img :src="activeSide === 'front' ? '{{ $maskUrlFront }}' : '{{ $maskUrlBack }}'" class="absolute w-full h-full object-contain mix-blend-multiply opacity-30 z-20 pointer-events-none transition-all duration-300">
                             
                             <!-- Base Colored Layer with Mask -->
-                            <div class="absolute inset-0 transition-colors duration-500 z-10"
+                            <div class="absolute inset-0 transition-all duration-500 z-10"
                                  :style="{ 
                                      backgroundColor: colorMap[selectedColor],
-                                     WebkitMaskImage: 'url({{ $maskUrl }})',
-                                     maskImage: 'url({{ $maskUrl }})',
+                                     WebkitMaskImage: 'url(' + (activeSide === 'front' ? '{{ $maskUrlFront }}' : '{{ $maskUrlBack }}') + ')',
+                                     maskImage: 'url(' + (activeSide === 'front' ? '{{ $maskUrlFront }}' : '{{ $maskUrlBack }}') + ')',
                                      WebkitMaskSize: 'contain',
                                      maskSize: 'contain',
                                      WebkitMaskPosition: 'center',
@@ -135,7 +144,7 @@
                             </div>
                             
                             <!-- Highlights Layer (Additive) -->
-                            <img src="{{ $maskUrl }}" class="absolute w-full h-full object-contain opacity-20 mix-blend-screen z-30 pointer-events-none">
+                            <img :src="activeSide === 'front' ? '{{ $maskUrlFront }}' : '{{ $maskUrlBack }}'" class="absolute w-full h-full object-contain opacity-20 mix-blend-screen z-30 pointer-events-none transition-all duration-300">
                         </div>
                         
                         <!-- Favorite Icon -->

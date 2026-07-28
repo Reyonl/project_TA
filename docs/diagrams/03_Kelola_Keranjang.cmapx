@@ -1,4 +1,4 @@
 <map id="03_Kelola_Keranjang_map" name="03_Kelola_Keranjang_map">
-<area shape="rect" id="id1" href="Hapus" title="Hapus" alt="" coords="86,256,124,269"/>
-<area shape="rect" id="id2" href="Lanjut" title="Lanjut" alt="" coords="15,394,68,408"/>
+<area shape="rect" id="id1" href="Hapus" title="Hapus" alt="" coords="86,252,124,266"/>
+<area shape="rect" id="id2" href="Lanjut" title="Lanjut" alt="" coords="15,391,68,405"/>
 </map>

@@ -105,4 +105,14 @@
             padding: 0.375rem;
         }
     }
+
+    /* Print Area Flash Animation */
+    #printAreaBox.border-red-500 {
+        border-color: #ef4444 !important;
+        border-width: 2px !important;
+        transition: all 0.2s ease-in-out;
+    }
+    #printAreaBox.bg-red-500\/10 {
+        background-color: rgba(239, 68, 68, 0.1) !important;
+    }
 </style>

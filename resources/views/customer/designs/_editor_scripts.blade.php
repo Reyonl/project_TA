@@ -337,37 +337,23 @@ function initFabricEditor() {
         if(stickerSearchInput) stickerSearchInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') loadStickers(stickerSearchInput.value.trim() || 'star'); });
     } catch(e) { console.error("Sticker Init Error:", e); }
 
-    // Perhitungan Harga Sablon Dinamis Per Objek
+    // Perhitungan Harga Sablon Dinamis Per Objek (Saat ini Dinonaktifkan)
     window.recalculateTotalPrice = function() {
-        let totalDesignPrice = 0;
+        let totalDesignPrice = 0; // Pricing dinonaktifkan
         let breakdownTextFront = [];
         let breakdownTextBack = [];
 
         if (canvasFront) {
             canvasFront.getObjects().forEach((obj, idx) => {
-                const size = obj.sablonSize || 'a5';
-                let price = 10000;
-                let sizeLabel = 'A5 Logo';
-                if (size === 'a4') { price = 25000; sizeLabel = 'A4'; }
-                else if (size === 'a3') { price = 35000; sizeLabel = 'A3'; }
-                
-                totalDesignPrice += price;
                 let typeLabel = obj.type === 'i-text' ? 'Teks' : (obj.customType === 'custom-svg' ? 'Stiker' : 'Gambar');
-                breakdownTextFront.push(`${typeLabel} #${idx+1} (${sizeLabel}: Rp ${price.toLocaleString('id-ID')})`);
+                breakdownTextFront.push(`${typeLabel} #${idx+1}`);
             });
         }
 
         if (canvasBack) {
             canvasBack.getObjects().forEach((obj, idx) => {
-                const size = obj.sablonSize || 'a5';
-                let price = 10000;
-                let sizeLabel = 'A5 Logo';
-                if (size === 'a4') { price = 25000; sizeLabel = 'A4'; }
-                else if (size === 'a3') { price = 35000; sizeLabel = 'A3'; }
-                
-                totalDesignPrice += price;
                 let typeLabel = obj.type === 'i-text' ? 'Teks' : (obj.customType === 'custom-svg' ? 'Stiker' : 'Gambar');
-                breakdownTextBack.push(`${typeLabel} #${idx+1} (${sizeLabel}: Rp ${price.toLocaleString('id-ID')})`);
+                breakdownTextBack.push(`${typeLabel} #${idx+1}`);
             });
         }
 
@@ -569,6 +555,35 @@ function initFabricEditor() {
             topOffset = -boundingRect.top;
         } else if (boundingRect.top + boundingRect.height > pa_height) {
             topOffset = pa_height - (boundingRect.top + boundingRect.height);
+        }
+
+        if (leftOffset !== 0 || topOffset !== 0) {
+            if (!window._boundaryAlertShown) {
+                window._boundaryAlertShown = true;
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top',
+                        icon: 'warning',
+                        title: 'Objek menyentuh batas area cetak',
+                        showConfirmButton: false,
+                        timer: 2000,
+                        timerProgressBar: true
+                    });
+                }
+                
+                // Flash print area
+                const paBox = document.getElementById('printAreaBox');
+                if (paBox) {
+                    paBox.classList.add('border-red-500', 'bg-red-500/10');
+                    setTimeout(() => {
+                        paBox.classList.remove('border-red-500', 'bg-red-500/10');
+                        window._boundaryAlertShown = false;
+                    }, 1500);
+                } else {
+                    setTimeout(() => window._boundaryAlertShown = false, 2000);
+                }
+            }
         }
 
         if (leftOffset !== 0) obj.set('left', obj.left + leftOffset);

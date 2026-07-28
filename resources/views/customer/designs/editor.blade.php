@@ -10,7 +10,7 @@
                 else printbox.classList.replace('border-white/30', 'border-slate-800/20');
             }
         };
-    </script>
+    </script>`
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Dancing+Script:wght@700&family=Lobster&family=Montserrat:wght@400;700&family=Pacifico&family=Playfair+Display:wght@700&family=Roboto:wght@400;700&family=Oswald:wght@500&family=Anton&display=swap" rel="stylesheet">
 
     <div class="min-h-screen bg-slate-50" 

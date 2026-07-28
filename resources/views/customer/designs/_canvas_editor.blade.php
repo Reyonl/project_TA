@@ -222,7 +222,8 @@
         </div>
         <div class="p-5 md:p-6 space-y-6 md:space-y-8 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
             {{-- Sablon Size Picker for Selected Object --}}
-            <div id="objectSablonSizeControl" class="space-y-3 pb-5 md:pb-6 border-b border-slate-100">
+            {{-- HIDDEN: Ukuran sablon disembunyikan sementara, data tetap tersimpan di JS --}}
+            <div id="objectSablonSizeControl" class="space-y-3 pb-5 md:pb-6 border-b border-slate-100" style="display: none !important;">
                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Ukuran Sablon Objek</label>
                 <div class="grid grid-cols-3 gap-2">
                     <button type="button" id="btnSizeA5" onclick="setObjectSablonSize('a5')" class="size-btn flex flex-col items-center justify-center p-2 rounded-xl border border-slate-200 bg-slate-50 hover:border-red-400 transition cursor-pointer">

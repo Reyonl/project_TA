@@ -9,7 +9,7 @@ skinparam DefaultFontSize 12
 actor "Pelanggan" as Customer
 boundary "Halaman Registrasi" as View
 control "Kontroler Registrasi" as Controller
-database "Basis Data\n(Pelanggan)" as DB
+entity "Basis Data\n(Pelanggan)" as DB
 
 Customer -> View : Membuka halaman registrasi
 View --> Customer : Menampilkan formulir registrasi
@@ -44,7 +44,7 @@ actor "Pelanggan" as Customer
 boundary "Editor Desain" as View
 control "Kontroler Desain" as Controller
 boundary "Penyimpanan\n(Storage)" as Storage
-database "Basis Data" as DB
+entity "Basis Data" as DB
 
 Customer -> View : Membuka Editor Desain
 Customer -> View : Langkah 1: Memilih Warna Pakaian
@@ -75,7 +75,7 @@ skinparam shadowing false
 actor "Pelanggan" as Customer
 boundary "Halaman Keranjang" as View
 control "Kontroler Keranjang" as Controller
-database "Basis Data\n(Keranjang)" as DB
+entity "Basis Data\n(Keranjang)" as DB
 
 Customer -> View : Membuka keranjang
 View -> Controller : Meminta data keranjang
@@ -109,7 +109,7 @@ actor "Pelanggan" as Customer
 boundary "Halaman Checkout" as View
 control "Kontroler Checkout" as Controller
 boundary "Penyimpanan\n(Storage)" as Storage
-database "Basis Data\n(Pesanan)" as DB
+entity "Basis Data\n(Pesanan)" as DB
 
 Customer -> View : Mengunggah bukti & klik buat pesanan
 View -> Controller : Mengirim bukti pembayaran
@@ -137,7 +137,7 @@ skinparam shadowing false
 actor "Pelanggan" as Customer
 boundary "Halaman Riwayat" as View
 control "Kontroler Pesanan" as Controller
-database "Basis Data" as DB
+entity "Basis Data" as DB
 
 Customer -> View : Membuka riwayat pesanan
 View -> Controller : Meminta riwayat pesanan
@@ -168,7 +168,7 @@ skinparam shadowing false
 actor "Pengguna" as Actor
 boundary "Halaman Masuk (Login)" as View
 control "Kontroler Otentikasi" as Controller
-database "Basis Data" as DB
+entity "Basis Data" as DB
 
 Actor -> View : Membuka formulir masuk
 Actor -> View : Mengisi email & kata sandi
@@ -196,7 +196,7 @@ skinparam shadowing false
 actor "Admin" as Admin
 boundary "Halaman Produk" as View
 control "Kontroler Produk" as Controller
-database "Basis Data" as DB
+entity "Basis Data" as DB
 
 Admin -> View : Mengakses menu produk
 View -> Controller : Meminta daftar produk
@@ -234,7 +234,7 @@ actor "Admin" as Admin
 boundary "Halaman Templat" as View
 control "Kontroler Templat" as Controller
 boundary "Penyimpanan" as Storage
-database "Basis Data" as DB
+entity "Basis Data" as DB
 
 Admin -> View : Mengunggah gambar templat
 View -> Controller : Mengirim gambar
@@ -254,6 +254,7 @@ Controller -> Storage : Menghapus file gambar
 Controller -> DB : Menghapus data templat
 Controller --> View : Mengarahkan kembali
 deactivate Controller
+@enduml
 
 @startuml 09_Review_Desain
 hide footbox
@@ -265,7 +266,7 @@ actor "Pelanggan" as Customer
 boundary "Detail Pesanan" as View
 control "Kontroler Pesanan\n(Admin / Customer)" as Controller
 boundary "Penyimpanan\n(Storage)" as Storage
-database "Basis Data" as DB
+entity "Basis Data" as DB
 
 Admin -> View : Memeriksa detail desain pesanan
 
@@ -324,7 +325,7 @@ skinparam shadowing false
 actor "Pemilik" as Owner
 boundary "Halaman Laporan\n(Browser)" as View
 control "Kontroler Laporan" as Controller
-database "Basis Data" as DB
+entity "Basis Data" as DB
 
 Owner -> View : Memilih rentang tanggal & Filter
 View -> Controller : Meminta laporan sesuai tanggal
@@ -363,7 +364,7 @@ skinparam shadowing false
 actor "Admin" as Admin
 boundary "Manajemen Pesanan" as View
 control "Kontroler Pesanan" as Controller
-database "Basis Data" as DB
+entity "Basis Data" as DB
 
 Admin -> View : Melihat tabel pesanan masuk
 
@@ -400,7 +401,7 @@ actor "Pemilik" as Owner
 boundary "Halaman Laporan" as View
 control "Kontroler Laporan" as Controller
 boundary "Pembuat PDF" as PDF
-database "Basis Data" as DB
+entity "Basis Data" as DB
 
 Owner -> View : Memilih rentang tanggal & Filter
 View -> Controller : Meminta laporan sesuai tanggal
