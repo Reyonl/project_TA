@@ -128,5 +128,57 @@ Route::middleware('auth:admin')->prefix('admin')->name('admin.')->group(function
     });
 });
 
+// ==================== DEBUG SEMENTARA ====================
+Route::get('/debug-storage', function () {
+    $storagePath  = storage_path('app/public');
+    $publicPath   = public_path();
+    $basePath     = base_path();
+
+    // Scan isi folder storage/app/public jika ada
+    $files = [];
+    if (is_dir($storagePath)) {
+        foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($storagePath, FilesystemIterator::SKIP_DOTS)) as $file) {
+            $files[] = $file->getPathname();
+            if (count($files) >= 20) { $files[] = '... (terpotong)'; break; }
+        }
+    }
+
+    return response()->json([
+        'base_path'      => $basePath,
+        'public_path'    => $publicPath,
+        'storage_path'   => $storagePath,
+        'storage_exists' => is_dir($storagePath),
+        'files_found'    => $files,
+    ]);
+});
+// ==================== END DEBUG ====================
+
+// Fallback Route untuk melayani file storage langsung melalui PHP
+// Sangat berguna di shared hosting di mana symlink bermasalah
+Route::get('storage/{path}', function ($path) {
+    $fullPath = storage_path('app/public/' . $path);
+    
+    // DEBUG SEMENTARA - hapus setelah solved
+    if (!file_exists($fullPath)) {
+        return response()->json([
+            'error'     => 'File not found',
+            'path_requested' => $path,
+            'full_path_checked' => $fullPath,
+            'storage_dir_exists' => is_dir(storage_path('app/public')),
+            'designs_dir_exists' => is_dir(storage_path('app/public/designs')),
+            'designs_dir_contents' => is_dir(storage_path('app/public/designs'))
+                ? array_slice(scandir(storage_path('app/public/designs')), 0, 10)
+                : [],
+        ]);
+    }
+    
+    $mimeType = \Illuminate\Support\Facades\File::mimeType($fullPath);
+    return response()->file($fullPath, [
+        'Content-Type' => $mimeType
+    ]);
+})->where('path', '.*');
+
+
+
 require __DIR__.'/auth.php';
 require __DIR__.'/settings.php';

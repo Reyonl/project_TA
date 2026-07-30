@@ -34,11 +34,6 @@
                         <input type="text" name="nama_template" id="nama_template" class="w-full rounded-lg border-slate-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm" value="{{ old('nama_template') }}" required>
                     </div>
 
-                    <div class="mb-4">
-                        <label for="kategori" class="block text-sm font-medium text-slate-700 mb-1">Kategori (Baju, Hoodie, Polo, dsb)</label>
-                        <input type="text" name="kategori" id="kategori" class="w-full rounded-lg border-slate-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm" value="{{ old('kategori') ?? 'Kaos' }}" required>
-                    </div>
-
                     <div class="mb-6">
                         <label for="file_template" class="block text-sm font-medium text-slate-700 mb-1">File Gambar Template (PNG / JPEG / SVG)</label>
                         <input type="file" name="file_template" id="file_template" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 border border-slate-200 rounded-lg cursor-pointer" accept="image/*" required>

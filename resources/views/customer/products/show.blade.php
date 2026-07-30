@@ -207,21 +207,6 @@
                     </div>
                 </div>
 
-                <!-- Info Box (Premium Style) -->
-                <div class="bg-red-50 border border-red-100 rounded-2xl p-6 mb-8 flex gap-4 shadow-sm relative overflow-hidden group">
-                    <div class="absolute -right-2 -bottom-2 text-red-200/40 group-hover:scale-110 transition-transform duration-700">
-                         <svg class="w-20 h-20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-                    </div>
-                    <div>
-                        <h4 class="font-black text-red-900 text-sm mb-1 uppercase tracking-tight">Panduan Bahan & Ukuran</h4>
-                        <p class="text-sm text-red-700/80 mb-3 leading-relaxed font-medium italic">Pastikan brand Anda mendapatkan kualitas terbaik dengan panduan presisi kami.</p>
-                        <a href="#" class="text-xs font-black text-red-600 hover:text-red-800 flex items-center gap-1 uppercase tracking-widest">
-                            LIHAT DETAIL
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
-                        </a>
-                    </div>
-                </div>
-
                 <hr class="border-slate-200 mb-8" />
 
                 <!-- Configurator -->
@@ -366,13 +351,7 @@
                     @endif
                 </div>
 
-                <div class="mt-6 border border-slate-200 rounded-lg p-4 bg-white shadow-sm flex items-center justify-between">
-                    <div>
-                        <h5 class="text-sm font-bold text-slate-800 mb-0.5">Diskon Partai Besar</h5>
-                        <p class="text-xs text-slate-500">Hemat hingga 20% untuk pembelian grosir.</p>
-                    </div>
-                    <button class="px-3 py-1.5 bg-slate-100 font-semibold text-xs text-slate-700 rounded hover:bg-slate-200 transition">Lihat Promo</button>
-                </div>
+
             </div>
         </main>
     </body>

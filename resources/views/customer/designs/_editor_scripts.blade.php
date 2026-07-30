@@ -267,6 +267,22 @@ function initFabricEditor() {
     // Upload handler
     const imageLoader = document.getElementById('imageLoader');
     if(imageLoader) imageLoader.addEventListener('change', function(e) {
+        var file = e.target.files[0];
+        if (!file) return;
+
+        // Validasi format sesuai flowchart
+        var validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml'];
+        if (!validTypes.includes(file.type)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Format Tidak Valid',
+                text: 'Harap unggah gambar dengan format PNG, JPG, atau SVG.',
+                confirmButtonColor: '#4f46e5'
+            });
+            e.target.value = ''; // Reset input
+            return;
+        }
+
         var reader = new FileReader();
         reader.onload = function(event) {
             var imgObj = new Image(); imgObj.src = event.target.result;
@@ -279,7 +295,7 @@ function initFabricEditor() {
                 window.activeCanvas.add(img); window.activeCanvas.setActiveObject(img); window.activeCanvas.requestRenderAll();
             }
         };
-        reader.readAsDataURL(e.target.files[0]); e.target.value = '';
+        reader.readAsDataURL(file); e.target.value = '';
     });
 
     // Template click

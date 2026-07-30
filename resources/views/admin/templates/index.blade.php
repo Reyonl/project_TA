@@ -21,7 +21,6 @@
                         <div class="border border-slate-200 rounded-xl p-4 text-center">
                             <img src="{{ Storage::url($template->file_template) }}" alt="Template" class="w-full h-32 object-contain bg-slate-100 rounded-lg mb-3">
                             <p class="font-semibold text-slate-800 truncate mb-1">{{ $template->nama_template }}</p>
-                            <p class="text-xs text-slate-500 mb-3">{{ $template->kategori }}</p>
 
                             <div class="flex gap-2">
                                 <a href="{{ route('admin.templates.edit', $template) }}" class="flex-1 text-center text-sm text-slate-700 bg-slate-100 hover:bg-slate-200 py-1.5 rounded-md font-semibold transition">

@@ -128,15 +128,20 @@
                             
                             <!-- Image Container with Hover Effect -->
                             <div class="relative h-64 bg-slate-50 flex items-center justify-center p-6 overflow-hidden">
-                                <!-- Placeholder Image based on Product Type -->
-                                @if($item->jenis_produk == 'kaos')
-                                    <div class="text-7xl lg:text-8xl transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-xl select-none">👕</div>
-                                @elseif($item->jenis_produk == 'hoodie')
-                                    <div class="text-7xl lg:text-8xl transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-xl select-none">🧥</div>
-                                @elseif($item->jenis_produk == 'topi')
-                                    <div class="text-7xl lg:text-8xl transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-xl select-none">🧢</div>
+                                <!-- Image based on Product -->
+                                @if($item->gambar_produk)
+                                    <img src="{{ Storage::url($item->gambar_produk) }}" class="w-full h-full object-contain transform group-hover:scale-110 group-hover:-translate-y-2 transition-transform duration-500 drop-shadow-2xl select-none p-4" alt="{{ $item->nama_produk }}">
                                 @else
-                                    <div class="text-7xl lg:text-8xl transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-xl select-none">👕</div>
+                                    <!-- Placeholder Image based on Product Type -->
+                                    @if($item->jenis_produk == 'kaos')
+                                        <div class="text-7xl lg:text-8xl transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-xl select-none">👕</div>
+                                    @elseif($item->jenis_produk == 'hoodie')
+                                        <div class="text-7xl lg:text-8xl transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-xl select-none">🧥</div>
+                                    @elseif($item->jenis_produk == 'topi')
+                                        <div class="text-7xl lg:text-8xl transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-xl select-none">🧢</div>
+                                    @else
+                                        <div class="text-7xl lg:text-8xl transform group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 drop-shadow-xl select-none">👕</div>
+                                    @endif
                                 @endif
                                 
                                 <!-- Badges -->
