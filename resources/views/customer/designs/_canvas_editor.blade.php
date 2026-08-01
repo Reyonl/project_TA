@@ -15,6 +15,9 @@
             if ($jenis === 'polo') return ['width' => 90, 'height' => 90, 'top' => 160, 'left' => 265, 'label' => 'Pocket'];
             if ($jenis === 'seragam') return ['width' => 100, 'height' => 100, 'top' => 180, 'left' => 135, 'label' => 'Dada'];
         }
+        if (in_array($side, ['left', 'right'])) {
+            return ['width' => 140, 'height' => 320, 'top' => 140, 'left' => 170, 'label' => 'Samping'];
+        }
         return ['width' => 220, 'height' => 320, 'top' => 120, 'left' => 130, 'label' => 'Area Cetak'];
     };
 @endphp
@@ -136,8 +139,8 @@
         {{-- Step Label --}}
         <div class="h-14 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-4 md:px-6 shadow-sm z-10 w-full flex-shrink-0">
             <div class="flex items-center gap-2 md:gap-4">
-                <span class="text-xs md:text-sm font-black text-slate-800 uppercase tracking-widest" x-text="currentStep === 2 ? 'Bagian Depan' : 'Bagian Belakang'"></span>
-                <span class="text-[10px] md:text-xs font-bold px-2 md:px-3 py-1 rounded-full" :class="currentStep === 2 ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'" x-text="currentStep === 2 ? 'STEP 2' : 'STEP 3'"></span>
+                <span class="text-xs md:text-sm font-black text-slate-800 uppercase tracking-widest" x-text="activeSide === 'front' ? 'Bagian Depan' : (activeSide === 'back' ? 'Bagian Belakang' : (activeSide === 'left' ? 'Samping Kiri' : 'Samping Kanan'))"></span>
+                <span class="text-[10px] md:text-xs font-bold px-2 md:px-3 py-1 rounded-full bg-red-100 text-red-700" x-text="'STEP ' + currentStep"></span>
             </div>
         </div>
 
@@ -155,6 +158,8 @@
                         <div x-data="{
                             getMockupUrl() {
                                 if(activeSide === 'front') return '{{ asset('images/mockups/'.$mockupBase.'.png?v='.time()) }}';
+                                if(activeSide === 'left') return '{{ asset('images/mockups/'.$mockupBase.'_samping_kiri.png?v='.time()) }}';
+                                if(activeSide === 'right') return '{{ asset('images/mockups/'.$mockupBase.'_samping_kanan.png?v='.time()) }}';
                                 return '{{ asset('images/mockups/'.$mockupBase.'_belakang.png?v='.time()) }}';
                             }
                         }" class="w-full h-full flex items-center justify-center">
@@ -175,6 +180,8 @@
                     window.printAreaDims = window.printAreaDims || {};
                     window.printAreaDims['front'] = {!! json_encode($getPrintArea('front')) !!};
                     window.printAreaDims['back'] = {!! json_encode($getPrintArea('back')) !!};
+                    window.printAreaDims['left'] = {!! json_encode($getPrintArea('left')) !!};
+                    window.printAreaDims['right'] = {!! json_encode($getPrintArea('right')) !!};
                 </script>
 
                 {{-- Print Area Visualizer --}}
@@ -199,6 +206,16 @@
                 {{-- Fabric Canvas Back --}}
                 <div class="absolute z-20" style="top: {{ $paBack['top'] }}px; left: {{ $paBack['left'] }}px; width: {{ $paBack['width'] }}px; height: {{ $paBack['height'] }}px;" x-show="activeSide === 'back'" x-cloak>
                     <canvas id="tshirt-canvas-back" width="{{ $paBack['width'] }}" height="{{ $paBack['height'] }}"></canvas>
+                </div>
+                @php $paLeft = $getPrintArea('left'); @endphp
+                {{-- Fabric Canvas Left --}}
+                <div class="absolute z-20" style="top: {{ $paLeft['top'] }}px; left: {{ $paLeft['left'] }}px; width: {{ $paLeft['width'] }}px; height: {{ $paLeft['height'] }}px;" x-show="activeSide === 'left'" x-cloak>
+                    <canvas id="tshirt-canvas-left" width="{{ $paLeft['width'] }}" height="{{ $paLeft['height'] }}"></canvas>
+                </div>
+                @php $paRight = $getPrintArea('right'); @endphp
+                {{-- Fabric Canvas Right --}}
+                <div class="absolute z-20" style="top: {{ $paRight['top'] }}px; left: {{ $paRight['left'] }}px; width: {{ $paRight['width'] }}px; height: {{ $paRight['height'] }}px;" x-show="activeSide === 'right'" x-cloak>
+                    <canvas id="tshirt-canvas-right" width="{{ $paRight['width'] }}" height="{{ $paRight['height'] }}"></canvas>
                 </div>
             </div>
         </div>

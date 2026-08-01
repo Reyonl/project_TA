@@ -1,5 +1,4 @@
 <x-app-layout>
-    <script src="/js/fabric.min.js"></script>
     <script>
         window.activeBaseColorLocal = '#ffffff'; 
         window.canvasBackgroundChange = function(color) {
@@ -10,13 +9,13 @@
                 else printbox.classList.replace('border-white/30', 'border-slate-800/20');
             }
         };
-    </script>`
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Dancing+Script:wght@700&family=Lobster&family=Montserrat:wght@400;700&family=Pacifico&family=Playfair+Display:wght@700&family=Roboto:wght@400;700&family=Oswald:wght@500&family=Anton&display=swap" rel="stylesheet">
 
     <div class="min-h-screen bg-slate-50" 
          x-data="{ 
              currentStep: 1,
-             totalSteps: 4,
+             totalSteps: {{ $produk->jenis_produk == 'hoodie' ? 6 : 4 }},
              activeTab: 'templates', 
              baseColor: '#ffffff',
              activeSide: 'front', 
@@ -31,7 +30,11 @@
                  this.currentStep = step;
                  if(step === 2) { this.activeSide = 'front'; if(window.switchCanvasSide) window.switchCanvasSide('front'); }
                  if(step === 3) { this.activeSide = 'back'; if(window.switchCanvasSide) window.switchCanvasSide('back'); }
-                 if(step === 4 && window.generatePreviews) { setTimeout(() => window.generatePreviews(), 300); }
+                 if(this.totalSteps === 6) {
+                     if(step === 4) { this.activeSide = 'left'; if(window.switchCanvasSide) window.switchCanvasSide('left'); }
+                     if(step === 5) { this.activeSide = 'right'; if(window.switchCanvasSide) window.switchCanvasSide('right'); }
+                 }
+                 if(step === this.totalSteps && window.generatePreviews) { setTimeout(() => window.generatePreviews(), 300); }
              },
              getColorName(hex) {
                  for(let [name, val] of Object.entries(this.colorMap)) { if(val === hex) return name; }
@@ -54,14 +57,19 @@
                     <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Editor Desain — {{ $produk->nama_produk }}</span>
                 </div>
                 <div class="flex items-center gap-2">
-                    @php $stepNames = ['Produk & Warna','Desain Depan','Desain Belakang','Review & Simpan']; @endphp
-                    @for($i = 1; $i <= 4; $i++)
-                    <div class="flex items-center {{ $i < 4 ? 'flex-1' : 'flex-none' }}">
+                    @php 
+                        $stepNames = $produk->jenis_produk == 'hoodie' 
+                            ? ['Produk & Warna','Desain Depan','Desain Belakang','Samping Kiri','Samping Kanan','Review & Simpan']
+                            : ['Produk & Warna','Desain Depan','Desain Belakang','Review & Simpan']; 
+                        $stepsCount = count($stepNames);
+                    @endphp
+                    @for($i = 1; $i <= $stepsCount; $i++)
+                    <div class="flex items-center {{ $i < $stepsCount ? 'flex-1' : 'flex-none' }}">
                         <div class="flex items-center justify-center w-8 h-8 rounded-full text-xs font-black transition-all duration-300 shrink-0"
                              :class="currentStep >= {{ $i }} ? 'bg-red-600 text-white shadow-lg shadow-red-200' : 'bg-slate-200 text-slate-400'">{{ $i }}</div>
                         <span class="ml-2 text-xs font-bold hidden md:inline"
                               :class="currentStep >= {{ $i }} ? 'text-red-700' : 'text-slate-400'">{{ $stepNames[$i-1] }}</span>
-                        @if($i < 4)
+                        @if($i < $stepsCount)
                         <div class="flex-1 h-1 mx-3 rounded-full transition-all duration-500"
                              :class="currentStep > {{ $i }} ? 'bg-red-500' : 'bg-slate-200'"></div>
                         @endif
@@ -137,8 +145,8 @@
             </div>
         </div>
 
-        {{-- ===== STEP 2 & 3: CANVAS EDITOR (SINGLE INSTANCE) ===== --}}
-        <div x-show="currentStep === 2 || currentStep === 3" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" x-cloak>
+        {{-- ===== STEP 2 - 5: CANVAS EDITOR (SINGLE INSTANCE) ===== --}}
+        <div x-show="currentStep > 1 && currentStep < totalSteps" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" x-cloak>
             @include('customer.designs._canvas_editor')
 
             {{-- Navigation Buttons --}}
@@ -147,27 +155,27 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Kembali
                 </button>
                 <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                    {{-- Skip button only on Step 3 --}}
-                    <button x-show="currentStep === 3" @click="goToStep(4)" class="flex items-center justify-center gap-2 w-full sm:w-auto bg-slate-100 border border-slate-300 text-slate-600 font-bold py-3 px-6 rounded-xl hover:bg-slate-200 transition text-sm">
-                        Skip Belakang →
+                    {{-- Skip button for all steps except 1 and last step --}}
+                    <button x-show="currentStep > 1 && currentStep < totalSteps - 1" @click="goToStep(currentStep + 1)" class="flex items-center justify-center gap-2 w-full sm:w-auto bg-slate-100 border border-slate-300 text-slate-600 font-bold py-3 px-6 rounded-xl hover:bg-slate-200 transition text-sm">
+                        Skip Bagian Ini →
                     </button>
                     <button @click="goToStep(currentStep + 1)" class="flex items-center justify-center gap-2 w-full sm:w-auto bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-black py-3 px-8 rounded-xl shadow-lg shadow-red-200 transition-all text-sm hover:-translate-y-0.5">
-                        <span x-text="currentStep === 2 ? 'Lanjut ke Desain Belakang' : 'Lanjut ke Review'"></span>
+                        <span x-text="currentStep < totalSteps - 1 ? 'Lanjut ke Sisi Berikutnya' : 'Lanjut ke Review'"></span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                     </button>
                 </div>
             </div>
         </div>
 
-        {{-- ===== STEP 4: REVIEW & SIMPAN ===== --}}
-        <div x-show="currentStep === 4" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" x-cloak>
+        {{-- ===== STEP 4/6: REVIEW & SIMPAN ===== --}}
+        <div x-show="currentStep === totalSteps" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" x-cloak>
             <div class="max-w-3xl mx-auto px-6 py-12">
                 <div class="text-center mb-10">
                     <h1 class="text-3xl font-black text-slate-800 mb-2">Review Desain Anda</h1>
                     <p class="text-slate-500">Pastikan semua desain sudah benar sebelum menyimpan</p>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 {{ $produk->jenis_produk == 'hoodie' ? 'md:grid-cols-4' : '' }} gap-4 mb-8">
                     <div class="bg-white rounded-xl border border-slate-200 p-4 text-center shadow-sm">
                         <h4 class="text-xs font-black text-slate-500 uppercase mb-3">Depan</h4>
                         <div class="bg-slate-50 rounded-lg border border-slate-100 overflow-hidden mx-auto w-full max-w-[200px] h-[250px]">
@@ -188,6 +196,28 @@
                             </div>
                         </div>
                     </div>
+                    @if($produk->jenis_produk == 'hoodie')
+                    <div class="bg-white rounded-xl border border-slate-200 p-4 text-center shadow-sm">
+                        <h4 class="text-xs font-black text-slate-500 uppercase mb-3">Samping Kiri</h4>
+                        <div class="bg-slate-50 rounded-lg border border-slate-100 overflow-hidden mx-auto w-full max-w-[200px] h-[250px]">
+                            <img id="preview-left" src="" alt="Preview Kiri" class="w-full h-full object-contain" style="display:none;" onload="this.style.display='block'; this.nextElementSibling.style.display='none';">
+                            <div class="flex items-center justify-center h-full text-slate-400 text-xs">
+                                <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                                Memuat preview...
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl border border-slate-200 p-4 text-center shadow-sm">
+                        <h4 class="text-xs font-black text-slate-500 uppercase mb-3">Samping Kanan</h4>
+                        <div class="bg-slate-50 rounded-lg border border-slate-100 overflow-hidden mx-auto w-full max-w-[200px] h-[250px]">
+                            <img id="preview-right" src="" alt="Preview Kanan" class="w-full h-full object-contain" style="display:none;" onload="this.style.display='block'; this.nextElementSibling.style.display='none';">
+                            <div class="flex items-center justify-center h-full text-slate-400 text-xs">
+                                <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                                Memuat preview...
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                 </div>
 
                 <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-8 mb-8">
@@ -216,7 +246,7 @@
                 </div>
 
                 <div class="flex flex-col sm:flex-row justify-between gap-4 mt-6">
-                    <button @click="goToStep(3)" class="flex items-center justify-center gap-2 w-full sm:w-auto bg-white border border-slate-300 text-slate-600 font-bold py-3 px-6 rounded-xl hover:bg-slate-50 transition text-sm">
+                    <button @click="goToStep(totalSteps - 1)" class="flex items-center justify-center gap-2 w-full sm:w-auto bg-white border border-slate-300 text-slate-600 font-bold py-3 px-6 rounded-xl hover:bg-slate-50 transition text-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Kembali
                     </button>
                     <button id="saveDesignBtn" class="flex items-center justify-center gap-2 w-full sm:w-auto bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-700 hover:to-emerald-600 text-white font-black py-3 px-8 rounded-xl shadow-lg shadow-green-200 transition-all text-sm hover:-translate-y-0.5">
@@ -229,5 +259,6 @@
     </div>
 
     @include('customer.designs._editor_styles')
+    <script src="{{ asset('js/fabric.min.js') }}"></script>
     @include('customer.designs._editor_scripts')
 </x-app-layout>

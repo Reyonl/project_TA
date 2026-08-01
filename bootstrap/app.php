@@ -16,11 +16,11 @@ use Illuminate\Foundation\Configuration\Middleware;
 |--------------------------------------------------------------------------
 */
 $basePath = dirname(__DIR__);
-$publicPath = file_exists($basePath.'/vendor/autoload.php')
-    // index.php satu level dengan vendor/ → Hostinger mode
-    ? $basePath
+$publicPath = file_exists($basePath.'/public/index.php')
     // index.php berada di dalam public/ → local/default mode
-    : $basePath.'/public';
+    ? $basePath.'/public'
+    // index.php dipindah ke luar (root) → Hostinger mode
+    : $basePath;
 
 return Application::configure(basePath: $basePath)
     ->withRouting(

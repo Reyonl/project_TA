@@ -68,6 +68,8 @@ function initFabricEditor() {
     // Generate preview thumbnails for Step 4
     const mockupFrontUrl = '{{ asset("images/mockups/" . $mockupBase . ".png") }}';
     const mockupBackUrl = '{{ asset("images/mockups/" . $mockupBase . "_belakang.png") }}';
+    const mockupLeftUrl = '{{ asset("images/mockups/" . $mockupBase . "_samping_kiri.png") }}';
+    const mockupRightUrl = '{{ asset("images/mockups/" . $mockupBase . "_samping_kanan.png") }}';
 
     function compositePreview(targetImgId, fabricCanvas, mockupUrl, hasDesign) {
         const targetImg = document.getElementById(targetImgId);
@@ -153,6 +155,10 @@ function initFabricEditor() {
         try {
             compositePreview('preview-front', canvasFront, mockupFrontUrl, true);
             compositePreview('preview-back', canvasBack, mockupBackUrl, canvasBack && canvasBack.getObjects().length > 0);
+            if(document.getElementById('preview-left')) {
+                compositePreview('preview-left', canvasLeft, mockupLeftUrl, canvasLeft && canvasLeft.getObjects().length > 0);
+                compositePreview('preview-right', canvasRight, mockupRightUrl, canvasRight && canvasRight.getObjects().length > 0);
+            }
         } catch(e) { console.warn('Preview generation error:', e); }
     };
 
@@ -161,7 +167,7 @@ function initFabricEditor() {
     if(rootEl && window.Alpine) {
         Alpine.effect(() => {
             const data = Alpine.$data(rootEl);
-            if(data.currentStep === 4) { setTimeout(() => window.generatePreviews(), 300); }
+            if(data.currentStep === data.totalSteps) { setTimeout(() => window.generatePreviews(), 300); }
         });
     }
 
@@ -358,6 +364,8 @@ function initFabricEditor() {
         let totalDesignPrice = 0; // Pricing dinonaktifkan
         let breakdownTextFront = [];
         let breakdownTextBack = [];
+        let breakdownTextLeft = [];
+        let breakdownTextRight = [];
 
         if (canvasFront) {
             canvasFront.getObjects().forEach((obj, idx) => {
@@ -370,6 +378,20 @@ function initFabricEditor() {
             canvasBack.getObjects().forEach((obj, idx) => {
                 let typeLabel = obj.type === 'i-text' ? 'Teks' : (obj.customType === 'custom-svg' ? 'Stiker' : 'Gambar');
                 breakdownTextBack.push(`${typeLabel} #${idx+1}`);
+            });
+        }
+
+        if (canvasLeft) {
+            canvasLeft.getObjects().forEach((obj, idx) => {
+                let typeLabel = obj.type === 'i-text' ? 'Teks' : (obj.customType === 'custom-svg' ? 'Stiker' : 'Gambar');
+                breakdownTextLeft.push(`${typeLabel} #${idx+1}`);
+            });
+        }
+
+        if (canvasRight) {
+            canvasRight.getObjects().forEach((obj, idx) => {
+                let typeLabel = obj.type === 'i-text' ? 'Teks' : (obj.customType === 'custom-svg' ? 'Stiker' : 'Gambar');
+                breakdownTextRight.push(`${typeLabel} #${idx+1}`);
             });
         }
 
@@ -388,7 +410,19 @@ function initFabricEditor() {
                 breakdownTextBack.forEach(item => { html += `<li>${item}</li>`; });
                 html += `</ul></div>`;
             }
-            if (breakdownTextFront.length === 0 && breakdownTextBack.length === 0) {
+            if (breakdownTextLeft.length > 0) {
+                html += `<div class="mb-2"><span class="font-bold text-slate-700 block text-xs">Sisi Kiri:</span>`;
+                html += `<ul class="list-disc list-inside text-xs text-slate-500 pl-2">`;
+                breakdownTextLeft.forEach(item => { html += `<li>${item}</li>`; });
+                html += `</ul></div>`;
+            }
+            if (breakdownTextRight.length > 0) {
+                html += `<div class="mb-2"><span class="font-bold text-slate-700 block text-xs">Sisi Kanan:</span>`;
+                html += `<ul class="list-disc list-inside text-xs text-slate-500 pl-2">`;
+                breakdownTextRight.forEach(item => { html += `<li>${item}</li>`; });
+                html += `</ul></div>`;
+            }
+            if (breakdownTextFront.length === 0 && breakdownTextBack.length === 0 && breakdownTextLeft.length === 0 && breakdownTextRight.length === 0) {
                 html = `<p class="text-xs text-slate-400 italic">Belum ada objek sablon ditambahkan.</p>`;
             }
             breakdownContainer.innerHTML = html;
@@ -409,7 +443,9 @@ function initFabricEditor() {
         window.currentHargaDesain = totalDesignPrice;
         let desc = '';
         if(breakdownTextFront.length > 0) desc += 'Depan: ' + breakdownTextFront.join(', ') + '. ';
-        if(breakdownTextBack.length > 0) desc += 'Belakang: ' + breakdownTextBack.join(', ') + '.';
+        if(breakdownTextBack.length > 0) desc += 'Belakang: ' + breakdownTextBack.join(', ') + '. ';
+        if(breakdownTextLeft.length > 0) desc += 'Kiri: ' + breakdownTextLeft.join(', ') + '. ';
+        if(breakdownTextRight.length > 0) desc += 'Kanan: ' + breakdownTextRight.join(', ') + '.';
         window.currentDetailSablon = desc;
     };
 

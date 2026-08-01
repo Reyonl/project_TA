@@ -90,14 +90,17 @@
                             $baseImg = match($produk->jenis_produk) {
                                 'kaos' => $isPanjang ? 'kaos_panjang.png' : 'kaos.png',
                                 'hoodie' => 'hoodie.png',
-                                'topi' => 'topi.png',
                                 'polo' => 'polo.png',
                                 'seragam' => 'seragam.png',
                                 default => 'kaos.png'
                             };
                             $baseImgBack = str_replace('.png', '_belakang.png', $baseImg);
+                            $baseImgLeft = str_replace('.png', '_samping_kiri.png', $baseImg);
+                            $baseImgRight = str_replace('.png', '_samping_kanan.png', $baseImg);
                             $maskUrlFront = asset('images/mockups/'.$baseImg); 
                             $maskUrlBack = asset('images/mockups/'.$baseImgBack);
+                            $maskUrlLeft = asset('images/mockups/'.$baseImgLeft);
+                            $maskUrlRight = asset('images/mockups/'.$baseImgRight);
                         @endphp
                         
                         <!-- Thumbnail Depan -->
@@ -117,6 +120,22 @@
                             <span :class="activeSide === 'back' ? 'text-slate-900 font-extrabold' : 'text-slate-500 font-bold'" class="text-[10px] uppercase tracking-wider transition">Belakang</span>
                         </div>
                         @endif
+
+                        <!-- Thumbnail Samping Kiri & Kanan (Khusus Hoodie) -->
+                        @if($produk->jenis_produk == 'hoodie')
+                        <div class="flex flex-col gap-1 items-center mt-1">
+                            <button type="button" @click="activeSide = 'left'" :class="activeSide === 'left' ? 'border-2 border-slate-900 shadow-md opacity-100' : 'border border-slate-200 opacity-60 hover:opacity-100'" class="w-full aspect-square rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center relative transition shadow-sm cursor-pointer">
+                                <img src="{{ $maskUrlLeft }}" class="w-[85%] object-contain" alt="Kiri">
+                            </button>
+                            <span :class="activeSide === 'left' ? 'text-slate-900 font-extrabold' : 'text-slate-500 font-bold'" class="text-[10px] uppercase tracking-wider transition">Kiri</span>
+                        </div>
+                        <div class="flex flex-col gap-1 items-center mt-1">
+                            <button type="button" @click="activeSide = 'right'" :class="activeSide === 'right' ? 'border-2 border-slate-900 shadow-md opacity-100' : 'border border-slate-200 opacity-60 hover:opacity-100'" class="w-full aspect-square rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center relative transition shadow-sm cursor-pointer">
+                                <img src="{{ $maskUrlRight }}" class="w-[85%] object-contain" alt="Kanan">
+                            </button>
+                            <span :class="activeSide === 'right' ? 'text-slate-900 font-extrabold' : 'text-slate-500 font-bold'" class="text-[10px] uppercase tracking-wider transition">Kanan</span>
+                        </div>
+                        @endif
                     </div>
                     
                     <!-- Main Image -->
@@ -126,14 +145,14 @@
                         <!-- Interactive Tinted Preview -->
                         <div class="relative w-full h-full max-h-[500px] aspect-square flex items-center justify-center group-hover:scale-105 transition-transform duration-700">
                             <!-- Shadow/Texture Layer (Transparent Overlay) -->
-                            <img :src="activeSide === 'front' ? '{{ $maskUrlFront }}' : '{{ $maskUrlBack }}'" class="absolute w-full h-full object-contain mix-blend-multiply opacity-30 z-20 pointer-events-none transition-all duration-300">
+                            <img :src="activeSide === 'front' ? '{{ $maskUrlFront }}' : (activeSide === 'back' ? '{{ $maskUrlBack }}' : (activeSide === 'left' ? '{{ $maskUrlLeft }}' : '{{ $maskUrlRight }}'))" class="absolute w-full h-full object-contain mix-blend-multiply opacity-30 z-20 pointer-events-none transition-all duration-300">
                             
                             <!-- Base Colored Layer with Mask -->
                             <div class="absolute inset-0 transition-all duration-500 z-10"
                                  :style="{ 
                                      backgroundColor: colorMap[selectedColor],
-                                     WebkitMaskImage: 'url(' + (activeSide === 'front' ? '{{ $maskUrlFront }}' : '{{ $maskUrlBack }}') + ')',
-                                     maskImage: 'url(' + (activeSide === 'front' ? '{{ $maskUrlFront }}' : '{{ $maskUrlBack }}') + ')',
+                                     WebkitMaskImage: 'url(' + (activeSide === 'front' ? '{{ $maskUrlFront }}' : (activeSide === 'back' ? '{{ $maskUrlBack }}' : (activeSide === 'left' ? '{{ $maskUrlLeft }}' : '{{ $maskUrlRight }}'))) + ')',
+                                     maskImage: 'url(' + (activeSide === 'front' ? '{{ $maskUrlFront }}' : (activeSide === 'back' ? '{{ $maskUrlBack }}' : (activeSide === 'left' ? '{{ $maskUrlLeft }}' : '{{ $maskUrlRight }}'))) + ')',
                                      WebkitMaskSize: 'contain',
                                      maskSize: 'contain',
                                      WebkitMaskPosition: 'center',
@@ -144,7 +163,7 @@
                             </div>
                             
                             <!-- Highlights Layer (Additive) -->
-                            <img :src="activeSide === 'front' ? '{{ $maskUrlFront }}' : '{{ $maskUrlBack }}'" class="absolute w-full h-full object-contain opacity-20 mix-blend-screen z-30 pointer-events-none transition-all duration-300">
+                            <img :src="activeSide === 'front' ? '{{ $maskUrlFront }}' : (activeSide === 'back' ? '{{ $maskUrlBack }}' : (activeSide === 'left' ? '{{ $maskUrlLeft }}' : '{{ $maskUrlRight }}'))" class="absolute w-full h-full object-contain opacity-20 mix-blend-screen z-30 pointer-events-none transition-all duration-300">
                         </div>
                         
                         <!-- Favorite Icon -->
