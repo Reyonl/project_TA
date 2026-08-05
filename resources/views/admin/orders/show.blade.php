@@ -180,7 +180,7 @@
                                                 <div class="flex flex-col items-center shrink-0 w-[280px] snap-center">
                                                     <span class="text-[10px] font-bold text-slate-400 mb-1">KIRI</span>
                                                     <div class="relative w-full h-[350px] rounded-lg overflow-hidden flex items-center justify-center shadow-inner bg-slate-50 border border-slate-200 group transition-all">
-                                                        @php $mockupPathL = asset('images/mockups/' . $mockupBase . '_kiri.png'); @endphp
+                                                        @php $mockupPathL = asset('images/mockups/' . $mockupBase . '_samping_kiri.png'); @endphp
                                                         <img src="{{ $mockupPathL }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-95 z-0 transition-transform group-hover:scale-105" onerror="this.src='{{ $mockupPath }}'">
                                                         <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10 transition-transform group-hover:scale-105"
                                                              style="-webkit-mask-image: url('{{ $mockupPathL }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ $mockupPathL }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
@@ -193,7 +193,7 @@
                                                     </div>
                                                     @php
                                                         $desainUrlL = Str::startsWith($detail->desain->file_desain_kiri, 'data:image') ? $detail->desain->file_desain_kiri : Storage::url($detail->desain->file_desain_kiri);
-                                                        $mockupUrlL = asset('images/mockups/' . $bajuType . '_kiri.png?v='.time());
+                                                        $mockupUrlL = asset('images/mockups/' . $bajuType . '_samping_kiri.png?v='.time());
                                                     @endphp
                                                     <button type="button" onclick="openDesignModal('{{ $desainUrlL }}', '{{ $mockupUrlL }}', '{{ $bajuColor }}', '{{ $bajuType }}', 'left')" class="mt-2 w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold py-2 px-3 rounded-lg border border-slate-300 transition duration-200 flex items-center justify-center gap-1.5 shadow-sm">
                                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
@@ -211,7 +211,7 @@
                                                 <div class="flex flex-col items-center shrink-0 w-[280px] snap-center">
                                                     <span class="text-[10px] font-bold text-slate-400 mb-1">KANAN</span>
                                                     <div class="relative w-full h-[350px] rounded-lg overflow-hidden flex items-center justify-center shadow-inner bg-slate-50 border border-slate-200 group transition-all">
-                                                        @php $mockupPathR = asset('images/mockups/' . $mockupBase . '_kanan.png'); @endphp
+                                                        @php $mockupPathR = asset('images/mockups/' . $mockupBase . '_samping_kanan.png'); @endphp
                                                         <img src="{{ $mockupPathR }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow opacity-95 z-0 transition-transform group-hover:scale-105" onerror="this.src='{{ $mockupPath }}'">
                                                         <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10 transition-transform group-hover:scale-105"
                                                              style="-webkit-mask-image: url('{{ $mockupPathR }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ $mockupPathR }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
@@ -224,7 +224,7 @@
                                                     </div>
                                                     @php
                                                         $desainUrlR = Str::startsWith($detail->desain->file_desain_kanan, 'data:image') ? $detail->desain->file_desain_kanan : Storage::url($detail->desain->file_desain_kanan);
-                                                        $mockupUrlR = asset('images/mockups/' . $bajuType . '_kanan.png?v='.time());
+                                                        $mockupUrlR = asset('images/mockups/' . $bajuType . '_samping_kanan.png?v='.time());
                                                     @endphp
                                                     <button type="button" onclick="openDesignModal('{{ $desainUrlR }}', '{{ $mockupUrlR }}', '{{ $bajuColor }}', '{{ $bajuType }}', 'right')" class="mt-2 w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold py-2 px-3 rounded-lg border border-slate-300 transition duration-200 flex items-center justify-center gap-1.5 shadow-sm">
                                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
@@ -273,7 +273,7 @@
                                                 </span>
                                                 @endif
                                                 @if($detail->desain->detail_sablon)
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                                                <span class="inline-block px-2 py-1 rounded text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 break-words whitespace-normal max-w-full">
                                                     Rincian Sablon: <strong class="ml-1 text-slate-800">{{ $detail->desain->detail_sablon }}</strong>
                                                 </span>
                                                 @endif

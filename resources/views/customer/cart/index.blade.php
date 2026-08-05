@@ -42,7 +42,8 @@
                                         </div>
                                         
                                         <!-- Thumbnail Desain -->
-                                        <div class="w-24 sm:w-32 aspect-[3/4] bg-white rounded-lg shadow-inner overflow-hidden flex items-center justify-center relative flex-shrink-0">
+                                        <div class="w-24 sm:w-32 aspect-[3/4] bg-white rounded-lg shadow-inner overflow-hidden flex items-center justify-center relative flex-shrink-0 @if($cart->desain) cursor-pointer group/thumb ring-1 ring-slate-200 hover:ring-indigo-500 transition @endif" @if($cart->desain) onclick="openPreviewModal({{ $cart->id_cart }})" @endif>
+
                                         @if($cart->desain)
                                             @php
                                                 $bajuType = $cart->produk->jenis_produk;
@@ -82,8 +83,14 @@
                                                 if($cart->desain->file_desain_kanan) $sisiCount++;
                                             @endphp
                                             @if($sisiCount > 1)
-                                            <span class="absolute bottom-1 right-1 bg-indigo-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow shadow-indigo-200">{{ $sisiCount }} Sisi</span>
+                                            <span class="absolute bottom-1 right-1 bg-indigo-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow shadow-indigo-200 z-30">{{ $sisiCount }} Sisi</span>
                                             @endif
+                                            
+                                            <!-- Hover Preview Icon -->
+                                            <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/thumb:opacity-100 transition-opacity z-40">
+                                                <svg class="w-8 h-8 text-white drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
+                                            </div>
+
                                         @else
                                             <!-- Produk Jadi -->
                                             <div class="absolute inset-0 z-0 flex items-center justify-center bg-slate-50">
@@ -207,6 +214,105 @@
         </div>
     </div>
 
+    <!-- Modals Preview Desain -->
+    @foreach($carts as $cart)
+        @if($cart->desain)
+            <div id="previewModal-{{ $cart->id_cart }}" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 transition-opacity">
+                <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] flex flex-col overflow-hidden transform scale-95 transition-transform duration-300" id="previewModalInner-{{ $cart->id_cart }}">
+                    <!-- Header Modal -->
+                    <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white z-10 shadow-sm">
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800">Preview Desain Full View</h3>
+                            <p class="text-sm text-slate-500">{{ $cart->produk->nama_produk }} - <span class="uppercase">{{ $cart->desain->warna_baju ?: 'Putih' }}</span></p>
+                        </div>
+                        <button onclick="closePreviewModal({{ $cart->id_cart }})" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                    
+                    <!-- Body Modal (Slider) -->
+                    <div class="flex-1 bg-slate-100 relative overflow-hidden flex flex-col">
+                        @php
+                            $bajuTypeModal = $cart->produk->jenis_produk;
+                            $bajuColorModal = $cart->desain->warna_baju ?: '#ffffff';
+                            $isPanjangModal = \Illuminate\Support\Str::contains(strtolower($cart->produk->nama_produk), 'panjang');
+                            $mockupBaseModal = match($bajuTypeModal) {
+                                'kaos' => $isPanjangModal ? 'kaos_panjang' : 'kaos',
+                                'hoodie' => 'hoodie',
+                                'topi' => 'topi',
+                                'polo' => 'polo',
+                                'seragam' => 'seragam',
+                                default => 'kaos'
+                            };
+                            
+                            $sides = [
+                                ['name' => 'Depan', 'file' => $cart->desain->file_desain, 'base' => $mockupBaseModal],
+                                ['name' => 'Belakang', 'file' => $cart->desain->file_desain_belakang, 'base' => $mockupBaseModal . '_belakang'],
+                                ['name' => 'Kiri', 'file' => $cart->desain->file_desain_kiri, 'base' => $mockupBaseModal . '_samping_kiri'],
+                                ['name' => 'Kanan', 'file' => $cart->desain->file_desain_kanan, 'base' => $mockupBaseModal . '_samping_kanan'],
+                            ];
+                            
+                            $activeSides = array_filter($sides, function($s) { return !empty($s['file']); });
+                            $activeSides = array_values($activeSides);
+                            $totalSides = count($activeSides);
+                        @endphp
+                        
+                        <div class="relative w-full h-[60vh] md:h-[70vh] flex items-center justify-center">
+                            @foreach($activeSides as $index => $side)
+                                @php 
+                                    $mockupPath = 'images/mockups/' . $side['base'] . '.png';
+                                    $fallbackPath = 'images/mockups/' . $mockupBaseModal . '.png';
+                                    $mockupUrlModal = file_exists(public_path($mockupPath)) ? asset($mockupPath) : asset($fallbackPath);
+                                    
+                                    $designUrlModal = Str::startsWith($side['file'], 'data:image') ? $side['file'] : Storage::url($side['file']);
+                                @endphp
+                                
+                                <div id="slide-{{ $cart->id_cart }}-{{ $index }}" class="absolute inset-0 w-full h-full transition-opacity duration-300 ease-in-out {{ $index === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0' }} flex flex-col items-center justify-center p-4 sm:p-8">
+                                    
+                                    <h4 class="absolute top-4 sm:top-8 font-bold text-slate-700 uppercase tracking-widest text-sm px-6 py-2 bg-white/90 backdrop-blur rounded-full shadow-sm z-30">{{ $side['name'] }}</h4>
+                                    
+                                    <div class="w-full max-w-md aspect-[3/4] relative flex items-center justify-center mt-6">
+                                        <!-- Mockup Base -->
+                                        <div class="absolute inset-0 z-0">
+                                            <div class="w-full h-full flex items-center justify-center relative overflow-hidden">
+                                                <img src="{{ $mockupUrlModal }}" class="absolute w-[85%] h-[85%] object-contain drop-shadow-xl opacity-90 z-0">
+                                                <div class="absolute w-[85%] h-[85%] mix-blend-multiply z-10"
+                                                     style="-webkit-mask-image: url('{{ $mockupUrlModal }}'); -webkit-mask-size: contain; -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; mask-image: url('{{ $mockupUrlModal }}'); mask-size: contain; mask-position: center; mask-repeat: no-repeat;">
+                                                    <div class="w-full h-full" style="background-color: {{ $bajuColorModal }};"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Design Overlay -->
+                                        <div class="absolute z-20 drop-shadow-md" style="top: 20%; left: 27.08%; width: 45.83%; height: 53.33%;">
+                                            <img src="{{ $designUrlModal }}" class="w-full h-full object-contain">
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+
+                            @if($totalSides > 1)
+                                <!-- Arrows -->
+                                <button onclick="changeSlide({{ $cart->id_cart }}, -1, {{ $totalSides }})" class="absolute left-2 sm:left-8 top-1/2 -translate-y-1/2 z-30 p-3 sm:p-4 bg-white/80 hover:bg-white rounded-full shadow-lg text-slate-800 transition transform hover:scale-110">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                                </button>
+                                <button onclick="changeSlide({{ $cart->id_cart }}, 1, {{ $totalSides }})" class="absolute right-2 sm:right-8 top-1/2 -translate-y-1/2 z-30 p-3 sm:p-4 bg-white/80 hover:bg-white rounded-full shadow-lg text-slate-800 transition transform hover:scale-110">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                </button>
+                                
+                                <!-- Indicators -->
+                                <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex gap-2">
+                                    @for($i = 0; $i < $totalSides; $i++)
+                                        <div id="indicator-{{ $cart->id_cart }}-{{ $i }}" class="h-2.5 rounded-full transition-all {{ $i === 0 ? 'bg-indigo-600 w-6' : 'bg-slate-300 w-2.5' }}"></div>
+                                    @endfor
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endforeach
+
     <!-- Script AJAX untuk real-time update Qty & Skenario Pilih Item -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -295,5 +401,94 @@
                 alert('Terjadi kesalahan jaringan.');
             });
         }
+
+        // Preview Modal Functions
+        function openPreviewModal(cartId) {
+            const modal = document.getElementById('previewModal-' + cartId);
+            const inner = document.getElementById('previewModalInner-' + cartId);
+            if (modal && inner) {
+                modal.classList.remove('hidden');
+                // Trigger reflow for animation
+                void modal.offsetWidth;
+                inner.classList.remove('scale-95');
+                inner.classList.add('scale-100');
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            }
+        }
+
+        function closePreviewModal(cartId) {
+            const modal = document.getElementById('previewModal-' + cartId);
+            const inner = document.getElementById('previewModalInner-' + cartId);
+            if (modal && inner) {
+                inner.classList.remove('scale-100');
+                inner.classList.add('scale-95');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    document.body.style.overflow = 'auto';
+                    
+                    // Reset slide to 0 when closed
+                    if (window.currentSlides && window.currentSlides[cartId]) {
+                        const allSlides = modal.querySelectorAll('[id^="slide-'+cartId+'-"]');
+                        const allInd = modal.querySelectorAll('[id^="indicator-'+cartId+'-"]');
+                        allSlides.forEach((el, idx) => {
+                            if(idx === 0) { el.classList.remove('opacity-0','z-0'); el.classList.add('opacity-100','z-10'); }
+                            else { el.classList.remove('opacity-100','z-10'); el.classList.add('opacity-0','z-0'); }
+                        });
+                        allInd.forEach((el, idx) => {
+                            if(idx === 0) { el.classList.remove('bg-slate-300', 'w-2.5'); el.classList.add('bg-indigo-600','w-6'); }
+                            else { el.classList.remove('bg-indigo-600','w-6'); el.classList.add('bg-slate-300', 'w-2.5'); }
+                        });
+                        window.currentSlides[cartId] = 0;
+                    }
+                }, 200); // Wait for transition
+            }
+        }
+
+        // Slide logic
+        window.currentSlides = {};
+
+        function changeSlide(cartId, direction, total) {
+            if (window.currentSlides[cartId] === undefined) {
+                window.currentSlides[cartId] = 0;
+            }
+            
+            let currentIndex = window.currentSlides[cartId];
+            
+            // Hide current
+            const currentElem = document.getElementById(`slide-${cartId}-${currentIndex}`);
+            const currentInd = document.getElementById(`indicator-${cartId}-${currentIndex}`);
+            if (currentElem) {
+                currentElem.classList.remove('opacity-100', 'z-10');
+                currentElem.classList.add('opacity-0', 'z-0');
+            }
+            if (currentInd) {
+                currentInd.classList.remove('bg-indigo-600', 'w-6');
+                currentInd.classList.add('bg-slate-300', 'w-2.5');
+            }
+            
+            // Calculate next
+            currentIndex = (currentIndex + direction + total) % total;
+            window.currentSlides[cartId] = currentIndex;
+            
+            // Show next
+            const nextElem = document.getElementById(`slide-${cartId}-${currentIndex}`);
+            const nextInd = document.getElementById(`indicator-${cartId}-${currentIndex}`);
+            if (nextElem) {
+                nextElem.classList.remove('opacity-0', 'z-0');
+                nextElem.classList.add('opacity-100', 'z-10');
+            }
+            if (nextInd) {
+                nextInd.classList.remove('bg-slate-300', 'w-2.5');
+                nextInd.classList.add('bg-indigo-600', 'w-6');
+            }
+        }
+
+        // Close modal on click outside
+        window.addEventListener('click', function(e) {
+            if (e.target.id && e.target.id.startsWith('previewModal-')) {
+                const cartId = e.target.id.replace('previewModal-', '');
+                closePreviewModal(cartId);
+            }
+        });
     </script>
 </x-app-layout>

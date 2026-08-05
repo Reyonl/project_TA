@@ -118,14 +118,6 @@ class DesignController extends Controller
             'file_desain_belakang' => $fileNameBelakang,
             'file_desain_kiri' => $fileNameKiri,
             'file_desain_kanan' => $fileNameKanan,
-            'lebar_cm' => $request->lebar_cm,
-            'lebar_cm_belakang' => $request->lebar_cm_belakang,
-            'tinggi_cm' => $request->tinggi_cm,
-            'tinggi_cm_belakang' => $request->tinggi_cm_belakang,
-            'lebar_cm_kiri' => $request->lebar_cm_kiri,
-            'tinggi_cm_kiri' => $request->tinggi_cm_kiri,
-            'lebar_cm_kanan' => $request->lebar_cm_kanan,
-            'tinggi_cm_kanan' => $request->tinggi_cm_kanan,
             'harga_desain' => $request->harga_desain,
             'warna_baju' => $request->warna_baju,
             'raw_assets' => !empty($rawAssetsPaths) ? $rawAssetsPaths : null,
@@ -249,14 +241,6 @@ class DesignController extends Controller
             $desain->raw_assets = !empty($rawAssetsPaths) ? $rawAssetsPaths : null;
         }
 
-        $desain->lebar_cm = $request->lebar_cm;
-        $desain->tinggi_cm = $request->tinggi_cm;
-        $desain->lebar_cm_belakang = $request->lebar_cm_belakang;
-        $desain->tinggi_cm_belakang = $request->tinggi_cm_belakang;
-        $desain->lebar_cm_kiri = $request->lebar_cm_kiri;
-        $desain->tinggi_cm_kiri = $request->tinggi_cm_kiri;
-        $desain->lebar_cm_kanan = $request->lebar_cm_kanan;
-        $desain->tinggi_cm_kanan = $request->tinggi_cm_kanan;
         $desain->warna_baju = $request->warna_baju;
         $desain->harga_desain = $request->harga_desain;
         $desain->detail_sablon = $request->detail_sablon;

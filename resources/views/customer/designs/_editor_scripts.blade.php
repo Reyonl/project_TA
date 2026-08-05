@@ -23,6 +23,14 @@ function initFabricEditor() {
     }
     window.activeCanvas = canvasFront;
 
+    // Initialize Smart Guides
+    if (typeof initAligningGuidelines === 'function') {
+        initAligningGuidelines(canvasFront);
+        initAligningGuidelines(canvasBack);
+        if (canvasLeft) initAligningGuidelines(canvasLeft);
+        if (canvasRight) initAligningGuidelines(canvasRight);
+    }
+
     // Mobile Canvas Scaling
     window.setupMobileCanvasScaler = function() {
         const mockupContainer = document.getElementById('mockupContainer');
@@ -369,28 +377,40 @@ function initFabricEditor() {
 
         if (canvasFront) {
             canvasFront.getObjects().forEach((obj, idx) => {
-                let typeLabel = obj.type === 'i-text' ? 'Teks' : (obj.customType === 'custom-svg' ? 'Stiker' : 'Gambar');
+                let typeLabel = '';
+                if(obj.type === 'i-text') typeLabel = `Teks (Font: ${obj.fontFamily || 'Default'})`;
+                else if(obj.customType === 'custom-svg') typeLabel = 'Template/Stiker';
+                else typeLabel = 'Gambar Upload';
                 breakdownTextFront.push(`${typeLabel} #${idx+1}`);
             });
         }
 
         if (canvasBack) {
             canvasBack.getObjects().forEach((obj, idx) => {
-                let typeLabel = obj.type === 'i-text' ? 'Teks' : (obj.customType === 'custom-svg' ? 'Stiker' : 'Gambar');
+                let typeLabel = '';
+                if(obj.type === 'i-text') typeLabel = `Teks (Font: ${obj.fontFamily || 'Default'})`;
+                else if(obj.customType === 'custom-svg') typeLabel = 'Template/Stiker';
+                else typeLabel = 'Gambar Upload';
                 breakdownTextBack.push(`${typeLabel} #${idx+1}`);
             });
         }
 
         if (canvasLeft) {
             canvasLeft.getObjects().forEach((obj, idx) => {
-                let typeLabel = obj.type === 'i-text' ? 'Teks' : (obj.customType === 'custom-svg' ? 'Stiker' : 'Gambar');
+                let typeLabel = '';
+                if(obj.type === 'i-text') typeLabel = `Teks (Font: ${obj.fontFamily || 'Default'})`;
+                else if(obj.customType === 'custom-svg') typeLabel = 'Template/Stiker';
+                else typeLabel = 'Gambar Upload';
                 breakdownTextLeft.push(`${typeLabel} #${idx+1}`);
             });
         }
 
         if (canvasRight) {
             canvasRight.getObjects().forEach((obj, idx) => {
-                let typeLabel = obj.type === 'i-text' ? 'Teks' : (obj.customType === 'custom-svg' ? 'Stiker' : 'Gambar');
+                let typeLabel = '';
+                if(obj.type === 'i-text') typeLabel = `Teks (Font: ${obj.fontFamily || 'Default'})`;
+                else if(obj.customType === 'custom-svg') typeLabel = 'Template/Stiker';
+                else typeLabel = 'Gambar Upload';
                 breakdownTextRight.push(`${typeLabel} #${idx+1}`);
             });
         }
@@ -892,20 +912,7 @@ function initFabricEditor() {
 
         const activeBaseColor = window.activeBaseColorLocal || '#ffffff';
         
-        function getMaxDimensions(canvas) {
-            let maxW = 10, maxH = 10;
-            if (canvas) {
-                canvas.getObjects().forEach(obj => {
-                    const size = obj.sablonSize || 'a5';
-                    if (size === 'a3') { maxW = 25; maxH = 35; }
-                    else if (size === 'a4' && maxW < 20) { maxW = 20; maxH = 25; }
-                });
-            }
-            return { width: maxW, height: maxH };
-        }
 
-        const frontDims = getMaxDimensions(canvasFront);
-        const backDims = getMaxDimensions(canvasBack);
 
         let frontDataURL = canvasFront.toDataURL({ format: 'png', quality: 1, multiplier: 4 });
         let backDataURL = '', leftDataURL = '', rightDataURL = '';
@@ -926,17 +933,11 @@ function initFabricEditor() {
             file_desain_belakang: backDataURL,
             file_desain_kiri: leftDataURL,
             file_desain_kanan: rightDataURL,
-            lebar_cm: frontDims.width,
-            tinggi_cm: frontDims.height,
             warna_baju: activeBaseColor,
             raw_assets: rawAssets,
             harga_desain: window.currentHargaDesain || 0,
             detail_sablon: window.currentDetailSablon || ''
         };
-        if(backDataURL !== '') { 
-            payload.lebar_cm_belakang = backDims.width; 
-            payload.tinggi_cm_belakang = backDims.height; 
-        }
 
         const oldText = this.innerHTML;
         this.innerHTML = 'Memproses... ⏳'; this.disabled = true;

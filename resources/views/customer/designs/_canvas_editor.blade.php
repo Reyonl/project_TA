@@ -1,4 +1,5 @@
 {{-- Canvas Editor Partial - used in Step 2 (front) and Step 3 (others) --}}
+<script src="{{ asset('js/fabric-smart-guides.js') }}"></script>
 @php
     $hasBack = in_array($produk->jenis_produk, ['kaos', 'hoodie', 'polo', 'seragam']);
     $isPanjang = \Illuminate\Support\Str::contains(strtolower($produk->nama_produk), 'panjang');
