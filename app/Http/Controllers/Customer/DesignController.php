@@ -127,7 +127,6 @@ class DesignController extends Controller
             'lebar_cm_kanan' => $request->lebar_cm_kanan,
             'tinggi_cm_kanan' => $request->tinggi_cm_kanan,
             'harga_desain' => $request->harga_desain,
-            'tanggal_upload' => now(),
             'warna_baju' => $request->warna_baju,
             'raw_assets' => !empty($rawAssetsPaths) ? $rawAssetsPaths : null,
             'detail_sablon' => $request->detail_sablon,

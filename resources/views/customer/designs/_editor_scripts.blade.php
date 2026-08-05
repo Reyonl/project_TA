@@ -772,9 +772,6 @@ function initFabricEditor() {
         // Set active size buttons
         const size = activeObj.sablonSize || 'a5';
         window.updateSablonSizeButtons(size);
-        if (!activeObj.lockScalingX) {
-            window.resizeObjectToSablonSize(activeObj, size);
-        }
 
         if(activeObj.type === 'i-text') {
             textControls.classList.remove('hidden'); textControls.classList.add('flex');

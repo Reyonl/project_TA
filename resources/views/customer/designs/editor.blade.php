@@ -15,7 +15,7 @@
     <div class="min-h-screen bg-slate-50" 
          x-data="{ 
              currentStep: 1,
-             totalSteps: {{ $produk->jenis_produk == 'hoodie' ? 6 : 4 }},
+             totalSteps: {{ in_array($produk->jenis_produk, ['hoodie', 'kaos']) ? 6 : 4 }},
              activeTab: 'templates', 
              baseColor: '#ffffff',
              activeSide: 'front', 
@@ -58,7 +58,7 @@
                 </div>
                 <div class="flex items-center gap-2">
                     @php 
-                        $stepNames = $produk->jenis_produk == 'hoodie' 
+                        $stepNames = in_array($produk->jenis_produk, ['hoodie', 'kaos']) 
                             ? ['Produk & Warna','Desain Depan','Desain Belakang','Samping Kiri','Samping Kanan','Review & Simpan']
                             : ['Produk & Warna','Desain Depan','Desain Belakang','Review & Simpan']; 
                         $stepsCount = count($stepNames);
@@ -175,7 +175,7 @@
                     <p class="text-slate-500">Pastikan semua desain sudah benar sebelum menyimpan</p>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 {{ $produk->jenis_produk == 'hoodie' ? 'md:grid-cols-4' : '' }} gap-4 mb-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 {{ in_array($produk->jenis_produk, ['hoodie', 'kaos']) ? 'md:grid-cols-4' : '' }} gap-4 mb-8">
                     <div class="bg-white rounded-xl border border-slate-200 p-4 text-center shadow-sm">
                         <h4 class="text-xs font-black text-slate-500 uppercase mb-3">Depan</h4>
                         <div class="bg-slate-50 rounded-lg border border-slate-100 overflow-hidden mx-auto w-full max-w-[200px] h-[250px]">
@@ -196,7 +196,7 @@
                             </div>
                         </div>
                     </div>
-                    @if($produk->jenis_produk == 'hoodie')
+                    @if(in_array($produk->jenis_produk, ['hoodie', 'kaos']))
                     <div class="bg-white rounded-xl border border-slate-200 p-4 text-center shadow-sm">
                         <h4 class="text-xs font-black text-slate-500 uppercase mb-3">Samping Kiri</h4>
                         <div class="bg-slate-50 rounded-lg border border-slate-100 overflow-hidden mx-auto w-full max-w-[200px] h-[250px]">

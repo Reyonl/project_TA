@@ -121,8 +121,8 @@
                         </div>
                         @endif
 
-                        <!-- Thumbnail Samping Kiri & Kanan (Khusus Hoodie) -->
-                        @if($produk->jenis_produk == 'hoodie')
+                        <!-- Thumbnail Samping Kiri & Kanan (Hoodie & Kaos) -->
+                        @if(in_array($produk->jenis_produk, ['hoodie', 'kaos']))
                         <div class="flex flex-col gap-1 items-center mt-1">
                             <button type="button" @click="activeSide = 'left'" :class="activeSide === 'left' ? 'border-2 border-slate-900 shadow-md opacity-100' : 'border border-slate-200 opacity-60 hover:opacity-100'" class="w-full aspect-square rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center relative transition shadow-sm cursor-pointer">
                                 <img src="{{ $maskUrlLeft }}" class="w-[85%] object-contain" alt="Kiri">
