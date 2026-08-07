@@ -255,6 +255,18 @@
                             $activeSides = array_filter($sides, function($s) { return !empty($s['file']); });
                             $activeSides = array_values($activeSides);
                             $totalSides = count($activeSides);
+
+                            $getPrintAreaModal = function($side, $jenis) {
+                                $jenis = strtolower($jenis);
+                                if ($side === 'Depan') {
+                                    if ($jenis === 'polo') return ['width' => 90, 'height' => 90, 'top' => 160, 'left' => 265];
+                                    if ($jenis === 'seragam') return ['width' => 100, 'height' => 100, 'top' => 180, 'left' => 135];
+                                }
+                                if (in_array($side, ['Kiri', 'Kanan'])) {
+                                    return ['width' => 140, 'height' => 320, 'top' => 140, 'left' => 170];
+                                }
+                                return ['width' => 220, 'height' => 320, 'top' => 120, 'left' => 130];
+                            };
                         @endphp
                         
                         <div class="relative w-full h-[60vh] md:h-[70vh] flex items-center justify-center">
@@ -283,7 +295,14 @@
                                             </div>
                                         </div>
                                         <!-- Design Overlay -->
-                                        <div class="absolute z-20 drop-shadow-md" style="top: 20%; left: 27.08%; width: 45.83%; height: 53.33%;">
+                                        @php
+                                            $dims = $getPrintAreaModal($side['name'], $bajuTypeModal);
+                                            $topPct = ($dims['top'] / 600) * 100;
+                                            $leftPct = ($dims['left'] / 480) * 100;
+                                            $widthPct = ($dims['width'] / 480) * 100;
+                                            $heightPct = ($dims['height'] / 600) * 100;
+                                        @endphp
+                                        <div class="absolute z-20 drop-shadow-md" style="top: {{ $topPct }}%; left: {{ $leftPct }}%; width: {{ $widthPct }}%; height: {{ $heightPct }}%;">
                                             <img src="{{ $designUrlModal }}" class="w-full h-full object-contain">
                                         </div>
                                     </div>

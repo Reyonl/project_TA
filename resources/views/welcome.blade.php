@@ -4,6 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>DAILY.CO - Visualisasi Mockup Sablon Premium</title>
+        <link rel="icon" href="{{ asset('images/logo-dailyco.png') }}" type="image/png">
 
         <!-- Fonts: Inter & Outfit -->
         <link rel="preconnect" href="https://fonts.googleapis.com">

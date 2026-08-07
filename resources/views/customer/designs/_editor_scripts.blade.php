@@ -171,7 +171,7 @@ function initFabricEditor() {
     };
 
     // Watch for step changes to generate previews
-    const rootEl = document.querySelector('[x-data]');
+    const rootEl = document.getElementById('editor-alpine') || document.querySelector('[x-data]');
     if(rootEl && window.Alpine) {
         Alpine.effect(() => {
             const data = Alpine.$data(rootEl);
@@ -241,7 +241,7 @@ function initFabricEditor() {
     // Add image/SVG to canvas
     function addImageToCanvas(url) {
         let sideName = 'front';
-        try { const el = document.querySelector('[x-data]'); if(el && window.Alpine && window.Alpine.$data) sideName = window.Alpine.$data(el).activeSide || 'front'; } catch(e) {}
+        try { const el = document.getElementById('editor-alpine') || document.querySelector('[x-data]'); if(el && window.Alpine && window.Alpine.$data) sideName = window.Alpine.$data(el).activeSide || 'front'; } catch(e) {}
         const dims = window.printAreaDims[sideName] || window.printAreaDims['front'];
         const pa_width = dims ? dims.width : window.activeCanvas.width;
         const imgEl = new Image();
@@ -489,7 +489,7 @@ function initFabricEditor() {
 
         let sideName = 'front';
         try {
-            const el = document.querySelector('[x-data]');
+            const el = document.getElementById('editor-alpine') || document.querySelector('[x-data]');
             if (el && window.Alpine && window.Alpine.$data) {
                 sideName = window.Alpine.$data(el).activeSide || 'front';
             }
@@ -601,7 +601,7 @@ function initFabricEditor() {
         
         let sideName = 'front';
         try {
-            const el = document.querySelector('[x-data]');
+            const el = document.getElementById('editor-alpine') || document.querySelector('[x-data]');
             if (el && window.Alpine && window.Alpine.$data) {
                 sideName = window.Alpine.$data(el).activeSide || 'front';
             }
@@ -925,7 +925,7 @@ function initFabricEditor() {
             if(canvas) canvas.getObjects().forEach(obj => { if(obj.customType === 'custom-image' && obj.getSrc) rawAssets.push(obj.getSrc()); });
         });
 
-        const rootData = window.Alpine ? window.Alpine.$data(document.querySelector('[x-data]')) : {};
+        const rootData = window.Alpine ? window.Alpine.$data(document.getElementById('editor-alpine') || document.querySelector('[x-data]')) : {};
         const payload = {
             _token: '{{ csrf_token() }}',
             id_produk: '{{ $produk->id_produk }}',
