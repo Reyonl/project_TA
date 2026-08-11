@@ -147,7 +147,7 @@
 
         {{-- Canvas Workspace --}}
         <div class="flex-1 overflow-hidden flex justify-center items-center relative bg-slate-50 mobile-canvas-scaler" id="canvasScalerWrapper">
-            <div class="relative shadow-2xl rounded-xl overflow-hidden pointer-events-auto flex items-center justify-center bg-slate-100 transition-transform origin-top-left md:origin-center" id="mockupContainer" style="width: 480px; height: 600px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);">
+            <div class="relative shadow-2xl rounded-xl overflow-hidden pointer-events-auto flex items-center justify-center bg-slate-100 origin-top-left md:origin-center" id="mockupContainer" style="width: 480px; height: 600px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);">
                 {{-- Side Indicator --}}
                 <div class="absolute top-4 left-4 z-30 pointer-events-none">
                     <span class="bg-indigo-600/90 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-lg border border-indigo-400/50 uppercase tracking-widest backdrop-blur-sm" x-text="activeSide === 'front' ? 'Depan' : (activeSide === 'back' ? 'Belakang' : activeSide.toUpperCase())">Depan</span>
@@ -219,6 +219,20 @@
                     <canvas id="tshirt-canvas-right" width="{{ $paRight['width'] }}" height="{{ $paRight['height'] }}"></canvas>
                 </div>
             </div>
+            
+            {{-- Zoom & Pan Controls --}}
+            <div class="absolute bottom-4 right-4 flex flex-col gap-2 z-30">
+                <button type="button" id="zoomInBtn" class="w-10 h-10 bg-white/90 backdrop-blur rounded-full shadow-md text-slate-700 hover:text-sky-500 hover:bg-sky-50 flex items-center justify-center transition border border-slate-200" title="Zoom In (Scroll Up)">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                </button>
+                <button type="button" id="zoomResetBtn" class="w-10 h-10 bg-white/90 backdrop-blur rounded-full shadow-md text-slate-700 hover:text-sky-500 hover:bg-sky-50 flex items-center justify-center transition border border-slate-200 text-[10px] font-black" title="Reset Zoom">
+                    100%
+                </button>
+                <button type="button" id="zoomOutBtn" class="w-10 h-10 bg-white/90 backdrop-blur rounded-full shadow-md text-slate-700 hover:text-sky-500 hover:bg-sky-50 flex items-center justify-center transition border border-slate-200" title="Zoom Out (Scroll Down)">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
+                </button>
+            </div>
+
         </div>
     </div>
 
@@ -277,6 +291,22 @@
                     <textarea id="textValueControl" rows="2" class="w-full text-sm font-bold border-slate-200 rounded-xl py-3 px-4 focus:ring-red-500 focus:border-red-500 bg-slate-50 shadow-sm" placeholder="Ketik teks di sini..."></textarea>
                 </div>
                 <div class="space-y-3">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Perataan Teks</label>
+                    <div class="flex gap-2">
+                        <button type="button" id="textAlignLeft" class="flex-1 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition text-slate-600 text-center font-bold">Kiri</button>
+                        <button type="button" id="textAlignCenter" class="flex-1 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition text-slate-600 text-center font-bold">Tengah</button>
+                        <button type="button" id="textAlignRight" class="flex-1 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition text-slate-600 text-center font-bold">Kanan</button>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Spasi Baris (<span id="lineHeightVal">1.2</span>)</label>
+                    <input type="range" id="lineHeightControl" min="5" max="30" value="12" class="w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer accent-red-600">
+                </div>
+                <div class="space-y-3">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Spasi Huruf (<span id="charSpacingVal">0</span>)</label>
+                    <input type="range" id="charSpacingControl" min="-50" max="300" value="0" class="w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer accent-red-600">
+                </div>
+                <div class="space-y-3">
                     <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Warna Teks</label>
                     <div class="flex items-center gap-4">
                         <input type="color" id="textColorControl" class="w-12 h-12 p-1 border border-slate-200 rounded-xl cursor-pointer bg-white shadow-sm" value="#000000">
@@ -309,7 +339,15 @@
                     <button id="detectBgColorBtn" class="flex-1 bg-slate-100 text-slate-600 text-xs font-bold py-3 md:py-4 rounded-xl hover:bg-slate-200 transition border border-slate-200 shadow-sm">🔍 Auto</button>
                     <button id="removeBgBtn" class="flex-1 bg-sky-50 border border-sky-100 text-sky-600 text-xs font-black py-3 md:py-4 rounded-xl hover:bg-sky-100 transition uppercase tracking-widest">✨ EKSEKUSI</button>
                 </div>
-                <button id="resetBgBtn" class="w-full text-[10px] uppercase font-bold text-slate-400 hover:text-red-500 transition py-2 underline">Undo Hapus Latar</button>
+                <div class="space-y-3 pt-3 border-t border-slate-100">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Transparansi (<span id="imageOpacityVal">100</span>%)</label>
+                    <input type="range" id="imageOpacityControl" min="0" max="100" value="100" class="w-full h-1.5 bg-slate-200 rounded-full appearance-none accent-sky-500 cursor-pointer">
+                </div>
+                <div class="flex gap-2 pt-2 border-t border-slate-100">
+                    <button type="button" id="flipHBtn" class="flex-1 bg-slate-50 text-slate-600 text-xs font-bold py-2 rounded-xl hover:bg-slate-100 transition border border-slate-200 shadow-sm">Flip Horizontal</button>
+                    <button type="button" id="flipVBtn" class="flex-1 bg-slate-50 text-slate-600 text-xs font-bold py-2 rounded-xl hover:bg-slate-100 transition border border-slate-200 shadow-sm">Flip Vertikal</button>
+                </div>
+                <button id="resetBgBtn" class="w-full text-[10px] uppercase font-bold text-slate-400 hover:text-red-500 transition py-2 underline mt-2">Undo Filter Gambar</button>
             </div>
             {{-- SVG Properties --}}
             <div id="svgControls" class="hidden flex-col gap-4">
@@ -327,11 +365,39 @@
                     <button id="sendBackwardBtn" class="flex items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold py-3 px-2 md:px-4 rounded-xl border border-slate-200 transition text-[11px] md:text-xs">↓ Ke Belakang</button>
                 </div>
             </div>
-            {{-- Delete --}}
-            <div class="pt-6 md:pt-8 mt-2 border-t-2 border-slate-50 border-dashed">
-                <button id="deleteObjBtn" class="w-full bg-red-50 hover:bg-red-600 hover:text-white text-red-600 font-black py-4 rounded-2xl transition border border-red-100 flex items-center justify-center gap-2 shadow-inner uppercase tracking-widest text-[11px]">
+            {{-- Alignment --}}
+            <div class="pt-5 md:pt-6 border-t border-slate-100">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 md:mb-4 text-center">Posisi & Perataan</p>
+                <div class="grid grid-cols-2 gap-3">
+                    <button id="alignCenterHBtn" class="flex items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold py-3 px-2 md:px-4 rounded-xl border border-slate-200 transition text-[11px] md:text-xs" title="Tengah Horizontal">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12h16M12 4v16"></path></svg> Tengah H
+                    </button>
+                    <button id="alignCenterVBtn" class="flex items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold py-3 px-2 md:px-4 rounded-xl border border-slate-200 transition text-[11px] md:text-xs" title="Tengah Vertikal">
+                        <svg class="w-4 h-4 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12h16M12 4v16"></path></svg> Tengah V
+                    </button>
+                </div>
+            </div>
+            {{-- Group & Ungroup --}}
+            <div id="groupingControls" class="hidden pt-5 md:pt-6 border-t border-slate-100">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 md:mb-4 text-center">Grup Objek</p>
+                <div class="grid grid-cols-2 gap-3">
+                    <button id="groupBtn" class="hidden flex items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold py-3 px-2 md:px-4 rounded-xl border border-slate-200 transition text-[11px] md:text-xs">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg> Group
+                    </button>
+                    <button id="ungroupBtn" class="hidden flex items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold py-3 px-2 md:px-4 rounded-xl border border-slate-200 transition text-[11px] md:text-xs">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Ungroup
+                    </button>
+                </div>
+            </div>
+            {{-- Delete & Duplicate --}}
+            <div class="pt-6 md:pt-8 mt-2 border-t-2 border-slate-50 border-dashed grid grid-cols-2 gap-3">
+                <button id="duplicateObjBtn" class="flex-1 bg-white hover:bg-slate-50 text-slate-600 font-black py-4 rounded-2xl transition border border-slate-200 flex items-center justify-center gap-2 shadow-sm uppercase tracking-widest text-[11px]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg>
+                    <span>Duplikat</span>
+                </button>
+                <button id="deleteObjBtn" class="flex-1 bg-red-50 hover:bg-red-600 hover:text-white text-red-600 font-black py-4 rounded-2xl transition border border-red-100 flex items-center justify-center gap-2 shadow-inner uppercase tracking-widest text-[11px]">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                    <span>Hapus Objek</span>
+                    <span>Hapus</span>
                 </button>
             </div>
         </div>

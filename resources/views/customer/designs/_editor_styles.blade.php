@@ -115,4 +115,13 @@
     #printAreaBox.bg-red-500\/10 {
         background-color: rgba(239, 68, 68, 0.1) !important;
     }
+
+    /* Panning Global Cursor Helpers */
+    body.is-panning, body.is-panning * {
+        cursor: grab !important;
+    }
+    body.is-panning-dragging, body.is-panning-dragging * {
+        cursor: grabbing !important;
+        user-select: none !important;
+    }
 </style>

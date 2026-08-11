@@ -48,11 +48,11 @@
                                     <td class="px-6 py-4 text-center">
                                         @php
                                             $statusColors = [
-                                                'pending'   => 'bg-yellow-100 text-yellow-700',
-                                                'diproses'  => 'bg-blue-100 text-blue-700',
-                                                'dikirim'   => 'bg-purple-100 text-purple-700',
-                                                'selesai'   => 'bg-green-100 text-green-700',
-                                                'dibatalkan'=> 'bg-red-100 text-red-700',
+                                                'reviewing'        => 'bg-amber-100 text-amber-700',
+                                                'pending_payment'  => 'bg-orange-100 text-orange-700',
+                                                'processing'       => 'bg-sky-100 text-sky-700',
+                                                'completed'        => 'bg-emerald-100 text-emerald-700',
+                                                'cancelled'        => 'bg-rose-100 text-rose-700',
                                             ];
                                             $color = $statusColors[$order->status_order] ?? 'bg-slate-100 text-slate-700';
                                         @endphp

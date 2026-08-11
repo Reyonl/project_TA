@@ -18,7 +18,6 @@ class StoreCheckoutRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'bukti_pembayaran' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             'cart_ids' => 'required|array|min:1',
             'cart_ids.*' => 'exists:carts,id_cart',
         ];
@@ -27,10 +26,8 @@ class StoreCheckoutRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'bukti_pembayaran.required' => 'Bukti pembayaran wajib diunggah.',
-            'bukti_pembayaran.image' => 'File harus berupa gambar.',
-            'bukti_pembayaran.mimes' => 'Format file harus JPEG, PNG, atau JPG.',
-            'bukti_pembayaran.max' => 'Ukuran file maksimal 2MB.',
+            'cart_ids.required' => 'Keranjang tidak boleh kosong.',
+            'cart_ids.min' => 'Pilih minimal 1 item untuk checkout.',
         ];
     }
 }

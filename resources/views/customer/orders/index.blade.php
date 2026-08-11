@@ -42,11 +42,11 @@
                     @foreach($orders as $order)
                         @php
                             $statusConfig = [
-                                'pending'    => ['label' => 'Menunggu Konfirmasi', 'color' => 'bg-amber-100 text-amber-700 border-amber-200',  'icon' => '⏳'],
-                                'diproses'   => ['label' => 'Sedang Diproses',     'color' => 'bg-sky-100 text-sky-700 border-sky-200',     'icon' => '⚙️'],
-                                'dikirim'    => ['label' => 'Dikirim',             'color' => 'bg-violet-100 text-violet-700 border-violet-200', 'icon' => '🚚'],
-                                'selesai'    => ['label' => 'Selesai',             'color' => 'bg-emerald-100 text-emerald-700 border-emerald-200',   'icon' => '✅'],
-                                'dibatalkan' => ['label' => 'Dibatalkan',          'color' => 'bg-rose-100 text-rose-700 border-rose-200',       'icon' => '❌'],
+                                'reviewing'        => ['label' => 'Review Desain',       'color' => 'bg-amber-100 text-amber-700 border-amber-200',  'icon' => '🔍'],
+                                'pending_payment'  => ['label' => 'Menunggu Pembayaran', 'color' => 'bg-orange-100 text-orange-700 border-orange-200', 'icon' => '💳'],
+                                'processing'       => ['label' => 'Sedang Diproses',     'color' => 'bg-sky-100 text-sky-700 border-sky-200',     'icon' => '⚙️'],
+                                'completed'        => ['label' => 'Selesai',             'color' => 'bg-emerald-100 text-emerald-700 border-emerald-200',   'icon' => '✅'],
+                                'cancelled'        => ['label' => 'Dibatalkan',          'color' => 'bg-rose-100 text-rose-700 border-rose-200',       'icon' => '❌'],
                             ];
                             $status = $statusConfig[$order->status_order] ?? ['label' => ucfirst($order->status_order), 'color' => 'bg-slate-100 text-slate-700 border-slate-200', 'icon' => '📋'];
                         @endphp

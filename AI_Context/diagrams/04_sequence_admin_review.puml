@@ -1,0 +1,95 @@
+@startuml
+
+title DailyCo — Sequence Diagram: Admin Review & Payment Verification
+
+actor Customer as C
+actor Admin as A
+participant "AdminOrderController" as AOC
+participant "DB (order_details)" as DBOD
+participant "DB (orders)" as DBO
+participant "Storage" as ST
+participant "CustomerOrderController" as COC
+
+== Admin Review Desain ==
+
+A -> AOC : GET /admin/orders
+AOC -> DBO : Load all orders (with relations)
+AOC -> A : List semua pesanan
+
+A -> AOC : GET /admin/orders/{order_id}
+AOC -> DBO : Load order + orderDetails + desain
+AOC -> A : Tampil detail order\n(gambar desain, status)
+
+loop Per OrderDetail yang belum disetujui
+  A -> AOC : PATCH /admin/orders/{order}/desain/{detail}\n{status_desain: 'revision_required', catatan_admin: '...'}
+  AOC -> DBOD : Update status_desain\n+ catatan_admin
+  
+  note right of AOC
+    Jika status='revision_required':
+    Customer akan melihat tombol "Edit Desain"
+    di halaman order mereka
+  end note
+  
+  AOC -> A : Redirect back (success)
+end
+
+note over A : Setelah revisi customer:
+
+loop Admin review ulang setelah revisi
+  A -> AOC : PATCH /admin/orders/{order}/desain/{detail}\n{status_desain: 'approved'}
+  AOC -> DBOD : Update status_desain = 'approved'
+  
+  AOC -> AOC : Cek: apakah SEMUA orderDetails\n  sudah 'approved'?
+  
+  alt Semua approved && order status masih 'reviewing'
+    AOC -> DBO : Update orders:\n  status_order='pending_payment'\n  payment_status='awaiting_payment'
+    note right of AOC
+      AUTO-TRANSITION:
+      Order otomatis maju ke
+      pending_payment
+    end note
+  end
+  
+  AOC -> A : Redirect back
+end
+
+== Customer Upload Bukti Bayar ==
+
+C -> COC : POST /customer/orders/{id}/payment\n{bukti_pembayaran: file}
+COC -> COC : Validasi: payment_status IN\n['awaiting_payment', 'failed']
+COC -> ST : Simpan file ke bukti_pembayaran/
+COC -> DBO : Update payment_status = 'awaiting_verification'
+COC -> C : Redirect back (success)
+
+== Admin Verifikasi Pembayaran ==
+
+A -> AOC : GET /admin/orders/{order_id}
+AOC -> A : Tampil bukti pembayaran customer
+
+alt Admin Approve
+  A -> AOC : PATCH /admin/orders/{order}/verify-payment\n{action: 'approve'}
+  AOC -> DBO : payment_status = 'paid'\n  status_order = 'processing'
+  AOC -> A : Redirect back (success)
+else Admin Reject
+  A -> AOC : PATCH /admin/orders/{order}/verify-payment\n{action: 'reject'}
+  AOC -> DBO : payment_status = 'failed'\n  status_order = 'pending_payment'
+  note right of AOC
+    Customer bisa upload ulang
+    (payment_status='failed' diizinkan)
+  end note
+  AOC -> A : Redirect back (success)
+end
+
+== Customer Revisi Desain ==
+
+C -> COC : GET /customer/orders
+COC -> C : List order\n(badge "Revisi Diperlukan" terlihat)
+
+C -> C : Klik "Edit Desain" → redirect ke editor\nGET /customer/design/{produk}?revisi={old_id_desain}
+C -> C : Edit di canvas, klik simpan
+C -> AOC : PATCH /customer/design/{old_desain}
+AOC -> AOC : BUAT desain BARU (parent_id=old_id)
+AOC -> DBOD : Update id_desain → desain baru\n  status_desain → 'pending'\n  catatan_admin → 'Telah diperbaiki...'
+AOC -> C : Redirect /customer/orders
+
+@enduml

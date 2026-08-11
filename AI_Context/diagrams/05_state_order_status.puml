@@ -1,0 +1,34 @@
+@startuml
+
+title DailyCo — State Diagram: Order Status
+
+[*] --> reviewing : Customer buat pesanan\n(CheckoutController@store)
+
+reviewing --> pending_payment : Admin approve\nSEMUA desain\n(AUTO-TRANSITION)
+reviewing --> cancelled : Admin batalkan
+
+pending_payment --> processing : Admin approve\npembayaran
+pending_payment --> cancelled : Admin batalkan
+pending_payment --> pending_payment : Customer upload bukti\n→ awaiting_verification\nAdmin reject\n→ payment_status=failed
+
+processing --> completed : Admin tandai selesai
+processing --> cancelled : Admin batalkan
+
+completed --> [*]
+cancelled --> [*]
+
+note right of reviewing
+  payment_status: unpaid → awaiting_payment
+  (berubah bersamaan dengan
+   status_order ke pending_payment)
+end note
+
+note right of pending_payment
+  Sub-state payment_status:
+  awaiting_payment → customer upload
+  awaiting_verification → admin cek
+  failed → admin reject (bisa upload ulang)
+  paid → admin approve → processing
+end note
+
+@enduml

@@ -1,0 +1,58 @@
+@startuml
+
+title DailyCo — Sequence Diagram: Customer Design & Order Flow
+
+actor Customer as C
+participant "Browser\n(Alpine.js)" as BR
+participant "DesignController" as DC
+participant "Storage" as ST
+participant "DB (desains)" as DBD
+participant "DB (carts)" as DBC
+participant "CheckoutController" as CC
+participant "DB (orders)" as DBO
+participant "DB (order_details)" as DBOD
+
+== Proses Desain ==
+
+C -> BR : Pilih produk, klik "Mulai Desain"
+BR -> DC : GET /customer/design/{produk}?color=
+DC -> BR : Return editor.blade.php\n(dengan $produk, $templates, $totalSteps)
+
+C -> BR : (Editor Terbuka)\nStep 1: Pilih warna baju
+note right of BR: Alpine baseColor diupdate\nCSS multiply blend mockup
+
+C -> BR : Step 2-5: Desain di canvas\n(Fabric.js)
+note right of BR: Objek ditambah, dimodif,\nundo/redo, zoom/pan
+
+C -> BR : Step Review: Preview OK\nKlik "Simpan & Masukkan ke Keranjang"
+
+BR -> BR : Export canvas ke dataURL PNG\n(multiplier: 4)\nPackage canvas JSON + payload
+BR -> DC : POST /customer/design (JSON)
+
+DC -> ST : Decode base64 → simpan PNG\n(designs/{uuid}.png)
+DC -> DBD : Desain::create({...})
+DC -> DBC : Cart::create({id_desain=new, qty=1})
+DC -> BR : JSON {success: true, redirect_url: /customer/cart}
+BR -> C : Redirect ke /customer/cart
+
+== Proses Checkout ==
+
+C -> BR : Centang item, klik "Checkout"
+BR -> CC : GET /customer/checkout?cart_ids[]=...
+CC -> DBC : Load cart items
+CC -> BR : Return checkout confirmation view
+
+C -> BR : Konfirmasi, klik "Buat Pesanan"
+BR -> CC : POST /customer/checkout {cart_ids}
+
+CC -> CC : DB::transaction {
+CC -> DBO : Order::create({status_order='reviewing', payment_status='unpaid'})
+CC -> DBOD : OrderDetail::create (per cart item)
+note right of CC: id_desain dari cart\nstatus_desain='pending' (ada desain)\natau 'approved' (ready-made)
+CC -> DBC : Cart::whereIn(ids)->delete()
+CC -> CC : }
+
+CC -> BR : Redirect /customer/orders (flash success)
+BR -> C : Tampil halaman pesanan
+
+@enduml

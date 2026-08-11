@@ -23,7 +23,124 @@ function initFabricEditor() {
     }
     window.activeCanvas = canvasFront;
 
-    // Initialize Smart Guides
+    // Load saved data if exists
+    const savedData = {
+        front: {!! $desainRevisi && $desainRevisi->canvas_front ? json_encode($desainRevisi->canvas_front) : 'null' !!},
+        back: {!! $desainRevisi && $desainRevisi->canvas_back ? json_encode($desainRevisi->canvas_back) : 'null' !!},
+        left: {!! $desainRevisi && $desainRevisi->canvas_left ? json_encode($desainRevisi->canvas_left) : 'null' !!},
+        right: {!! $desainRevisi && $desainRevisi->canvas_right ? json_encode($desainRevisi->canvas_right) : 'null' !!}
+    };
+
+    window.isLoadingJSON = false;
+    function safeLoadCanvas(canvas, jsonStr) {
+        if (!jsonStr || jsonStr === 'null') return;
+        try {
+            const jsonObj = typeof jsonStr === 'string' ? JSON.parse(jsonStr) : jsonStr;
+            window.isLoadingJSON = true;
+            canvas.loadFromJSON(jsonObj, function() {
+                canvas.renderAll();
+                if(typeof window.renderLayersList === 'function') window.renderLayersList();
+                if(typeof window.saveHistory === 'function') window.saveHistory();
+                window.isLoadingJSON = false;
+            });
+        } catch (e) {
+            console.error("Error loading canvas JSON", e);
+            window.isLoadingJSON = false;
+        }
+    }
+
+    safeLoadCanvas(canvasFront, savedData.front);
+    safeLoadCanvas(canvasBack, savedData.back);
+    if(canvasLeft) {
+        safeLoadCanvas(canvasLeft, savedData.left);
+        safeLoadCanvas(canvasRight, savedData.right);
+    }
+
+    // History states
+    window.historyStates = {
+        front: { undo: [], redo: [] },
+        back: { undo: [], redo: [] },
+        left: { undo: [], redo: [] },
+        right: { undo: [], redo: [] }
+    };
+    window.isHistoryAction = false;
+
+    window.saveHistory = function() {
+        if(window.isHistoryAction) return;
+        let side = 'front';
+        if(window.activeCanvas === canvasBack) side = 'back';
+        else if(window.activeCanvas === canvasLeft) side = 'left';
+        else if(window.activeCanvas === canvasRight) side = 'right';
+
+        if(window.activeCanvas) {
+            const json = window.activeCanvas.toJSON(['customType', 'sablonSize']);
+            window.historyStates[side].undo.push(JSON.stringify(json));
+            window.historyStates[side].redo = []; // clear redo on new action
+            if(typeof window.updateHistoryButtons === 'function') window.updateHistoryButtons();
+        }
+    };
+
+    window.undoHistory = function() {
+        let side = 'front';
+        if(window.activeCanvas === canvasBack) side = 'back';
+        else if(window.activeCanvas === canvasLeft) side = 'left';
+        else if(window.activeCanvas === canvasRight) side = 'right';
+
+        if(window.historyStates[side].undo.length > 0) {
+            window.isHistoryAction = true;
+            const currentJson = window.activeCanvas.toJSON(['customType', 'sablonSize']);
+            window.historyStates[side].redo.push(JSON.stringify(currentJson));
+            
+            const previousState = window.historyStates[side].undo.pop();
+            window.activeCanvas.loadFromJSON(previousState, function() {
+                window.activeCanvas.renderAll();
+                window.isHistoryAction = false;
+                if(typeof window.recalculateTotalPrice === 'function') window.recalculateTotalPrice();
+                if(typeof window.renderLayersList === 'function') window.renderLayersList();
+                if(typeof window.updateHistoryButtons === 'function') window.updateHistoryButtons();
+            });
+        }
+    };
+
+    window.redoHistory = function() {
+        let side = 'front';
+        if(window.activeCanvas === canvasBack) side = 'back';
+        else if(window.activeCanvas === canvasLeft) side = 'left';
+        else if(window.activeCanvas === canvasRight) side = 'right';
+
+        if(window.historyStates[side].redo.length > 0) {
+            window.isHistoryAction = true;
+            const currentJson = window.activeCanvas.toJSON(['customType', 'sablonSize']);
+            window.historyStates[side].undo.push(JSON.stringify(currentJson));
+            
+            const nextState = window.historyStates[side].redo.pop();
+            window.activeCanvas.loadFromJSON(nextState, function() {
+                window.activeCanvas.renderAll();
+                window.isHistoryAction = false;
+                if(typeof window.recalculateTotalPrice === 'function') window.recalculateTotalPrice();
+                if(typeof window.renderLayersList === 'function') window.renderLayersList();
+                if(typeof window.updateHistoryButtons === 'function') window.updateHistoryButtons();
+            });
+        }
+    };
+
+    window.updateHistoryButtons = function() {
+        let side = 'front';
+        if(window.activeCanvas === canvasBack) side = 'back';
+        else if(window.activeCanvas === canvasLeft) side = 'left';
+        else if(window.activeCanvas === canvasRight) side = 'right';
+
+        const btnUndo = document.getElementById('btnUndoAction');
+        const btnRedo = document.getElementById('btnRedoAction');
+        if(btnUndo) {
+            if(window.historyStates[side].undo.length > 0) { btnUndo.classList.remove('opacity-50', 'cursor-not-allowed'); btnUndo.disabled = false; }
+            else { btnUndo.classList.add('opacity-50', 'cursor-not-allowed'); btnUndo.disabled = true; }
+        }
+        if(btnRedo) {
+            if(window.historyStates[side].redo.length > 0) { btnRedo.classList.remove('opacity-50', 'cursor-not-allowed'); btnRedo.disabled = false; }
+            else { btnRedo.classList.add('opacity-50', 'cursor-not-allowed'); btnRedo.disabled = true; }
+        }
+    };
     if (typeof initAligningGuidelines === 'function') {
         initAligningGuidelines(canvasFront);
         initAligningGuidelines(canvasBack);
@@ -31,28 +148,117 @@ function initFabricEditor() {
         if (canvasRight) initAligningGuidelines(canvasRight);
     }
 
+    window._desktopZoom = 1.0;
+    window._mockupPanX = 0;
+    window._mockupPanY = 0;
+
+    // ==========================================================
+    // SPACE PAN MODE — uses pointer-events:none on upperCanvasEl
+    // and global class on body for uniform grab/grabbing cursor
+    // ==========================================================
+    const _panCanvases = [canvasFront, canvasBack, canvasLeft, canvasRight].filter(Boolean);
+    let _panIsActive   = false;  // Space is held down
+    let _panIsDragging = false;  // mouse is pressed during pan
+    let _panLastX = 0, _panLastY = 0;
+    const _panWrapper = document.getElementById('canvasScalerWrapper');
+    const _panMockup  = document.getElementById('mockupContainer');
+
+    function _panActivate() {
+        if (_panIsActive) return;
+        _panIsActive = true;
+        document.body.classList.add('is-panning');
+        _panCanvases.forEach(function(c) {
+            c.selection = false;
+            if (c.upperCanvasEl) {
+                c.upperCanvasEl.style.pointerEvents = 'none';
+            }
+        });
+    }
+
+    function _panDeactivate() {
+        if (!_panIsActive && !_panIsDragging) return;
+        _panIsActive   = false;
+        _panIsDragging = false;
+        document.body.classList.remove('is-panning', 'is-panning-dragging');
+        _panCanvases.forEach(function(c) {
+            c.selection = true;
+            if (c.upperCanvasEl) {
+                c.upperCanvasEl.style.pointerEvents = '';
+            }
+        });
+    }
+
+    // Mousedown — on WINDOW capture, fires regardless of which child is the event target
+    window.addEventListener('mousedown', function(e) {
+        if (!_panIsActive && e.button !== 1) return;
+        // Only pan when click is inside the canvas wrapper
+        if (_panWrapper && !_panWrapper.contains(e.target) && e.target !== _panWrapper) return;
+        _panIsDragging = true;
+        _panLastX = e.clientX;
+        _panLastY = e.clientY;
+        document.body.classList.add('is-panning-dragging');
+        e.preventDefault();
+    }, { capture: true });
+
+    // Mousemove — on window so we track even if mouse leaves wrapper
+    window.addEventListener('mousemove', function(e) {
+        if (!_panIsDragging || !_panMockup) return;
+        var dx = e.clientX - _panLastX;
+        var dy = e.clientY - _panLastY;
+        window._mockupPanX = (window._mockupPanX || 0) + dx;
+        window._mockupPanY = (window._mockupPanY || 0) + dy;
+        _panLastX = e.clientX;
+        _panLastY = e.clientY;
+        if (typeof window.setupMobileCanvasScaler === 'function') {
+            window.setupMobileCanvasScaler();
+        }
+    });
+
+    // Mouseup — stop dragging, restore grab cursor if Space still held
+    window.addEventListener('mouseup', function() {
+        if (!_panIsDragging) return;
+        _panIsDragging = false;
+        document.body.classList.remove('is-panning-dragging');
+        if (_panIsActive) {
+            document.body.classList.add('is-panning');
+        }
+    });
+
+    // Window blur — ensure pan mode is deactivated if window loses focus
+    window.addEventListener('blur', _panDeactivate);
+    
     // Mobile Canvas Scaling
     window.setupMobileCanvasScaler = function() {
         const mockupContainer = document.getElementById('mockupContainer');
         const scalerWrapper = document.getElementById('canvasScalerWrapper');
         if(!mockupContainer || !scalerWrapper) return;
         
-        if(window.innerWidth >= 768) {
-            mockupContainer.style.transform = 'none';
-            return;
+        let scale = 1.0;
+        let pX = 0;
+        let pY = 0;
+        
+        if(window.innerWidth < 768) {
+            const availableWidth = scalerWrapper.clientWidth - 32;
+            const availableHeight = scalerWrapper.clientHeight - 32;
+            
+            if (availableWidth > 0 && availableHeight > 0) {
+                const scaleW = availableWidth / 480;
+                const scaleH = availableHeight / 600;
+                scale = Math.min(scaleW, scaleH, 1.0);
+            }
         }
         
-        const availableWidth = scalerWrapper.clientWidth - 32;
-        const availableHeight = scalerWrapper.clientHeight - 32;
+        // Multiply by desktop zoom if applicable
+        if (window.innerWidth >= 768) {
+            scale = window._desktopZoom;
+        }
         
-        if (availableWidth <= 0 || availableHeight <= 0) return;
+        pX = window._mockupPanX;
+        pY = window._mockupPanY;
         
-        const scaleW = availableWidth / 480;
-        const scaleH = availableHeight / 600;
-        const scale = Math.min(scaleW, scaleH, 1.0);
-        
-        mockupContainer.style.transform = `scale(${scale})`;
+        mockupContainer.style.transform = `translate(${pX}px, ${pY}px) scale(${scale})`;
     };
+    
     
     window.addEventListener('resize', window.setupMobileCanvasScaler);
     window.addEventListener('orientationchange', () => setTimeout(window.setupMobileCanvasScaler, 200));
@@ -70,7 +276,13 @@ function initFabricEditor() {
         else if(side === 'back') window.activeCanvas = canvasBack;
         else if(side === 'left') window.activeCanvas = canvasLeft;
         else if(side === 'right') window.activeCanvas = canvasRight;
+        if(window.activeCanvas) {
+            window.activeCanvas.calcOffset();
+            window.activeCanvas.renderAll();
+        }
         if (typeof window.renderLayersList === 'function') window.renderLayersList();
+        if (typeof window.updateHistoryButtons === 'function') window.updateHistoryButtons();
+        if (typeof window.setupMobileCanvasScaler === 'function') window.setupMobileCanvasScaler();
     };
 
     // Generate preview thumbnails for Step 4
@@ -220,7 +432,23 @@ function initFabricEditor() {
     const addTextBtn = document.getElementById('addTextBtn');
     if(addTextBtn) {
         addTextBtn.addEventListener('click', function() {
-            const text = new fabric.IText('Teks Anda', { left: 20, top: 20, fontFamily: 'Arial', fill: '#000000', fontSize: 40, fontWeight: 'bold', sablonSize: 'a5' });
+            let sideName = 'front';
+            try { const el = document.getElementById('editor-alpine') || document.querySelector('[x-data]'); if(el && window.Alpine && window.Alpine.$data) sideName = window.Alpine.$data(el).activeSide || 'front'; } catch(e) {}
+            const dims = window.printAreaDims[sideName] || window.printAreaDims['front'];
+            const w = dims ? dims.width : window.activeCanvas.width;
+            
+            const text = new fabric.IText('Teks Anda', { 
+                left: w / 2, 
+                top: 40, 
+                originX: 'center',
+                originY: 'center',
+                textAlign: 'center',
+                fontFamily: 'Arial', 
+                fill: '#000000', 
+                fontSize: 40, 
+                fontWeight: 'bold', 
+                sablonSize: 'a5' 
+            });
             window.activeCanvas.add(text);
             window.activeCanvas.setActiveObject(text);
             window.activeCanvas.requestRenderAll();
@@ -704,9 +932,16 @@ function initFabricEditor() {
                         <span class="text-[9px] text-slate-400">Lapisan ${i + 1}</span>
                     </div>
                 </div>
-                <button onclick="if(typeof window.deleteLayerIndex === 'function') window.deleteLayerIndex(${i})" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition shrink-0" title="Hapus Lapisan">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                </button>
+                <div class="flex items-center">
+                    <button onclick="if(typeof window.toggleLockLayer === 'function') window.toggleLockLayer(${i})" class="p-2 ${obj.locked ? 'text-red-500' : 'text-slate-400 hover:text-slate-600'} rounded-lg transition shrink-0" title="${obj.locked ? 'Buka Kunci' : 'Kunci Lapisan'}">
+                        ${obj.locked 
+                            ? '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>'
+                            : '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg>'}
+                    </button>
+                    <button onclick="if(typeof window.deleteLayerIndex === 'function') window.deleteLayerIndex(${i})" class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition shrink-0" title="Hapus Lapisan">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                </div>
             </div>`;
         }
         container.innerHTML = html;
@@ -719,6 +954,29 @@ function initFabricEditor() {
             window.activeCanvas.setActiveObject(objects[i]);
             window.activeCanvas.requestRenderAll();
             window.renderLayersList();
+        }
+    };
+
+    window.toggleLockLayer = function(i) {
+        if(!window.activeCanvas) return;
+        const objects = window.activeCanvas.getObjects();
+        if(objects[i]) {
+            const obj = objects[i];
+            obj.locked = !obj.locked;
+            obj.set({
+                selectable: !obj.locked,
+                evented: !obj.locked,
+                lockMovementX: obj.locked,
+                lockMovementY: obj.locked,
+                lockRotation: obj.locked,
+                lockScalingX: obj.locked,
+                lockScalingY: obj.locked,
+                hasControls: !obj.locked
+            });
+            window.activeCanvas.discardActiveObject();
+            window.activeCanvas.requestRenderAll();
+            window.renderLayersList();
+            if(typeof window.saveHistory === 'function') window.saveHistory();
         }
     };
 
@@ -740,23 +998,146 @@ function initFabricEditor() {
         c.on('selection:cleared', hideControls); 
         c.on('object:added', function(e) {
             const obj = e.target;
-            if (obj) {
+            if (obj && !window.isHistoryAction && !obj.isClone && !window.isLoadingJSON) {
                 const size = obj.sablonSize || ((obj.type === 'i-text' || obj.customType === 'custom-svg') ? 'a5' : 'a4');
                 window.resizeObjectToSablonSize(obj, size);
             }
-            window.recalculateTotalPrice();
+            if (obj && obj.isClone) {
+                delete obj.isClone;
+            }
+            if(typeof window.recalculateTotalPrice === 'function') window.recalculateTotalPrice();
             if(typeof window.renderLayersList === 'function') window.renderLayersList();
+            if(typeof window.saveHistory === 'function') window.saveHistory();
         });
         c.on('object:removed', function(e) {
-            window.recalculateTotalPrice();
+            if(typeof window.recalculateTotalPrice === 'function') window.recalculateTotalPrice();
             if(typeof window.renderLayersList === 'function') window.renderLayersList();
+            if(typeof window.saveHistory === 'function') window.saveHistory();
         });
         c.on('object:modified', function(e) {
             if(typeof window.renderLayersList === 'function') window.renderLayersList();
+            if(typeof window.saveHistory === 'function') window.saveHistory();
         });
         c.on('object:moving', constrainObjectBounds);
         c.on('object:scaling', constrainObjectBounds);
     });
+
+    // Workspace Wheel Zoom (attached directly to scaler wrapper)
+    if (_panWrapper) {
+        _panWrapper.addEventListener('wheel', function(e) {
+            if (window.innerWidth < 768) return;
+            e.preventDefault();
+            
+            var delta = e.deltaY;
+            var oldZoom = window._desktopZoom || 1.0;
+            var factor = delta < 0 ? 1.1 : 0.9;
+            var newZoom = oldZoom * factor;
+            
+            if (newZoom > 3.5) newZoom = 3.5;
+            if (newZoom < 0.4) newZoom = 0.4;
+            
+            if (newZoom !== oldZoom) {
+                var rect = _panWrapper.getBoundingClientRect();
+                var centerX = rect.left + rect.width / 2;
+                var centerY = rect.top + rect.height / 2;
+                var mouseX = e.clientX - centerX;
+                var mouseY = e.clientY - centerY;
+                
+                var k = newZoom / oldZoom;
+                window._mockupPanX = (window._mockupPanX || 0) - (k - 1) * (mouseX - (window._mockupPanX || 0));
+                window._mockupPanY = (window._mockupPanY || 0) - (k - 1) * (mouseY - (window._mockupPanY || 0));
+                
+                window._desktopZoom = newZoom;
+                if (typeof window.setupMobileCanvasScaler === 'function') {
+                    window.setupMobileCanvasScaler();
+                }
+                var resetBtn = document.getElementById('zoomResetBtn');
+                if (resetBtn) {
+                    resetBtn.innerText = Math.round(window._desktopZoom * 100) + '%';
+                }
+            }
+        }, { passive: false });
+    }
+
+    // Global Keyboard Shortcuts
+    window.addEventListener('keydown', function(e) {
+        if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+        if(e.key === 'Delete' || e.key === 'Backspace') {
+            const activeObj = window.activeCanvas.getActiveObject();
+            if(activeObj && !activeObj.isEditing) {
+                e.preventDefault();
+                window.activeCanvas.remove(activeObj);
+                window.activeCanvas.discardActiveObject();
+                window.activeCanvas.requestRenderAll();
+                if(typeof hideControls === 'function') hideControls();
+            }
+        }
+        
+        if(e.code === 'Space') {
+            if (e.repeat) return;  // ignore key-hold repeats
+            if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                const activeObj = window.activeCanvas ? window.activeCanvas.getActiveObject() : null;
+                if (activeObj && activeObj.isEditing) {
+                    return; // Allow typing spaces when text object is in edit mode
+                }
+                e.preventDefault();  // prevent page scroll on Space
+                _panActivate();
+            }
+        }
+        
+        if(e.ctrlKey || e.metaKey) {
+            if(e.key === 'z' || e.key === 'Z') {
+                e.preventDefault();
+                if(e.shiftKey) window.redoHistory();
+                else window.undoHistory();
+            }
+            if(e.key === 'y' || e.key === 'Y') {
+                e.preventDefault();
+                window.redoHistory();
+            }
+            if(e.key === 'c' || e.key === 'C') {
+                e.preventDefault();
+                const activeObj = window.activeCanvas.getActiveObject();
+                if(activeObj) {
+                    activeObj.clone(function(cloned) {
+                        window._clipboard = cloned;
+                    }, ['customType', 'sablonSize']);
+                }
+            }
+            if(e.key === 'v' || e.key === 'V') {
+                e.preventDefault();
+                if(!window._clipboard) return;
+                window._clipboard.clone(function(clonedObj) {
+                    window.activeCanvas.discardActiveObject();
+                    clonedObj.set({
+                        left: clonedObj.left + 10,
+                        top: clonedObj.top + 10,
+                        evented: true,
+                    });
+                    clonedObj.isClone = true;
+                    if (clonedObj.type === 'activeSelection') {
+                        clonedObj.canvas = window.activeCanvas;
+                        clonedObj.forEachObject(function(obj) { obj.isClone = true; window.activeCanvas.add(obj); });
+                        clonedObj.setCoords();
+                    } else {
+                        window.activeCanvas.add(clonedObj);
+                    }
+                    window._clipboard.top += 10;
+                    window._clipboard.left += 10;
+                    window.activeCanvas.setActiveObject(clonedObj);
+                    window.activeCanvas.requestRenderAll();
+                }, ['customType', 'sablonSize']);
+            }
+        }
+    });
+
+    window.addEventListener('keyup', function(e) {
+        if(e.code === 'Space') {
+            _panDeactivate();
+        }
+    });
+
 
     window.toggleMobileProperties = function() {
         if(!editorControls) return;
@@ -792,12 +1173,34 @@ function initFabricEditor() {
         // Set active size buttons
         const size = activeObj.sablonSize || 'a5';
         window.updateSablonSizeButtons(size);
+        
+        const groupingControls = document.getElementById('groupingControls');
+        const groupBtnEl = document.getElementById('groupBtn');
+        const ungroupBtnEl = document.getElementById('ungroupBtn');
+
+        if(groupingControls) {
+            groupingControls.classList.add('hidden');
+            if (activeObj.type === 'activeSelection') {
+                groupingControls.classList.remove('hidden');
+                if (groupBtnEl) { groupBtnEl.classList.remove('hidden'); groupBtnEl.classList.add('flex'); }
+                if (ungroupBtnEl) { ungroupBtnEl.classList.add('hidden'); ungroupBtnEl.classList.remove('flex'); }
+            } else if (activeObj.type === 'group' && activeObj.customType !== 'custom-svg') {
+                groupingControls.classList.remove('hidden');
+                if (groupBtnEl) { groupBtnEl.classList.add('hidden'); groupBtnEl.classList.remove('flex'); }
+                if (ungroupBtnEl) { ungroupBtnEl.classList.remove('hidden'); ungroupBtnEl.classList.add('flex'); }
+            }
+        }
 
         if(activeObj.type === 'i-text') {
             textControls.classList.remove('hidden'); textControls.classList.add('flex');
             const textValueControl = document.getElementById('textValueControl');
             if(textValueControl) textValueControl.value = activeObj.text || '';
             fontFamilyControl.value = activeObj.fontFamily.replace(/["']/g, "");
+            
+            const lhControl = document.getElementById('lineHeightControl');
+            if(lhControl) { lhControl.value = (activeObj.lineHeight || 1.16) * 10; document.getElementById('lineHeightVal').textContent = (lhControl.value / 10).toFixed(1); }
+            const csControl = document.getElementById('charSpacingControl');
+            if(csControl) { csControl.value = activeObj.charSpacing || 0; document.getElementById('charSpacingVal').textContent = csControl.value; }
             
             let fillHex = '#000000';
             if (activeObj.fill) {
@@ -826,6 +1229,11 @@ function initFabricEditor() {
                 document.getElementById('svgColorVal').textContent = svgHex.toUpperCase();
             }
         }
+        
+        if(activeObj) {
+            const opControl = document.getElementById('imageOpacityControl');
+            if(opControl) { opControl.value = Math.round((activeObj.opacity !== undefined ? activeObj.opacity : 1) * 100); document.getElementById('imageOpacityVal').textContent = opControl.value; }
+        }
     }
 
     if(textColorControl) textColorControl.addEventListener('input', () => { document.getElementById('textColorVal').textContent = textColorControl.value.toUpperCase(); });
@@ -847,7 +1255,7 @@ function initFabricEditor() {
         }
     });
 
-    if(resetBgBtn) resetBgBtn.addEventListener('click', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'image') { o.filters = o.filters.filter(f => f.type !== 'RemoveColor'); o.applyFilters(); window.activeCanvas.renderAll(); } });
+    if(resetBgBtn) resetBgBtn.addEventListener('click', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'image') { o.filters = o.filters.filter(f => f.type !== 'RemoveColor'); o.applyFilters(); window.activeCanvas.renderAll(); if(typeof window.saveHistory === 'function') window.saveHistory(); } });
     if(removeBgBtn) removeBgBtn.addEventListener('click', function() {
         const o = window.activeCanvas.getActiveObject();
         if(o && o.type === 'image') {
@@ -855,6 +1263,7 @@ function initFabricEditor() {
             const dist = (parseInt(removeColorTolerance.value) || 15) / 100;
             o.filters.push(new fabric.Image.filters.RemoveColor({ color: removeColorTarget.value, distance: dist }));
             o.applyFilters(); window.activeCanvas.renderAll();
+            if(typeof window.saveHistory === 'function') window.saveHistory();
         }
     });
 
@@ -884,6 +1293,171 @@ function initFabricEditor() {
         if(mobileEditBtn) mobileEditBtn.classList.add('hidden');
     }
     if(deleteObjBtn) deleteObjBtn.addEventListener('click', function() { const o = window.activeCanvas.getActiveObject(); if(o) { window.activeCanvas.remove(o); hideControls(); } });
+
+    // Duplicate
+    const duplicateObjBtn = document.getElementById('duplicateObjBtn');
+    if(duplicateObjBtn) duplicateObjBtn.addEventListener('click', function() {
+        const o = window.activeCanvas.getActiveObject();
+        if(o) {
+            o.clone(function(cloned) {
+                window.activeCanvas.discardActiveObject();
+                cloned.set({
+                    left: cloned.left + 10,
+                    top: cloned.top + 10,
+                    evented: true,
+                });
+                cloned.isClone = true;
+                if (cloned.type === 'activeSelection') {
+                    cloned.canvas = window.activeCanvas;
+                    cloned.forEachObject(function(obj) { obj.isClone = true; window.activeCanvas.add(obj); });
+                    cloned.setCoords();
+                } else {
+                    window.activeCanvas.add(cloned);
+                }
+                window.activeCanvas.setActiveObject(cloned);
+                window.activeCanvas.requestRenderAll();
+            }, ['customType', 'sablonSize']);
+        }
+    });
+
+    // Alignment
+    const alignCenterHBtn = document.getElementById('alignCenterHBtn');
+    const alignCenterVBtn = document.getElementById('alignCenterVBtn');
+    if(alignCenterHBtn) alignCenterHBtn.addEventListener('click', function() {
+        const o = window.activeCanvas.getActiveObject();
+        if(o) {
+            let sideName = 'front';
+            try { const el = document.getElementById('editor-alpine') || document.querySelector('[x-data]'); if(el && window.Alpine && window.Alpine.$data) sideName = window.Alpine.$data(el).activeSide || 'front'; } catch(e) {}
+            const dims = window.printAreaDims[sideName] || window.printAreaDims['front'];
+            const w = dims ? dims.width : window.activeCanvas.width;
+            o.set({ left: w / 2, originX: 'center' });
+            o.setCoords();
+            window.activeCanvas.requestRenderAll();
+            if(typeof window.saveHistory === 'function') window.saveHistory();
+        }
+    });
+    if(alignCenterVBtn) alignCenterVBtn.addEventListener('click', function() {
+        const o = window.activeCanvas.getActiveObject();
+        if(o) {
+            let sideName = 'front';
+            try { const el = document.getElementById('editor-alpine') || document.querySelector('[x-data]'); if(el && window.Alpine && window.Alpine.$data) sideName = window.Alpine.$data(el).activeSide || 'front'; } catch(e) {}
+            const dims = window.printAreaDims[sideName] || window.printAreaDims['front'];
+            const h = dims ? dims.height : window.activeCanvas.height;
+            o.set({ top: h / 2, originY: 'center' });
+            o.setCoords();
+            window.activeCanvas.requestRenderAll();
+            if(typeof window.saveHistory === 'function') window.saveHistory();
+        }
+    });
+    
+    // Group & Ungroup
+    const groupBtn = document.getElementById('groupBtn');
+    const ungroupBtn = document.getElementById('ungroupBtn');
+    
+    if (groupBtn) groupBtn.addEventListener('click', function() {
+        const activeObj = window.activeCanvas.getActiveObject();
+        if (activeObj && activeObj.type === 'activeSelection') {
+            activeObj.toGroup();
+            window.activeCanvas.requestRenderAll();
+            if(typeof window.saveHistory === 'function') window.saveHistory();
+            showControls();
+        }
+    });
+
+    if (ungroupBtn) ungroupBtn.addEventListener('click', function() {
+        const activeObj = window.activeCanvas.getActiveObject();
+        if (activeObj && activeObj.type === 'group' && activeObj.customType !== 'custom-svg') {
+            activeObj.toActiveSelection();
+            window.activeCanvas.requestRenderAll();
+            if(typeof window.saveHistory === 'function') window.saveHistory();
+            showControls();
+        }
+    });
+
+    // Zoom Controls
+    const zoomInBtn = document.getElementById('zoomInBtn');
+    const zoomOutBtn = document.getElementById('zoomOutBtn');
+    const zoomResetBtn = document.getElementById('zoomResetBtn');
+
+    if(zoomInBtn) zoomInBtn.addEventListener('click', function() {
+        if(window.innerWidth < 768) return; // Disable on mobile
+        var oldZoom = window._desktopZoom || 1.0;
+        var newZoom = Math.min(3.5, oldZoom * 1.2);
+        if (newZoom !== oldZoom) {
+            var k = newZoom / oldZoom;
+            window._mockupPanX = (window._mockupPanX || 0) * k;
+            window._mockupPanY = (window._mockupPanY || 0) * k;
+            window._desktopZoom = newZoom;
+            if(typeof window.setupMobileCanvasScaler === 'function') window.setupMobileCanvasScaler();
+            if(zoomResetBtn) zoomResetBtn.innerText = Math.round(window._desktopZoom * 100) + '%';
+        }
+    });
+
+    if(zoomOutBtn) zoomOutBtn.addEventListener('click', function() {
+        if(window.innerWidth < 768) return;
+        var oldZoom = window._desktopZoom || 1.0;
+        var newZoom = Math.max(0.4, oldZoom / 1.2);
+        if (newZoom !== oldZoom) {
+            var k = newZoom / oldZoom;
+            window._mockupPanX = (window._mockupPanX || 0) * k;
+            window._mockupPanY = (window._mockupPanY || 0) * k;
+            window._desktopZoom = newZoom;
+            if(typeof window.setupMobileCanvasScaler === 'function') window.setupMobileCanvasScaler();
+            if(zoomResetBtn) zoomResetBtn.innerText = Math.round(window._desktopZoom * 100) + '%';
+        }
+    });
+
+    if(zoomResetBtn) zoomResetBtn.addEventListener('click', function() {
+        if(window.innerWidth < 768) return;
+        window._desktopZoom = 1.0;
+        window._mockupPanX = 0;
+        window._mockupPanY = 0;
+        if(typeof window.setupMobileCanvasScaler === 'function') window.setupMobileCanvasScaler();
+        zoomResetBtn.innerText = '100%';
+    });
+
+    // Text Properties
+    const textAlignLeft = document.getElementById('textAlignLeft');
+    const textAlignCenter = document.getElementById('textAlignCenter');
+    const textAlignRight = document.getElementById('textAlignRight');
+    const lineHeightControl = document.getElementById('lineHeightControl');
+    const charSpacingControl = document.getElementById('charSpacingControl');
+    
+    if(textAlignLeft) textAlignLeft.addEventListener('click', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set('textAlign', 'left'); window.activeCanvas.requestRenderAll(); } });
+    if(textAlignCenter) textAlignCenter.addEventListener('click', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set('textAlign', 'center'); window.activeCanvas.requestRenderAll(); } });
+    if(textAlignRight) textAlignRight.addEventListener('click', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set('textAlign', 'right'); window.activeCanvas.requestRenderAll(); } });
+    
+    if(lineHeightControl) lineHeightControl.addEventListener('input', function() {
+        document.getElementById('lineHeightVal').textContent = (this.value / 10).toFixed(1);
+        const o = window.activeCanvas.getActiveObject(); 
+        if(o && o.type === 'i-text') { o.set('lineHeight', this.value / 10); window.activeCanvas.requestRenderAll(); } 
+    });
+    
+    if(charSpacingControl) charSpacingControl.addEventListener('input', function() {
+        document.getElementById('charSpacingVal').textContent = this.value;
+        const o = window.activeCanvas.getActiveObject(); 
+        if(o && o.type === 'i-text') { o.set('charSpacing', parseInt(this.value)); window.activeCanvas.requestRenderAll(); } 
+    });
+
+    // Image Properties (Opacity, Flip)
+    const imageOpacityControl = document.getElementById('imageOpacityControl');
+    const flipHBtn = document.getElementById('flipHBtn');
+    const flipVBtn = document.getElementById('flipVBtn');
+
+    if(imageOpacityControl) imageOpacityControl.addEventListener('input', function() {
+        document.getElementById('imageOpacityVal').textContent = this.value;
+        const o = window.activeCanvas.getActiveObject();
+        if(o) { o.set('opacity', this.value / 100); window.activeCanvas.requestRenderAll(); }
+    });
+
+    if(flipHBtn) flipHBtn.addEventListener('click', function() {
+        const o = window.activeCanvas.getActiveObject();
+        if(o) { o.set('flipX', !o.flipX); window.activeCanvas.requestRenderAll(); if(typeof window.saveHistory === 'function') window.saveHistory(); }
+    });
+    if(flipVBtn) flipVBtn.addEventListener('click', function() {
+        const o = window.activeCanvas.getActiveObject();
+        if(o) { o.set('flipY', !o.flipY); window.activeCanvas.requestRenderAll(); if(typeof window.saveHistory === 'function') window.saveHistory(); }
+    });
 
     const textValueControl = document.getElementById('textValueControl');
     if(textValueControl) {
@@ -933,6 +1507,10 @@ function initFabricEditor() {
             file_desain_belakang: backDataURL,
             file_desain_kiri: leftDataURL,
             file_desain_kanan: rightDataURL,
+            canvas_front: JSON.stringify(canvasFront.toJSON(['customType', 'sablonSize'])),
+            canvas_back: canvasBack && canvasBack.getObjects().length > 0 ? JSON.stringify(canvasBack.toJSON(['customType', 'sablonSize'])) : null,
+            canvas_left: canvasLeft && canvasLeft.getObjects().length > 0 ? JSON.stringify(canvasLeft.toJSON(['customType', 'sablonSize'])) : null,
+            canvas_right: canvasRight && canvasRight.getObjects().length > 0 ? JSON.stringify(canvasRight.toJSON(['customType', 'sablonSize'])) : null,
             warna_baju: activeBaseColor,
             raw_assets: rawAssets,
             harga_desain: window.currentHargaDesain || 0,

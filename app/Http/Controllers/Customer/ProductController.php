@@ -27,7 +27,7 @@ class ProductController extends Controller
         if (Auth::guard('customer')->check()) {
             $customerId = Auth::guard('customer')->id();
             $activeOrdersCount = Order::where('id_customer', $customerId)
-                                    ->whereIn('status_order', ['pending', 'diproses'])
+                                    ->whereIn('status_order', ['reviewing', 'pending_payment', 'processing'])
                                     ->count();
             $cartCount = Cart::where('id_customer', $customerId)->sum('quantity');
         }

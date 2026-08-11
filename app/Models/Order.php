@@ -13,6 +13,7 @@ class Order extends Model
         'id_customer',
         'tanggal_order',
         'status_order',
+        'payment_status',
         'total_harga',
         'bukti_pembayaran',
     ];

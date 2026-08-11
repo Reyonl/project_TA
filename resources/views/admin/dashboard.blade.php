@@ -74,15 +74,19 @@
                                     <td class="py-4 px-8 text-sm font-semibold text-slate-800">{{ $order->customer->nama_customer }}</td>
                                     <td class="py-4 px-8 text-sm text-slate-500">{{ \Carbon\Carbon::parse($order->tanggal_order)->format('d M Y') }}</td>
                                     <td class="py-4 px-8">
-                                        @if($order->status_order == 'pending')
+                                        @if($order->status_order == 'reviewing')
                                             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">
-                                                <span class="w-2 h-2 rounded-full bg-amber-500 mr-2"></span>Menunggu Pembayaran
+                                                <span class="w-2 h-2 rounded-full bg-amber-500 mr-2"></span>Review Desain
                                             </span>
-                                        @elseif($order->status_order == 'diproses')
+                                        @elseif($order->status_order == 'pending_payment')
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-800 border border-orange-200">
+                                                <span class="w-2 h-2 rounded-full bg-orange-500 mr-2"></span>Menunggu Pembayaran
+                                            </span>
+                                        @elseif($order->status_order == 'processing')
                                             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-sky-100 text-sky-800 border border-sky-200">
                                                 <span class="w-2 h-2 rounded-full bg-sky-500 mr-2"></span>Sedang Diproses
                                             </span>
-                                        @elseif($order->status_order == 'selesai')
+                                        @elseif($order->status_order == 'completed')
                                             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
                                                 <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span>Selesai
                                             </span>

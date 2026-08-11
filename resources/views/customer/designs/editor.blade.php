@@ -14,10 +14,10 @@
 
     <div id="editor-alpine" class="min-h-screen bg-slate-50" 
          x-data="{ 
-             currentStep: 1,
+             currentStep: {{ $desainRevisi ? 2 : 1 }},
              totalSteps: {{ in_array($produk->jenis_produk, ['hoodie', 'kaos']) ? 6 : 4 }},
              activeTab: 'templates', 
-             baseColor: '#ffffff',
+             baseColor: '{{ $desainRevisi && $desainRevisi->warna_baju ? $desainRevisi->warna_baju : '#ffffff' }}',
              activeSide: 'front', 
              sidebarOpen: true,
              colorMap: {
@@ -34,6 +34,10 @@
                      if(step === 4) { this.activeSide = 'left'; if(window.switchCanvasSide) window.switchCanvasSide('left'); }
                      if(step === 5) { this.activeSide = 'right'; if(window.switchCanvasSide) window.switchCanvasSide('right'); }
                  }
+                 setTimeout(() => {
+                     if(typeof window.setupMobileCanvasScaler === 'function') window.setupMobileCanvasScaler();
+                     if(window.activeCanvas) window.activeCanvas.calcOffset();
+                 }, 80);
                  if(step === this.totalSteps && window.generatePreviews) { setTimeout(() => window.generatePreviews(), 300); }
              },
              getColorName(hex) {
@@ -54,7 +58,15 @@
                     <a href="{{ route('customer.dashboard') }}" class="flex items-center gap-2 hover:opacity-80 transition">
                         <img src="{{ asset('images/logo-dailyco.png') }}" class="h-8 w-auto" alt="Logo">
                     </a>
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Editor Desain — {{ $produk->nama_produk }}</span>
+                    <div class="flex items-center gap-2">
+                        <button id="btnUndoAction" onclick="if(typeof window.undoHistory === 'function') window.undoHistory()" disabled class="p-2 text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition opacity-50 cursor-not-allowed" title="Undo (Ctrl+Z)">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
+                        </button>
+                        <button id="btnRedoAction" onclick="if(typeof window.redoHistory === 'function') window.redoHistory()" disabled class="p-2 text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition opacity-50 cursor-not-allowed" title="Redo (Ctrl+Y)">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10h-10a8 8 0 00-8 8v2M21 10l-6 6m6-6l-6-6"></path></svg>
+                        </button>
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest hidden md:inline ml-2">Editor Desain</span>
+                    </div>
                 </div>
                 <div class="flex items-center gap-2">
                     @php 

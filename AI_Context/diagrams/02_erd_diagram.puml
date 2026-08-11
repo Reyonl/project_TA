@@ -1,0 +1,161 @@
+@startuml
+
+title DailyCo — Entity Relationship Diagram (Aktual)
+
+' =============================
+' ENTITIES
+' =============================
+
+entity "customers" as CUS {
+  *id_customer : bigint <<PK>>
+  --
+  nama_customer : varchar
+  email : varchar <<unique>>
+  password : varchar
+  no_hp : varchar <<null>>
+  alamat : text <<null>>
+  remember_token : varchar <<null>>
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "admins" as ADM {
+  *id_admin : bigint <<PK>>
+  --
+  nama_admin : varchar
+  email : varchar <<unique>>
+  password : varchar
+  role : varchar
+  remember_token : varchar <<null>>
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+note right of ADM
+  role: 'admin' | 'owner'
+end note
+
+entity "produks" as PRD {
+  *id_produk : bigint <<PK>>
+  --
+  nama_produk : varchar
+  jenis_produk : varchar
+  tipe_produk : varchar
+  harga_dasar : decimal
+  deskripsi : text <<null>>
+  gambar_produk : varchar <<null>>
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+note right of PRD
+  jenis_produk: kaos|hoodie|polo
+  tipe_produk: kustom|jadi
+end note
+
+entity "templates" as TPL {
+  *id_template : bigint <<PK>>
+  --
+  id_admin : bigint <<FK>>
+  nama_template : varchar
+  file_template : varchar
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "desains" as DSN {
+  *id_desain : bigint <<PK>>
+  --
+  parent_id : bigint <<FK, null>>
+  id_customer : bigint <<FK>>
+  id_template : bigint <<FK, null>>
+  file_desain : varchar
+  file_desain_belakang : varchar <<null>>
+  file_desain_kiri : varchar <<null>>
+  file_desain_kanan : varchar <<null>>
+  warna_baju : varchar <<null>>
+  canvas_front : longtext <<null>>
+  canvas_back : longtext <<null>>
+  canvas_left : longtext <<null>>
+  canvas_right : longtext <<null>>
+  harga_desain : decimal <<null>>
+  raw_assets : json <<null>>
+  detail_sablon : text <<null>>
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "carts" as CRT {
+  *id_cart : bigint <<PK>>
+  --
+  id_customer : bigint <<FK>>
+  id_produk : bigint <<FK>>
+  id_desain : bigint <<FK, null>>
+  quantity : int
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "orders" as ORD {
+  *id_order : bigint <<PK>>
+  --
+  id_customer : bigint <<FK>>
+  tanggal_order : datetime
+  status_order : enum
+  payment_status : enum
+  total_harga : decimal
+  bukti_pembayaran : varchar <<null>>
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+note right of ORD
+  status_order: reviewing|pending_payment|
+                processing|completed|cancelled
+
+  payment_status: unpaid|awaiting_payment|
+                  awaiting_verification|paid|failed
+end note
+
+entity "order_details" as ODD {
+  *id_order_detail : bigint <<PK>>
+  --
+  id_order : bigint <<FK>>
+  id_produk : bigint <<FK>>
+  id_desain : bigint <<FK, null>>
+  quantity : int
+  harga_produk : decimal
+  harga_desain : decimal
+  subtotal : decimal
+  status_desain : enum
+  catatan_admin : text <<null>>
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+note right of ODD
+  status_desain: pending|revision_required|approved
+end note
+
+' =============================
+' RELATIONSHIPS
+' =============================
+
+CUS ||--o{ DSN : "membuat"
+CUS ||--o{ CRT : "punya"
+CUS ||--o{ ORD : "melakukan"
+
+ADM ||--o{ TPL : "upload"
+
+TPL |o--o{ DSN : "digunakan di"
+
+DSN ||--o{ CRT : "ada di"
+DSN ||--o{ ODD : "ada di"
+DSN |o--o{ DSN : "versi dari (parent_id)"
+
+ORD ||--o{ ODD : "terdiri dari"
+
+PRD ||--o{ CRT : "di-cart"
+PRD ||--o{ ODD : "di-order"
+
+@enduml

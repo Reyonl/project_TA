@@ -20,8 +20,8 @@ class DashboardController extends Controller
         }
 
         // Statistik
-        $pesananBaru = Order::where('status_order', 'pending')->count();
-        $sedangDiproses = Order::where('status_order', 'diproses')->count();
+        $pesananBaru = Order::whereIn('status_order', ['reviewing', 'pending_payment'])->count();
+        $sedangDiproses = Order::where('status_order', 'processing')->count();
         $totalProduk = Produk::count();
 
         // 5 Pesanan Terbaru

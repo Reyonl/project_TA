@@ -18,6 +18,10 @@ class Desain extends Model
         'file_desain_kanan',
         'harga_desain',
         'warna_baju',
+        'canvas_front',
+        'canvas_back',
+        'canvas_left',
+        'canvas_right',
         'raw_assets',
         'detail_sablon',
     ];

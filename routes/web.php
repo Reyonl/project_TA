@@ -46,6 +46,7 @@ Route::middleware('auth:customer')->prefix('customer')->name('customer.')->group
     // Pesanan Customer
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
+    Route::post('/orders/{id}/payment', [OrderController::class, 'uploadPayment'])->name('orders.payment');
 
 
     // =========================================================
@@ -120,6 +121,7 @@ Route::middleware('auth:admin')->prefix('admin')->name('admin.')->group(function
         Route::get('orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
         Route::patch('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.updateStatus');
         Route::patch('orders/{order}/desain/{orderDetail}', [AdminOrderController::class, 'updateStatusDesain'])->name('orders.updateStatusDesain');
+        Route::patch('orders/{order}/verify-payment', [AdminOrderController::class, 'verifyPayment'])->name('orders.verifyPayment');
     });
 
     // Owner & Admin

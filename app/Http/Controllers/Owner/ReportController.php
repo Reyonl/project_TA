@@ -36,14 +36,14 @@ class ReportController extends Controller
 
         // Data Dinamis berdasarkan Tanggal (Current)
         $totalOrders = Order::whereBetween('tanggal_order', [$startStr, $endStr])->count();
-        $totalRevenue = Order::where('status_order', 'selesai')
+        $totalRevenue = Order::where('status_order', 'completed')
                              ->whereBetween('tanggal_order', [$startStr, $endStr])
                              ->sum('total_harga');
         $totalDesains = Desain::whereBetween('created_at', [$startDateTimeStr, $endDateTimeStr])->count();
 
         // Data Dinamis berdasarkan Tanggal (Previous)
         $prevOrders = Order::whereBetween('tanggal_order', [$prevStartStr, $prevEndStr])->count();
-        $prevRevenue = Order::where('status_order', 'selesai')
+        $prevRevenue = Order::where('status_order', 'completed')
                             ->whereBetween('tanggal_order', [$prevStartStr, $prevEndStr])
                             ->sum('total_harga');
         $prevDesains = Desain::whereBetween('created_at', [$prevStartDateTimeStr, $prevEndDateTimeStr])->count();
@@ -64,7 +64,7 @@ class ReportController extends Controller
                                 \DB::raw('SUM(total_harga) as revenue'),
                                 \DB::raw('MONTH(tanggal_order) as month')
                             )
-                            ->where('status_order', 'selesai')
+                            ->where('status_order', 'completed')
                             ->whereBetween('tanggal_order', [$startStr, $endStr])
                             ->groupBy('month')
                             ->orderBy('month')

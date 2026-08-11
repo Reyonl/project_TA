@@ -9,14 +9,14 @@
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             @php
-                $statusOrder = ['pending', 'diproses', 'dikirim', 'selesai'];
+                $statusOrder = ['reviewing', 'pending_payment', 'processing', 'completed'];
                 $steps = [
-                    ['status' => 'pending', 'label' => 'Dikonfirmasi'],
-                    ['status' => 'diproses', 'label' => 'Diproses'],
-                    ['status' => 'dikirim', 'label' => 'Dikirim'],
-                    ['status' => 'selesai', 'label' => 'Selesai'],
+                    ['status' => 'reviewing', 'label' => 'Review Desain'],
+                    ['status' => 'pending_payment', 'label' => 'Pembayaran'],
+                    ['status' => 'processing', 'label' => 'Produksi'],
+                    ['status' => 'completed', 'label' => 'Selesai'],
                 ];
-                $isCancelled = $order->status_order === 'dibatalkan';
+                $isCancelled = $order->status_order === 'cancelled';
             @endphp
 
             <div class="bg-white overflow-hidden shadow-[0_20px_50px_rgba(220,_38,_38,_0.05)] sm:rounded-[2.5rem] border border-slate-100 p-10 mb-8 relative overflow-hidden group">
@@ -84,11 +84,11 @@
                         <dd class="mt-1">
                             @php
                                 $statusColors = [
-                                    'pending'  => 'bg-amber-100 text-amber-700 border-amber-200',
-                                    'diproses' => 'bg-sky-100 text-sky-700 border-sky-200',
-                                    'dikirim'  => 'bg-violet-100 text-violet-700 border-violet-200',
-                                    'selesai'  => 'bg-emerald-100 text-emerald-700 border-emerald-200',
-                                    'dibatalkan' => 'bg-rose-100 text-rose-700 border-rose-200',
+                                    'reviewing'  => 'bg-amber-100 text-amber-700 border-amber-200',
+                                    'pending_payment' => 'bg-orange-100 text-orange-700 border-orange-200',
+                                    'processing' => 'bg-sky-100 text-sky-700 border-sky-200',
+                                    'completed'  => 'bg-emerald-100 text-emerald-700 border-emerald-200',
+                                    'cancelled' => 'bg-rose-100 text-rose-700 border-rose-200',
                                 ];
                                 $colorClass = $statusColors[$order->status_order] ?? 'bg-slate-100 text-slate-700 border-slate-200';
                             @endphp
@@ -99,6 +99,49 @@
                     </div>
                 </dl>
             </div>
+
+            {{-- ===== Form Upload Pembayaran ===== --}}
+            @if($order->payment_status === 'awaiting_payment' || $order->payment_status === 'failed')
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-2xl border border-slate-100 p-6">
+                <h3 class="text-lg font-bold text-slate-800 border-b border-slate-100 pb-4 mb-4">Pembayaran (Transfer Bank)</h3>
+                
+                @if($order->payment_status === 'failed')
+                    <div class="bg-rose-50 border border-rose-200 text-rose-700 p-4 rounded-xl mb-6">
+                        <strong>Pembayaran Ditolak Admin!</strong> Silakan periksa kembali dan unggah ulang bukti transfer yang benar.
+                    </div>
+                @endif
+
+                <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-xl mb-6 flex items-start gap-4">
+                    <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center font-bold text-indigo-600 shadow-sm shrink-0">BCA</div>
+                    <div>
+                        <p class="text-sm text-slate-600 mb-1">Silakan transfer sesuai total tagihan ke rekening berikut:</p>
+                        <div class="flex items-center gap-3">
+                            <p class="text-lg font-bold text-slate-800 font-mono tracking-wider">8273 1234 5678</p>
+                        </div>
+                        <p class="text-sm font-semibold text-slate-700 mt-1">A.N: CustomSablon Nusantara</p>
+                    </div>
+                </div>
+
+                <form action="{{ route('customer.orders.payment', $order->id_order) }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Upload Bukti Transfer <span class="text-red-500">*</span></label>
+                        <input type="file" name="bukti_pembayaran" accept="image/png, image/jpeg, image/jpg" required class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                        @error('bukti_pembayaran')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <button type="submit" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg transition">
+                        Kirim Bukti Pembayaran
+                    </button>
+                </form>
+            </div>
+            @elseif($order->payment_status === 'awaiting_verification')
+            <div class="bg-blue-50 border border-blue-200 text-blue-700 p-4 rounded-xl shadow-sm">
+                <p class="font-bold">Menunggu Verifikasi Pembayaran</p>
+                <p class="text-sm mt-1">Bukti pembayaran Anda sedang diperiksa oleh Admin.</p>
+            </div>
+            @endif
 
             {{-- ===== Item Pesanan ===== --}}
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
@@ -224,7 +267,7 @@
                         </div>
 
                         <!-- Status Revisi -->
-                        @if($detail->status_desain == 'revisi')
+                        @if($detail->status_desain == 'revision_required')
                             <div class="mt-4 p-6 border border-rose-100 bg-rose-50 rounded-[2rem] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 relative overflow-hidden group">
                                 <div class="absolute -right-5 -bottom-5 text-rose-200/30 group-hover:scale-110 transition-transform">
                                     <svg class="w-20 h-20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
@@ -242,7 +285,7 @@
                                     PERBAIKI SEKARANG
                                 </a>
                             </div>
-                        @elseif($detail->status_desain == 'disetujui')
+                        @elseif($detail->status_desain == 'approved')
                             <div class="mt-4 p-4 border border-emerald-100 bg-emerald-50 rounded-2xl flex items-center gap-3">
                                 <div class="w-6 h-6 bg-emerald-500 rounded-lg flex items-center justify-center text-white shadow-sm">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>

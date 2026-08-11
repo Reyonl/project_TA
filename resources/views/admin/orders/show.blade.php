@@ -25,11 +25,11 @@
                         @csrf
                         @method('PATCH')
                         <select name="status_order" class="rounded-lg border-slate-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm font-semibold text-slate-700">
-                            <option value="pending" {{ $order->status_order == 'pending' ? 'selected' : '' }}>⏳ Menunggu Konfirmasi</option>
-                            <option value="diproses" {{ $order->status_order == 'diproses' ? 'selected' : '' }}>🏭 Sedang Diproses/Dicetak</option>
-                            <option value="dikirim" {{ $order->status_order == 'dikirim' ? 'selected' : '' }}>🚚 Dalam Pengiriman</option>
-                            <option value="selesai" {{ $order->status_order == 'selesai' ? 'selected' : '' }}>✅ Selesai</option>
-                            <option value="dibatalkan" {{ $order->status_order == 'dibatalkan' ? 'selected' : '' }}>❌ Dibatalkan</option>
+                            <option value="reviewing" {{ $order->status_order == 'reviewing' ? 'selected' : '' }}>🔍 Review Desain</option>
+                            <option value="pending_payment" {{ $order->status_order == 'pending_payment' ? 'selected' : '' }}>💳 Menunggu Pembayaran</option>
+                            <option value="processing" {{ $order->status_order == 'processing' ? 'selected' : '' }}>🏭 Sedang Diproses/Dicetak</option>
+                            <option value="completed" {{ $order->status_order == 'completed' ? 'selected' : '' }}>✅ Selesai</option>
+                            <option value="cancelled" {{ $order->status_order == 'cancelled' ? 'selected' : '' }}>❌ Dibatalkan</option>
                         </select>
                         <button type="submit" class="bg-indigo-600 text-white px-5 py-2 rounded-lg font-bold hover:bg-indigo-500 transition shadow">
                             Simpan Status
@@ -58,7 +58,21 @@
                         </li>
                     </ul>
                     
-                    <h4 class="font-bold text-slate-800 border-b pb-2 mb-4 mt-6">Bukti Pembayaran</h4>
+                    <h4 class="font-bold text-slate-800 border-b pb-2 mb-4 mt-6 flex justify-between items-center">
+                        Bukti Pembayaran
+                        @php
+                            $payColors = [
+                                'unpaid' => 'bg-slate-100 text-slate-700',
+                                'awaiting_payment' => 'bg-orange-100 text-orange-700',
+                                'awaiting_verification' => 'bg-blue-100 text-blue-700',
+                                'paid' => 'bg-emerald-100 text-emerald-700',
+                                'failed' => 'bg-rose-100 text-rose-700',
+                            ];
+                            $payColor = $payColors[$order->payment_status] ?? 'bg-slate-100 text-slate-700';
+                        @endphp
+                        <span class="text-[10px] px-2 py-1 rounded-full uppercase tracking-wider font-bold {{ $payColor }}">{{ str_replace('_', ' ', $order->payment_status) }}</span>
+                    </h4>
+                    
                     @if($order->bukti_pembayaran)
                         <div class="mt-2 text-center">
                             <a href="{{ Storage::url($order->bukti_pembayaran) }}" target="_blank" class="block rounded-lg overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition">
@@ -67,6 +81,25 @@
                             <a href="{{ Storage::url($order->bukti_pembayaran) }}" download="Bukti_Tf_{{ $order->id_order }}.jpg" class="mt-3 inline-block bg-slate-800 text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-slate-700 transition">
                                 Unduh Bukti
                             </a>
+
+                            @if($order->payment_status === 'awaiting_verification')
+                            <div class="mt-4 pt-4 border-t border-slate-100 flex gap-2">
+                                <form action="{{ route('admin.orders.verifyPayment', $order) }}" method="POST" class="flex-1">
+                                    @csrf @method('PATCH')
+                                    <input type="hidden" name="action" value="reject">
+                                    <button type="submit" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold py-2 rounded-lg text-sm border border-rose-200 transition">
+                                        Tolak
+                                    </button>
+                                </form>
+                                <form action="{{ route('admin.orders.verifyPayment', $order) }}" method="POST" class="flex-1">
+                                    @csrf @method('PATCH')
+                                    <input type="hidden" name="action" value="approve">
+                                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-lg text-sm transition shadow-sm">
+                                        Verifikasi Sah
+                                    </button>
+                                </form>
+                            </div>
+                            @endif
                         </div>
                     @else
                         <div class="mt-2 p-4 bg-yellow-50 text-yellow-700 text-sm font-semibold rounded-lg border border-yellow-200 text-center">
@@ -313,12 +346,12 @@
                                         <span class="font-black text-indigo-600 text-lg">Rp {{ number_format($detail->subtotal, 0, ',', '.') }}</span>
                                     </div>
 
-                                    @if($detail->status_desain == 'revisi')
+                                    @if($detail->status_desain == 'revision_required')
                                         <div class="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
                                             <p class="text-xs font-bold text-red-600 uppercase mb-1">Status: Menunggu Revisi Customer</p>
                                             <p class="text-sm text-red-700 italic">"{{ $detail->catatan_admin }}"</p>
                                         </div>
-                                    @elseif($detail->status_desain == 'disetujui' || $detail->status_desain == 'approved')
+                                    @elseif($detail->status_desain == 'approved')
                                         <div class="mt-3 p-2 bg-emerald-50 border border-emerald-200 rounded-lg text-center">
                                             <p class="text-xs font-bold text-emerald-600 uppercase">Status: {{ $detail->desain ? 'Desain Disetujui' : 'Produk Jadi (Siap Proses)' }}</p>
                                         </div>
@@ -329,7 +362,7 @@
                                             </button>
                                             <form action="{{ route('admin.orders.updateStatusDesain', [$order->id_order, $detail->id_order_detail]) }}" method="POST" class="flex-1">
                                                 @csrf @method('PATCH')
-                                                <input type="hidden" name="status_desain" value="disetujui">
+                                                <input type="hidden" name="status_desain" value="approved">
                                                 <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-lg text-sm transition">
                                                     Setujui Desain
                                                 </button>
@@ -345,7 +378,7 @@
                                             
                                             <form action="{{ route('admin.orders.updateStatusDesain', [$order->id_order, $detail->id_order_detail]) }}" method="POST">
                                                 @csrf @method('PATCH')
-                                                <input type="hidden" name="status_desain" value="revisi">
+                                                <input type="hidden" name="status_desain" value="revision_required">
                                                 <textarea name="catatan_admin" rows="4" class="w-full rounded-lg border-slate-300 focus:ring-red-500 focus:border-red-500 text-sm mb-4" placeholder="Misal: Resolusi gambar depan terlalu kecil / pecah..." required></textarea>
                                                 
                                                 <div class="flex gap-2 justify-end">

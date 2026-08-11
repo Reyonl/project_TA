@@ -64,24 +64,16 @@ class CheckoutController extends Controller
             $totalHarga += ($cart->produk->harga_dasar + $hargaDesain) * $cart->quantity;
         }
 
-        // Upload bukti pembayaran
-        $buktiPath = null;
-        if ($request->hasFile('bukti_pembayaran')) {
-            $file = $request->file('bukti_pembayaran');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->storeAs('bukti_pembayaran', $filename, 'public');
-            $buktiPath = 'bukti_pembayaran/' . $filename;
-        }
-
         // Gunakan transaction agar order & detail atomik
-        $order = DB::transaction(function () use ($id_customer, $totalHarga, $buktiPath, $carts, $cartIds) {
+        $order = DB::transaction(function () use ($id_customer, $totalHarga, $carts, $cartIds) {
             // Buat Order Induk
             $order = Order::create([
                 'id_customer' => $id_customer,
                 'tanggal_order' => now(),
-                'status_order' => 'pending',
+                'status_order' => 'reviewing',
+                'payment_status' => 'unpaid',
                 'total_harga' => $totalHarga,
-                'bukti_pembayaran' => $buktiPath,
+                'bukti_pembayaran' => null,
             ]);
 
             // Buat Order Details
@@ -97,7 +89,7 @@ class CheckoutController extends Controller
                     'harga_produk' => $cart->produk->harga_dasar,
                     'harga_desain' => $hargaDesain,
                     'subtotal' => $subtotalDetail,
-                    'status_desain' => $cart->id_desain ? 'pending' : 'disetujui', // If ready-made, design is already approved implicitly
+                    'status_desain' => $cart->id_desain ? 'pending' : 'approved', // Ready-made: design already approved
                 ]);
             }
 
