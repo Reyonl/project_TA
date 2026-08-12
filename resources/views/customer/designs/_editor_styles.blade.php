@@ -26,6 +26,16 @@
         backdrop-filter: blur(4px);
     }
 
+    /* Global Canvas crisp rendering optimization */
+    .canvas-container canvas,
+    .upper-canvas,
+    .lower-canvas {
+        image-rendering: auto;
+        image-rendering: -webkit-optimize-contrast;
+        transform: translateZ(0);
+        backface-visibility: hidden;
+    }
+
     /* ===== MOBILE RESPONSIVE OVERRIDES (< md / 768px) ===== */
     @media (max-width: 767px) {
 
@@ -41,7 +51,8 @@
             margin: 0 auto;
         }
         .mobile-canvas-scaler #mockupContainer {
-            transform-origin: top left;
+            transform-origin: center center;
+            touch-action: none;
         }
 
         /* ---- Sidebar → Slide-Up Bottom Sheet ---- */
@@ -58,9 +69,12 @@
             border-top: 1px solid #e2e8f0;
             z-index: 50 !important;
             box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.12);
+            touch-action: pan-y;
         }
         .editor-sidebar .custom-scrollbar {
             max-height: 42vh;
+            touch-action: pan-y;
+            -webkit-overflow-scrolling: touch;
         }
 
         /* ---- Properties Panel → Slide-Up Bottom Sheet ---- */
@@ -77,6 +91,7 @@
             border-top: 1px solid #e2e8f0;
             z-index: 50 !important;
             box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.12);
+            touch-action: pan-y;
         }
         /* Compact padding inside properties bottom sheet */
         .editor-properties .p-6 {
@@ -92,9 +107,18 @@
             padding-top: 1.25rem;
         }
 
-        /* Fabric.js canvas touch optimization */
-        .canvas-container {
-            touch-action: none;
+        /* Fabric.js canvas touch and rendering optimization */
+        .canvas-container,
+        .canvas-container canvas,
+        .upper-canvas,
+        .lower-canvas {
+            touch-action: none !important;
+            -webkit-user-select: none;
+            user-select: none;
+            image-rendering: auto;
+            image-rendering: -webkit-optimize-contrast;
+            transform: translateZ(0);
+            backface-visibility: hidden;
         }
 
         /* Size buttons — tighter on mobile */

@@ -12,16 +12,52 @@
 <script>
 function initFabricEditor() {
   try {
-    fabric.devicePixelRatio = (window.devicePixelRatio && window.devicePixelRatio > 2) ? window.devicePixelRatio : 3;
+    // High-resolution Retina & Zoom rendering multiplier (minimum 4x to ensure razor-sharp image rendering even at 350% zoom on high-DPI screens)
+    fabric.devicePixelRatio = Math.max((window.devicePixelRatio || 1) * 2, 4);
 
-    const canvasFront = new fabric.Canvas('tshirt-canvas-front', { preserveObjectStacking: true, selection: true, enableRetinaScaling: true, imageSmoothingEnabled: true });
-    const canvasBack = new fabric.Canvas('tshirt-canvas-back', { preserveObjectStacking: true, selection: true, enableRetinaScaling: true, imageSmoothingEnabled: true });
+    // Override Fabric's setImageSmoothing to enforce 'high' quality image interpolation
+    fabric.util.setImageSmoothing = function(ctx, enabled) {
+        if (ctx) {
+            ctx.imageSmoothingEnabled = enabled !== false;
+            ctx.webkitImageSmoothingEnabled = enabled !== false;
+            ctx.mozImageSmoothingEnabled = enabled !== false;
+            ctx.msImageSmoothingEnabled = enabled !== false;
+            ctx.oImageSmoothingEnabled = enabled !== false;
+            if (enabled !== false) {
+                ctx.imageSmoothingQuality = 'high';
+            }
+        }
+    };
+
+    const canvasOptions = { 
+        preserveObjectStacking: true, 
+        selection: true, 
+        enableRetinaScaling: true, 
+        imageSmoothingEnabled: true 
+    };
+
+    const canvasFront = new fabric.Canvas('tshirt-canvas-front', canvasOptions);
+    const canvasBack = new fabric.Canvas('tshirt-canvas-back', canvasOptions);
     let canvasLeft = null, canvasRight = null;
     if (document.getElementById('tshirt-canvas-left')) {
-        canvasLeft = new fabric.Canvas('tshirt-canvas-left', { preserveObjectStacking: true, selection: true });
-        canvasRight = new fabric.Canvas('tshirt-canvas-right', { preserveObjectStacking: true, selection: true });
+        canvasLeft = new fabric.Canvas('tshirt-canvas-left', canvasOptions);
+        canvasRight = new fabric.Canvas('tshirt-canvas-right', canvasOptions);
     }
     window.activeCanvas = canvasFront;
+
+    // Ensure high-quality rendering on all canvas contexts
+    [canvasFront, canvasBack, canvasLeft, canvasRight].forEach(function(c) {
+        if (c) {
+            if (c.contextContainer) {
+                c.contextContainer.imageSmoothingEnabled = true;
+                c.contextContainer.imageSmoothingQuality = 'high';
+            }
+            if (c.contextTop) {
+                c.contextTop.imageSmoothingEnabled = true;
+                c.contextTop.imageSmoothingQuality = 'high';
+            }
+        }
+    });
 
     // Load saved data if exists
     const savedData = {
@@ -38,6 +74,12 @@ function initFabricEditor() {
             const jsonObj = typeof jsonStr === 'string' ? JSON.parse(jsonStr) : jsonStr;
             window.isLoadingJSON = true;
             canvas.loadFromJSON(jsonObj, function() {
+                canvas.getObjects().forEach(function(o) {
+                    o.set({ objectCaching: false });
+                    if (o.type === 'image') {
+                        o.set({ imageSmoothing: true });
+                    }
+                });
                 canvas.renderAll();
                 if(typeof window.renderLayersList === 'function') window.renderLayersList();
                 if(typeof window.saveHistory === 'function') window.saveHistory();
@@ -93,6 +135,12 @@ function initFabricEditor() {
             
             const previousState = window.historyStates[side].undo.pop();
             window.activeCanvas.loadFromJSON(previousState, function() {
+                window.activeCanvas.getObjects().forEach(function(o) {
+                    o.set({ objectCaching: false });
+                    if (o.type === 'image') {
+                        o.set({ imageSmoothing: true });
+                    }
+                });
                 window.activeCanvas.renderAll();
                 window.isHistoryAction = false;
                 if(typeof window.recalculateTotalPrice === 'function') window.recalculateTotalPrice();
@@ -115,6 +163,12 @@ function initFabricEditor() {
             
             const nextState = window.historyStates[side].redo.pop();
             window.activeCanvas.loadFromJSON(nextState, function() {
+                window.activeCanvas.getObjects().forEach(function(o) {
+                    o.set({ objectCaching: false });
+                    if (o.type === 'image') {
+                        o.set({ imageSmoothing: true });
+                    }
+                });
                 window.activeCanvas.renderAll();
                 window.isHistoryAction = false;
                 if(typeof window.recalculateTotalPrice === 'function') window.recalculateTotalPrice();
@@ -424,6 +478,8 @@ function initFabricEditor() {
     fabric.Object.prototype.objectCaching = false;
     fabric.Image.prototype.objectCaching = false;
     fabric.Image.prototype.noScaleCache = false;
+    fabric.Image.prototype.imageSmoothing = true;
+    fabric.Image.prototype.strokeUniform = true;
     if(fabric.Object.prototype.setControlsVisibility) {
         fabric.Object.prototype.setControlsVisibility({ mt: false, mb: false, ml: false, mr: false });
     }
@@ -475,17 +531,31 @@ function initFabricEditor() {
         const imgEl = new Image();
         imgEl.crossOrigin = 'anonymous';
         imgEl.onload = function() {
-            const img = new fabric.Image(imgEl);
+            const img = new fabric.Image(imgEl, {
+                objectCaching: false,
+                imageSmoothing: true
+            });
             if(img.width > pa_width) img.scaleToWidth(pa_width - 20);
             else if(img.width < 40) img.scaleToWidth(80);
-            img.set({ left: 10, top: 10, objectCaching: false });
+            img.set({ left: 10, top: 10, objectCaching: false, imageSmoothing: true });
             img.customType = 'custom-image';
             img.sablonSize = 'a4';
             window.activeCanvas.add(img); window.activeCanvas.setActiveObject(img); window.activeCanvas.requestRenderAll();
         };
         imgEl.onerror = function() {
             const imgEl2 = new Image();
-            imgEl2.onload = function() { const img = new fabric.Image(imgEl2); if(img.width > pa_width) img.scaleToWidth(pa_width - 20); else if(img.width < 40) img.scaleToWidth(80); img.set({ left: 10, top: 10, objectCaching: false }); img.customType = 'custom-image'; img.sablonSize = 'a4'; window.activeCanvas.add(img); window.activeCanvas.setActiveObject(img); window.activeCanvas.requestRenderAll(); };
+            imgEl2.onload = function() { 
+                const img = new fabric.Image(imgEl2, {
+                    objectCaching: false,
+                    imageSmoothing: true
+                }); 
+                if(img.width > pa_width) img.scaleToWidth(pa_width - 20); 
+                else if(img.width < 40) img.scaleToWidth(80); 
+                img.set({ left: 10, top: 10, objectCaching: false, imageSmoothing: true }); 
+                img.customType = 'custom-image'; 
+                img.sablonSize = 'a4'; 
+                window.activeCanvas.add(img); window.activeCanvas.setActiveObject(img); window.activeCanvas.requestRenderAll(); 
+            };
             imgEl2.src = url;
         };
         imgEl.src = url;
@@ -498,7 +568,7 @@ function initFabricEditor() {
                 const group = fabric.util.groupSVGElements(objects, options);
                 const targetSize = Math.min(60, window.activeCanvas.width - 20);
                 group.scale(targetSize / Math.max(group.width || 1, group.height || 1));
-                group.set({ left: 10, top: 10 }); 
+                group.set({ left: 10, top: 10, objectCaching: false }); 
                 group.customType = 'custom-svg';
                 group.sablonSize = 'a5';
                 window.activeCanvas.add(group); window.activeCanvas.setActiveObject(group); window.activeCanvas.requestRenderAll();
@@ -527,15 +597,19 @@ function initFabricEditor() {
 
         var reader = new FileReader();
         reader.onload = function(event) {
-            var imgObj = new Image(); imgObj.src = event.target.result;
+            var imgObj = new Image(); 
             imgObj.onload = function() {
-                var img = new fabric.Image(imgObj);
+                var img = new fabric.Image(imgObj, {
+                    objectCaching: false,
+                    imageSmoothing: true
+                });
                 if(img.width > window.activeCanvas.width) img.scaleToWidth(window.activeCanvas.width - 20);
-                img.set({ left: 10, top: 10, objectCaching: false }); 
+                img.set({ left: 10, top: 10, objectCaching: false, imageSmoothing: true }); 
                 img.customType = 'custom-image';
                 img.sablonSize = 'a4';
                 window.activeCanvas.add(img); window.activeCanvas.setActiveObject(img); window.activeCanvas.requestRenderAll();
-            }
+            };
+            imgObj.src = event.target.result;
         };
         reader.readAsDataURL(file); e.target.value = '';
     });

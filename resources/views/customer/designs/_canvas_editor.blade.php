@@ -147,7 +147,7 @@
 
         {{-- Canvas Workspace --}}
         <div class="flex-1 overflow-hidden flex justify-center items-center relative bg-slate-50 mobile-canvas-scaler" id="canvasScalerWrapper">
-            <div class="relative shadow-2xl rounded-xl overflow-hidden pointer-events-auto flex items-center justify-center bg-slate-100 origin-top-left md:origin-center" id="mockupContainer" style="width: 480px; height: 600px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);">
+            <div class="relative shadow-2xl rounded-xl overflow-hidden pointer-events-auto flex items-center justify-center bg-slate-100 origin-center" id="mockupContainer" style="width: 480px; height: 600px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);">
                 {{-- Side Indicator --}}
                 <div class="absolute top-4 left-4 z-30 pointer-events-none">
                     <span class="bg-indigo-600/90 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-lg border border-indigo-400/50 uppercase tracking-widest backdrop-blur-sm" x-text="activeSide === 'front' ? 'Depan' : (activeSide === 'back' ? 'Belakang' : activeSide.toUpperCase())">Depan</span>

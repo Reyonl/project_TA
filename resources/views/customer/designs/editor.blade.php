@@ -52,7 +52,7 @@
          })">
 
         {{-- ===== PROGRESS BAR ===== --}}
-        <div class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
             <div class="max-w-5xl mx-auto px-6 py-4">
                 <div class="flex items-center justify-between mb-3">
                     <a href="{{ route('customer.dashboard') }}" class="flex items-center gap-2 hover:opacity-80 transition">
