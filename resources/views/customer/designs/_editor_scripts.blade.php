@@ -12,6 +12,8 @@
 <script>
 function initFabricEditor() {
   try {
+    console.log('[CANVAS DEBUG] initFabricEditor starting...');
+
     // High-resolution Retina & Zoom rendering multiplier (minimum 4x to ensure razor-sharp image rendering even at 350% zoom on high-DPI screens)
     fabric.devicePixelRatio = Math.max((window.devicePixelRatio || 1) * 2, 4);
 
@@ -45,6 +47,12 @@ function initFabricEditor() {
     }
     window.activeCanvas = canvasFront;
 
+    console.log('[CANVAS DEBUG] INIT FABRIC FRONT:', canvasFront);
+    console.log('[CANVAS DEBUG] INIT FABRIC BACK:', canvasBack);
+    if (canvasLeft) console.log('[CANVAS DEBUG] INIT FABRIC LEFT:', canvasLeft);
+    if (canvasRight) console.log('[CANVAS DEBUG] INIT FABRIC RIGHT:', canvasRight);
+    console.log('[CANVAS DEBUG] activeCanvas default:', window.activeCanvas);
+
     // Ensure high-quality rendering on all canvas contexts
     [canvasFront, canvasBack, canvasLeft, canvasRight].forEach(function(c) {
         if (c) {
@@ -59,7 +67,111 @@ function initFabricEditor() {
         }
     });
 
-    // Load saved data if exists
+    // ===== LOCAL DRAFT & RECOVERY ENGINE =====
+    const DRAFT_KEY = 'canvas_draft_p{{ $produk->id_produk }}{{ $desainRevisi ? '_rev_' . $desainRevisi->id_desain : '' }}_u{{ auth()->guard('customer')->id() }}';
+
+    function updateDraftStatusBadge(status, text) {
+        const badge = document.getElementById('draftStatusBadge');
+        const dot = document.getElementById('draftStatusDot');
+        const label = document.getElementById('draftStatusText');
+        if (!badge || !dot || !label) return;
+
+        badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border transition-all duration-300 ';
+        dot.className = 'w-2 h-2 rounded-full transition-colors duration-300 ';
+
+        if (status === 'saving') {
+            badge.className += 'bg-amber-50 border-amber-200 text-amber-700 shadow-sm';
+            dot.className += 'bg-amber-500 animate-pulse';
+            label.textContent = text || 'Menyimpan draft...';
+        } else if (status === 'saved') {
+            badge.className += 'bg-emerald-50 border-emerald-200 text-emerald-700';
+            dot.className += 'bg-emerald-500';
+            label.textContent = text || 'Tersimpan di perangkat';
+        } else if (status === 'offline') {
+            badge.className += 'bg-rose-50 border-rose-200 text-rose-700 shadow-sm';
+            dot.className += 'bg-rose-500 animate-ping';
+            label.textContent = text || 'Offline — disimpan di perangkat';
+        } else if (status === 'reconnecting') {
+            badge.className += 'bg-sky-50 border-sky-200 text-sky-700 shadow-sm';
+            dot.className += 'bg-sky-500 animate-bounce';
+            label.textContent = text || 'Koneksi kembali — menyinkronkan...';
+        } else {
+            badge.className += 'bg-slate-100 border-slate-200 text-slate-500';
+            dot.className += 'bg-slate-400';
+            label.textContent = text || 'Draft Siap';
+        }
+    }
+
+    let _draftSaveTimer = null;
+    window.saveLocalDraft = function(immediate = false) {
+        if (window.isLoadingJSON) {
+            console.log('[CANVAS DEBUG] saveLocalDraft SKIPPED because isLoadingJSON is true');
+            return;
+        }
+
+        console.log('[CANVAS DEBUG] saveLocalDraft CALLED (immediate: ' + immediate + ')');
+        updateDraftStatusBadge(navigator.onLine ? 'saving' : 'offline', navigator.onLine ? 'Menyimpan draft...' : 'Offline — menyimpan draft...');
+
+        const doSave = function() {
+            try {
+                const countFront = canvasFront ? canvasFront.getObjects().length : 0;
+                const countBack = canvasBack ? canvasBack.getObjects().length : 0;
+                const countLeft = canvasLeft ? canvasLeft.getObjects().length : 0;
+                const countRight = canvasRight ? canvasRight.getObjects().length : 0;
+                const totalObjs = countFront + countBack + countLeft + countRight;
+
+                console.log('[CANVAS DEBUG] saveLocalDraft executing doSave() - totalObjects:', totalObjs, {
+                    front: countFront,
+                    back: countBack,
+                    left: countLeft,
+                    right: countRight
+                });
+
+                const rootEl = document.getElementById('editor-alpine') || document.querySelector('[x-data]');
+                const alpineData = window.Alpine && rootEl ? window.Alpine.$data(rootEl) : null;
+                const currentBaseColor = alpineData ? alpineData.baseColor : (window.activeBaseColorLocal || '#ffffff');
+                const currentStep = alpineData ? alpineData.currentStep : 2;
+
+                const draftData = {
+                    version: 2,
+                    productId: '{{ $produk->id_produk }}',
+                    userId: '{{ auth()->guard('customer')->id() }}',
+                    timestamp: Date.now(),
+                    dateFormatted: new Date().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }),
+                    totalObjects: totalObjs,
+                    baseColor: currentBaseColor,
+                    currentStep: currentStep,
+                    canvases: {
+                        front: canvasFront ? canvasFront.toJSON(['customType', 'sablonSize', 'locked']) : null,
+                        back: canvasBack && countBack > 0 ? canvasBack.toJSON(['customType', 'sablonSize', 'locked']) : null,
+                        left: canvasLeft && countLeft > 0 ? canvasLeft.toJSON(['customType', 'sablonSize', 'locked']) : null,
+                        right: canvasRight && countRight > 0 ? canvasRight.toJSON(['customType', 'sablonSize', 'locked']) : null
+                    }
+                };
+
+                localStorage.setItem(DRAFT_KEY, JSON.stringify(draftData));
+                console.log('[CANVAS DEBUG] saveLocalDraft SAVED successfully to localStorage key:', DRAFT_KEY);
+                
+                if (navigator.onLine) {
+                    updateDraftStatusBadge('saved', 'Tersimpan ' + draftData.dateFormatted);
+                } else {
+                    updateDraftStatusBadge('offline', 'Offline — tersimpan di perangkat');
+                }
+            } catch (err) {
+                console.warn("[CANVAS DEBUG] Could not save local draft:", err);
+            }
+        };
+
+        if (immediate) {
+            if (_draftSaveTimer) clearTimeout(_draftSaveTimer);
+            doSave();
+        } else {
+            if (_draftSaveTimer) clearTimeout(_draftSaveTimer);
+            _draftSaveTimer = setTimeout(doSave, 800);
+        }
+    };
+
+    // Load saved data if exists (from server revisions)
     const savedData = {
         front: {!! $desainRevisi && $desainRevisi->canvas_front ? json_encode($desainRevisi->canvas_front) : 'null' !!},
         back: {!! $desainRevisi && $desainRevisi->canvas_back ? json_encode($desainRevisi->canvas_back) : 'null' !!},
@@ -69,11 +181,15 @@ function initFabricEditor() {
 
     window.isLoadingJSON = false;
     function safeLoadCanvas(canvas, jsonStr) {
+        const sideLabel = canvas === canvasFront ? 'FRONT' : (canvas === canvasBack ? 'BACK' : (canvas === canvasLeft ? 'LEFT' : 'RIGHT'));
+        console.log('[CANVAS DEBUG] safeLoadCanvas CALLED on canvas:', sideLabel, 'jsonStr:', jsonStr ? (typeof jsonStr === 'string' ? jsonStr.substring(0, 50) + '...' : 'object') : 'null');
         if (!jsonStr || jsonStr === 'null') return;
         try {
             const jsonObj = typeof jsonStr === 'string' ? JSON.parse(jsonStr) : jsonStr;
             window.isLoadingJSON = true;
+            console.log('[CANVAS DEBUG] canvas.loadFromJSON CALLED for', sideLabel);
             canvas.loadFromJSON(jsonObj, function() {
+                console.log('[CANVAS DEBUG] canvas.loadFromJSON COMPLETED for', sideLabel, 'objects count:', canvas.getObjects().length);
                 canvas.getObjects().forEach(function(o) {
                     o.set({ objectCaching: false });
                     if (o.type === 'image') {
@@ -86,17 +202,161 @@ function initFabricEditor() {
                 window.isLoadingJSON = false;
             });
         } catch (e) {
-            console.error("Error loading canvas JSON", e);
+            console.error("[CANVAS DEBUG] Error loading canvas JSON", e);
             window.isLoadingJSON = false;
         }
     }
 
-    safeLoadCanvas(canvasFront, savedData.front);
-    safeLoadCanvas(canvasBack, savedData.back);
-    if(canvasLeft) {
-        safeLoadCanvas(canvasLeft, savedData.left);
-        safeLoadCanvas(canvasRight, savedData.right);
+    function loadInitialServerData() {
+        console.log('[CANVAS DEBUG] loadInitialServerData CALLED');
+        safeLoadCanvas(canvasFront, savedData.front);
+        safeLoadCanvas(canvasBack, savedData.back);
+        if(canvasLeft) {
+            safeLoadCanvas(canvasLeft, savedData.left);
+            safeLoadCanvas(canvasRight, savedData.right);
+        }
+        updateDraftStatusBadge('saved', 'Draft Siap');
     }
+
+    function restoreDraftData(draft) {
+        console.log('[CANVAS DEBUG] restoreDraftData CALLED with draft:', draft);
+        window.isLoadingJSON = true;
+
+        // Restore base color
+        if (draft.baseColor) {
+            console.log('[CANVAS DEBUG] restoreDraftData restoring baseColor:', draft.baseColor);
+            window.canvasBackgroundChange(draft.baseColor);
+            try {
+                const rootEl = document.getElementById('editor-alpine') || document.querySelector('[x-data]');
+                if (rootEl && window.Alpine) {
+                    const data = window.Alpine.$data(rootEl);
+                    data.baseColor = draft.baseColor;
+                }
+            } catch(e) {}
+        }
+
+        // Restore canvases
+        if (draft.canvases) {
+            console.log('[CANVAS DEBUG] restoreDraftData restoring canvases...');
+            if (draft.canvases.front) safeLoadCanvas(canvasFront, draft.canvases.front);
+            if (draft.canvases.back) safeLoadCanvas(canvasBack, draft.canvases.back);
+            if (canvasLeft && draft.canvases.left) safeLoadCanvas(canvasLeft, draft.canvases.left);
+            if (canvasRight && draft.canvases.right) safeLoadCanvas(canvasRight, draft.canvases.right);
+        }
+
+        // Restore step
+        if (draft.currentStep && draft.currentStep > 1) {
+            console.log('[CANVAS DEBUG] restoreDraftData restoring currentStep to:', draft.currentStep);
+            try {
+                const rootEl = document.getElementById('editor-alpine') || document.querySelector('[x-data]');
+                if (rootEl && window.Alpine) {
+                    const data = window.Alpine.$data(rootEl);
+                    data.goToStep(draft.currentStep);
+                }
+            } catch(e) {}
+        }
+
+        window.isLoadingJSON = false;
+        if (typeof window.recalculateTotalPrice === 'function') window.recalculateTotalPrice();
+        if (typeof window.renderLayersList === 'function') window.renderLayersList();
+
+        updateDraftStatusBadge('saved', 'Draft Dipulihkan (' + (draft.dateFormatted || '') + ')');
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Draft Berhasil Dipulihkan!',
+            text: 'Desain Anda telah dikembalikan ke posisi semula.',
+            timer: 2000,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end'
+        });
+    }
+
+    function checkAndPromptDraftRecovery() {
+        console.log('[CANVAS DEBUG] checkAndPromptDraftRecovery CALLED');
+        try {
+            const rawDraft = localStorage.getItem(DRAFT_KEY);
+            console.log('[CANVAS DEBUG] local draft key:', DRAFT_KEY);
+            console.log('[CANVAS DEBUG] local draft raw:', rawDraft ? 'EXISTS (length: ' + rawDraft.length + ')' : 'NULL');
+
+            if (!rawDraft) {
+                console.log('[CANVAS DEBUG] No local draft found, calling loadInitialServerData()');
+                loadInitialServerData();
+                return;
+            }
+
+            const draft = JSON.parse(rawDraft);
+            console.log('[CANVAS DEBUG] Parsed draft:', draft);
+            if (!draft || !draft.canvases || draft.totalObjects === 0) {
+                console.log('[CANVAS DEBUG] Draft empty or 0 objects, clearing DRAFT_KEY and calling loadInitialServerData()');
+                localStorage.removeItem(DRAFT_KEY);
+                loadInitialServerData();
+                return;
+            }
+
+            const draftTime = draft.dateFormatted || new Date(draft.timestamp).toLocaleString('id-ID');
+            console.log('[CANVAS DEBUG] Showing Swal recovery prompt for draft from:', draftTime);
+
+            Swal.fire({
+                icon: 'question',
+                title: 'Draft Desain Ditemukan!',
+                html: `<div class="text-left text-sm text-slate-600 space-y-2">
+                    <p>Ditemukan draf desain yang belum tersimpan dari sesi sebelumnya:</p>
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs space-y-1">
+                        <div>📅 <strong>Waktu:</strong> ${draftTime}</div>
+                        <div>🎨 <strong>Warna Baju:</strong> ${draft.baseColor || 'Default'}</div>
+                        <div>🖼️ <strong>Total Objek:</strong> ${draft.totalObjects} objek desain</div>
+                    </div>
+                    <p class="mt-2 font-medium text-slate-700">Apakah Anda ingin memulihkan draft ini?</p>
+                </div>`,
+                showCancelButton: true,
+                confirmButtonText: '✨ Pulihkan Draft',
+                cancelButtonText: '🗑️ Mulai Baru',
+                confirmButtonColor: '#16a34a',
+                cancelButtonColor: '#64748b',
+                allowOutsideClick: false,
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    console.log('[CANVAS DEBUG] User confirmed draft recovery');
+                    restoreDraftData(draft);
+                } else {
+                    console.log('[CANVAS DEBUG] User declined draft recovery, clearing and starting fresh');
+                    localStorage.removeItem(DRAFT_KEY);
+                    loadInitialServerData();
+                    updateDraftStatusBadge('saved', 'Draft Baru');
+                }
+            });
+        } catch (e) {
+            console.error("[CANVAS DEBUG] Error reading draft:", e);
+            loadInitialServerData();
+        }
+    }
+
+    // Initialize Canvas Data with Recovery Check
+    checkAndPromptDraftRecovery();
+
+    // Network & Lifecycle Listeners for Draft
+    window.addEventListener('online', function() {
+        updateDraftStatusBadge('reconnecting', 'Koneksi kembali — menyinkronkan...');
+        setTimeout(() => {
+            window.saveLocalDraft(true);
+            updateDraftStatusBadge('saved', 'Tersimpan di perangkat');
+        }, 1200);
+    });
+
+    window.addEventListener('offline', function() {
+        updateDraftStatusBadge('offline', 'Offline — perubahan disimpan di perangkat');
+    });
+
+    window.addEventListener('beforeunload', function() {
+        window.saveLocalDraft(true);
+    });
+
+    window.addEventListener('pagehide', function() {
+        window.saveLocalDraft(true);
+    });
 
     // History states
     window.historyStates = {
@@ -119,6 +379,7 @@ function initFabricEditor() {
             window.historyStates[side].undo.push(JSON.stringify(json));
             window.historyStates[side].redo = []; // clear redo on new action
             if(typeof window.updateHistoryButtons === 'function') window.updateHistoryButtons();
+            if(typeof window.saveLocalDraft === 'function') window.saveLocalDraft();
         }
     };
 
@@ -242,40 +503,89 @@ function initFabricEditor() {
         });
     }
 
-    // Mousedown — on WINDOW capture, fires regardless of which child is the event target
-    window.addEventListener('mousedown', function(e) {
-        if (!_panIsActive && e.button !== 1) return;
-        // Only pan when click is inside the canvas wrapper
-        if (_panWrapper && !_panWrapper.contains(e.target) && e.target !== _panWrapper) return;
+    function _startPanDrag(clientX, clientY) {
         _panIsDragging = true;
-        _panLastX = e.clientX;
-        _panLastY = e.clientY;
+        _panLastX = clientX;
+        _panLastY = clientY;
         document.body.classList.add('is-panning-dragging');
-        e.preventDefault();
-    }, { capture: true });
+    }
 
-    // Mousemove — on window so we track even if mouse leaves wrapper
-    window.addEventListener('mousemove', function(e) {
+    function _movePanDrag(clientX, clientY) {
         if (!_panIsDragging || !_panMockup) return;
-        var dx = e.clientX - _panLastX;
-        var dy = e.clientY - _panLastY;
+        var dx = clientX - _panLastX;
+        var dy = clientY - _panLastY;
         window._mockupPanX = (window._mockupPanX || 0) + dx;
         window._mockupPanY = (window._mockupPanY || 0) + dy;
-        _panLastX = e.clientX;
-        _panLastY = e.clientY;
+        _panLastX = clientX;
+        _panLastY = clientY;
         if (typeof window.setupMobileCanvasScaler === 'function') {
             window.setupMobileCanvasScaler();
         }
-    });
+    }
 
-    // Mouseup — stop dragging, restore grab cursor if Space still held
-    window.addEventListener('mouseup', function() {
+    function _endPanDrag() {
         if (!_panIsDragging) return;
         _panIsDragging = false;
         document.body.classList.remove('is-panning-dragging');
         if (_panIsActive) {
             document.body.classList.add('is-panning');
+        } else {
+            _panCanvases.forEach(function(c) {
+                c.selection = true;
+                if (c.upperCanvasEl) c.upperCanvasEl.style.pointerEvents = '';
+            });
         }
+    }
+
+    // PointerDown (Handles Touchpad click-drag, Mouse Middle click, and Space + click)
+    window.addEventListener('pointerdown', function(e) {
+        const isMiddleClick = e.button === 1;
+        const isSpacePan = _panIsActive && (e.button === 0 || e.pointerType === 'touch');
+        const isBackgroundPan = e.button === 0 && e.target === _panWrapper;
+
+        if (!isMiddleClick && !isSpacePan && !isBackgroundPan) return;
+        if (_panWrapper && !_panWrapper.contains(e.target) && e.target !== _panWrapper) return;
+
+        if (isBackgroundPan || isMiddleClick || isSpacePan) {
+            _panCanvases.forEach(function(c) {
+                c.selection = false;
+                if (c.upperCanvasEl) c.upperCanvasEl.style.pointerEvents = 'none';
+            });
+        }
+
+        _startPanDrag(e.clientX, e.clientY);
+        if (isMiddleClick || isSpacePan) {
+            e.preventDefault();
+        }
+    });
+
+    window.addEventListener('pointermove', function(e) {
+        _movePanDrag(e.clientX, e.clientY);
+    });
+
+    window.addEventListener('pointerup', function(e) {
+        _endPanDrag();
+    });
+
+    window.addEventListener('pointercancel', function(e) {
+        _endPanDrag();
+    });
+
+    // Fallback for mousedown/mousemove/mouseup
+    window.addEventListener('mousedown', function(e) {
+        if (!_panIsDragging && (_panIsActive || e.button === 1 || e.target === _panWrapper)) {
+            if (_panWrapper && !_panWrapper.contains(e.target) && e.target !== _panWrapper) return;
+            _startPanDrag(e.clientX, e.clientY);
+            e.preventDefault();
+        }
+    }, { capture: true });
+
+    window.addEventListener('mousemove', function(e) {
+        _movePanDrag(e.clientX, e.clientY);
+    });
+
+    window.addEventListener('mouseup', function() {
+        _endPanDrag();
     });
 
     // Window blur — ensure pan mode is deactivated if window loses focus
@@ -484,138 +794,201 @@ function initFabricEditor() {
         fabric.Object.prototype.setControlsVisibility({ mt: false, mb: false, ml: false, mr: false });
     }
 
+    // Global Click Tracer for Asset Buttons
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('#addTextBtn');
+        const template = e.target.closest('.template-item');
+        const sticker = e.target.closest('#stickersContainer button, #stickersContainer > div');
+        const upload = e.target.closest('label[for="imageLoader"]') || (e.target.id === 'imageLoader' ? e.target : null);
+        if (btn || template || sticker || upload) {
+            console.log('[CANVAS DEBUG GLOBAL CLICK TRACER] Clicked asset target:', e.target, 'Matched element:', (btn || template || sticker || upload));
+        }
+    }, true);
+
     // Add Text
     const addTextBtn = document.getElementById('addTextBtn');
     if(addTextBtn) {
+        console.log('[CANVAS DEBUG] #addTextBtn found in DOM and listener attached');
         addTextBtn.addEventListener('click', function() {
+            console.log('[CANVAS DEBUG] addText button CLICKED');
+            console.log('[CANVAS DEBUG] activeCanvas exists:', !!window.activeCanvas);
+            console.log('[CANVAS DEBUG] activeCanvas initialized:', window.activeCanvas instanceof fabric.Canvas);
+            console.log('[CANVAS DEBUG] activeCanvas element:', window.activeCanvas ? window.activeCanvas.getElement() : null);
+            console.log('[CANVAS DEBUG] objects before:', window.activeCanvas ? window.activeCanvas.getObjects().length : 0);
+
             let sideName = 'front';
             try { const el = document.getElementById('editor-alpine') || document.querySelector('[x-data]'); if(el && window.Alpine && window.Alpine.$data) sideName = window.Alpine.$data(el).activeSide || 'front'; } catch(e) {}
-            const dims = window.printAreaDims[sideName] || window.printAreaDims['front'];
-            const w = dims ? dims.width : window.activeCanvas.width;
+            const dims = (window.printAreaDims && window.printAreaDims[sideName]) || (window.printAreaDims && window.printAreaDims['front']) || { width: 220, height: 320 };
+            const w = dims ? dims.width : (window.activeCanvas ? window.activeCanvas.width : 220);
             
+            console.log('[CANVAS DEBUG] creating IText');
             const text = new fabric.IText('Teks Anda', { 
                 left: w / 2, 
                 top: 40, 
-                originX: 'center',
-                originY: 'center',
-                textAlign: 'center',
+                originX: 'center', 
+                originY: 'center', 
+                textAlign: 'center', 
                 fontFamily: 'Arial', 
                 fill: '#000000', 
                 fontSize: 40, 
                 fontWeight: 'bold', 
                 sablonSize: 'a5' 
             });
+
+            console.log('[CANVAS DEBUG] calling canvas.add()', text);
             window.activeCanvas.add(text);
+            console.log('[CANVAS DEBUG] objects after:', window.activeCanvas.getObjects().length);
+
             window.activeCanvas.setActiveObject(text);
+            console.log('[CANVAS DEBUG] active object:', !!window.activeCanvas.getActiveObject());
+
             window.activeCanvas.requestRenderAll();
+            console.log('[CANVAS DEBUG] renderAll called');
+            console.log('[CANVAS DEBUG] text properties:', {
+                visible: text.visible,
+                opacity: text.opacity,
+                scaleX: text.scaleX,
+                scaleY: text.scaleY,
+                left: text.left,
+                top: text.top,
+                width: text.width,
+                height: text.height
+            });
         });
+    } else {
+        console.error('[CANVAS DEBUG] #addTextBtn NOT FOUND IN DOM!');
     }
 
     // Font controls
-    if(fontFamilyControl) fontFamilyControl.addEventListener('change', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set('fontFamily', this.value); window.activeCanvas.renderAll(); } });
-    if(textColorControl) textColorControl.addEventListener('input', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set('fill', this.value); window.activeCanvas.renderAll(); } });
-    if(textStrokeColor) textStrokeColor.addEventListener('input', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set({ stroke: this.value, strokeWidth: parseInt(textStrokeWidth.value) }); window.activeCanvas.renderAll(); } });
-    if(textStrokeWidth) textStrokeWidth.addEventListener('input', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set({ stroke: textStrokeColor.value, strokeWidth: parseInt(this.value) }); window.activeCanvas.renderAll(); } });
-    if(textShadowToggle) textShadowToggle.addEventListener('change', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set('shadow', this.checked ? new fabric.Shadow({ color: 'rgba(0,0,0,0.6)', blur: 4, offsetX: 2, offsetY: 2 }) : null); window.activeCanvas.renderAll(); } });
+    if(fontFamilyControl) fontFamilyControl.addEventListener('change', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set('fontFamily', this.value); window.activeCanvas.renderAll(); if(typeof window.saveHistory === 'function') window.saveHistory(); } });
+    if(textColorControl) textColorControl.addEventListener('input', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set('fill', this.value); window.activeCanvas.renderAll(); if(typeof window.saveHistory === 'function') window.saveHistory(); } });
+    if(textStrokeColor) textStrokeColor.addEventListener('input', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set({ stroke: this.value, strokeWidth: parseInt(textStrokeWidth.value) }); window.activeCanvas.renderAll(); if(typeof window.saveHistory === 'function') window.saveHistory(); } });
+    if(textStrokeWidth) textStrokeWidth.addEventListener('input', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set({ stroke: textStrokeColor.value, strokeWidth: parseInt(this.value) }); window.activeCanvas.renderAll(); if(typeof window.saveHistory === 'function') window.saveHistory(); } });
+    if(textShadowToggle) textShadowToggle.addEventListener('change', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set('shadow', this.checked ? new fabric.Shadow({ color: 'rgba(0,0,0,0.6)', blur: 4, offsetX: 2, offsetY: 2 }) : null); window.activeCanvas.renderAll(); if(typeof window.saveHistory === 'function') window.saveHistory(); } });
 
     // Layer management
-    if(bringForwardBtn) bringForwardBtn.addEventListener('click', function() { const o = window.activeCanvas.getActiveObject(); if(o) window.activeCanvas.bringForward(o); });
-    if(sendBackwardBtn) sendBackwardBtn.addEventListener('click', function() { const o = window.activeCanvas.getActiveObject(); if(o) window.activeCanvas.sendBackwards(o); });
+    if(bringForwardBtn) bringForwardBtn.addEventListener('click', function() { const o = window.activeCanvas.getActiveObject(); if(o) { window.activeCanvas.bringForward(o); if(typeof window.saveHistory === 'function') window.saveHistory(); } });
+    if(sendBackwardBtn) sendBackwardBtn.addEventListener('click', function() { const o = window.activeCanvas.getActiveObject(); if(o) { window.activeCanvas.sendBackwards(o); if(typeof window.saveHistory === 'function') window.saveHistory(); } });
 
     // Add image/SVG to canvas
     function addImageToCanvas(url) {
+        console.log('[CANVAS DEBUG] addImageToCanvas CALLED with url:', url);
+        if (!url) { console.warn('[CANVAS DEBUG] addImageToCanvas: empty url'); return; }
+        if (!window.activeCanvas) window.activeCanvas = canvasFront;
+        if (!window.activeCanvas) { console.error('[CANVAS DEBUG] addImageToCanvas: activeCanvas is NULL'); return; }
+
+        console.log('[CANVAS DEBUG] addImageToCanvas objects before:', window.activeCanvas.getObjects().length);
+
         let sideName = 'front';
         try { const el = document.getElementById('editor-alpine') || document.querySelector('[x-data]'); if(el && window.Alpine && window.Alpine.$data) sideName = window.Alpine.$data(el).activeSide || 'front'; } catch(e) {}
-        const dims = window.printAreaDims[sideName] || window.printAreaDims['front'];
-        const pa_width = dims ? dims.width : window.activeCanvas.width;
-        const imgEl = new Image();
-        imgEl.crossOrigin = 'anonymous';
-        imgEl.onload = function() {
-            const img = new fabric.Image(imgEl, {
-                objectCaching: false,
-                imageSmoothing: true
-            });
-            if(img.width > pa_width) img.scaleToWidth(pa_width - 20);
-            else if(img.width < 40) img.scaleToWidth(80);
+        const dims = (window.printAreaDims && window.printAreaDims[sideName]) || (window.printAreaDims && window.printAreaDims['front']) || { width: 220, height: 320 };
+        const pa_width = dims ? dims.width : (window.activeCanvas.width || 220);
+
+        fabric.Image.fromURL(url, function(img) {
+            console.log('[CANVAS DEBUG] fabric.Image.fromURL callback received:', img);
+            if (!img || !img.width) {
+                console.warn('[CANVAS DEBUG] fabric.Image.fromURL failed or has 0 width, attempting fallback without crossOrigin...');
+                // Fallback attempt without crossOrigin in case of CORS restriction
+                fabric.Image.fromURL(url, function(img2) {
+                    console.log('[CANVAS DEBUG] Fallback fabric.Image.fromURL callback received:', img2);
+                    if (!img2) return;
+                    img2.set({ left: 10, top: 10, objectCaching: false, imageSmoothing: true });
+                    img2.customType = 'custom-image';
+                    img2.sablonSize = 'a4';
+                    if (img2.width > pa_width) img2.scaleToWidth(pa_width - 20);
+                    else if (img2.width < 40) img2.scaleToWidth(80);
+                    window.activeCanvas.add(img2);
+                    window.activeCanvas.setActiveObject(img2);
+                    window.activeCanvas.requestRenderAll();
+                    console.log('[CANVAS DEBUG] Fallback image added. objects after:', window.activeCanvas.getObjects().length);
+                });
+                return;
+            }
             img.set({ left: 10, top: 10, objectCaching: false, imageSmoothing: true });
             img.customType = 'custom-image';
             img.sablonSize = 'a4';
-            window.activeCanvas.add(img); window.activeCanvas.setActiveObject(img); window.activeCanvas.requestRenderAll();
-        };
-        imgEl.onerror = function() {
-            const imgEl2 = new Image();
-            imgEl2.onload = function() { 
-                const img = new fabric.Image(imgEl2, {
-                    objectCaching: false,
-                    imageSmoothing: true
-                }); 
-                if(img.width > pa_width) img.scaleToWidth(pa_width - 20); 
-                else if(img.width < 40) img.scaleToWidth(80); 
-                img.set({ left: 10, top: 10, objectCaching: false, imageSmoothing: true }); 
-                img.customType = 'custom-image'; 
-                img.sablonSize = 'a4'; 
-                window.activeCanvas.add(img); window.activeCanvas.setActiveObject(img); window.activeCanvas.requestRenderAll(); 
-            };
-            imgEl2.src = url;
-        };
-        imgEl.src = url;
+            if (img.width > pa_width) img.scaleToWidth(pa_width - 20);
+            else if (img.width < 40) img.scaleToWidth(80);
+            window.activeCanvas.add(img);
+            window.activeCanvas.setActiveObject(img);
+            window.activeCanvas.requestRenderAll();
+            console.log('[CANVAS DEBUG] Image added. objects after:', window.activeCanvas.getObjects().length);
+        }, { crossOrigin: 'anonymous' });
     }
+    window.addImageToCanvas = addImageToCanvas;
 
     // Add SVG to canvas
     function addSVGToCanvas(url) {
+        console.log('[CANVAS DEBUG] addSVGToCanvas CALLED with url:', url);
+        if (!url) return;
+        if (!window.activeCanvas) window.activeCanvas = canvasFront;
+        if (!window.activeCanvas) return;
+
+        console.log('[CANVAS DEBUG] addSVGToCanvas objects before:', window.activeCanvas.getObjects().length);
+
         fabric.loadSVGFromURL(url, function(objects, options) {
+            console.log('[CANVAS DEBUG] fabric.loadSVGFromURL callback received, objects count:', objects ? objects.length : 0);
             if(objects && objects.length > 0) {
                 const group = fabric.util.groupSVGElements(objects, options);
-                const targetSize = Math.min(60, window.activeCanvas.width - 20);
+                const targetSize = Math.min(60, (window.activeCanvas.width || 220) - 20);
                 group.scale(targetSize / Math.max(group.width || 1, group.height || 1));
                 group.set({ left: 10, top: 10, objectCaching: false }); 
                 group.customType = 'custom-svg';
                 group.sablonSize = 'a5';
-                window.activeCanvas.add(group); window.activeCanvas.setActiveObject(group); window.activeCanvas.requestRenderAll();
-            } else { addImageToCanvas(url); }
+                window.activeCanvas.add(group); 
+                window.activeCanvas.setActiveObject(group); 
+                window.activeCanvas.requestRenderAll();
+                console.log('[CANVAS DEBUG] SVG group added. objects after:', window.activeCanvas.getObjects().length);
+            } else { 
+                console.log('[CANVAS DEBUG] SVG load returned no elements, routing to addImageToCanvas');
+                addImageToCanvas(url); 
+            }
         }, null, { crossOrigin: 'anonymous' });
     }
+    window.addSVGToCanvas = addSVGToCanvas;
 
     // Upload handler
     const imageLoader = document.getElementById('imageLoader');
-    if(imageLoader) imageLoader.addEventListener('change', function(e) {
-        var file = e.target.files[0];
-        if (!file) return;
+    if(imageLoader) {
+        console.log('[CANVAS DEBUG] #imageLoader found in DOM and listener attached');
+        imageLoader.addEventListener('change', function(e) {
+            console.log('[CANVAS DEBUG] imageLoader change event fired');
+            var file = e.target.files[0];
+            if (!file) return;
 
-        // Validasi format sesuai flowchart
-        var validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml'];
-        if (!validTypes.includes(file.type)) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Format Tidak Valid',
-                text: 'Harap unggah gambar dengan format PNG, JPG, atau SVG.',
-                confirmButtonColor: '#4f46e5'
-            });
-            e.target.value = ''; // Reset input
-            return;
-        }
-
-        var reader = new FileReader();
-        reader.onload = function(event) {
-            var imgObj = new Image(); 
-            imgObj.onload = function() {
-                var img = new fabric.Image(imgObj, {
-                    objectCaching: false,
-                    imageSmoothing: true
+            var validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml'];
+            if (!validTypes.includes(file.type)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Format Tidak Valid',
+                    text: 'Harap unggah gambar dengan format PNG, JPG, atau SVG.',
+                    confirmButtonColor: '#4f46e5'
                 });
-                if(img.width > window.activeCanvas.width) img.scaleToWidth(window.activeCanvas.width - 20);
-                img.set({ left: 10, top: 10, objectCaching: false, imageSmoothing: true }); 
-                img.customType = 'custom-image';
-                img.sablonSize = 'a4';
-                window.activeCanvas.add(img); window.activeCanvas.setActiveObject(img); window.activeCanvas.requestRenderAll();
-            };
-            imgObj.src = event.target.result;
-        };
-        reader.readAsDataURL(file); e.target.value = '';
-    });
+                e.target.value = '';
+                return;
+            }
 
-    // Template click
-    document.querySelectorAll('.template-item').forEach(item => { item.addEventListener('click', function() { addImageToCanvas(this.getAttribute('data-url')); }); });
+            var reader = new FileReader();
+            reader.onload = function(event) {
+                console.log('[CANVAS DEBUG] FileReader loaded image dataURL');
+                addImageToCanvas(event.target.result);
+            };
+            reader.readAsDataURL(file);
+            e.target.value = '';
+        });
+    }
+
+    // Template click with event delegation
+    document.addEventListener('click', function(e) {
+        const item = e.target.closest('.template-item');
+        if (item) {
+            const url = item.getAttribute('data-url');
+            console.log('[CANVAS DEBUG] Template item clicked, data-url:', url);
+            if (url) {
+                addImageToCanvas(url);
+            }
+        }
+    });
 
     // Stickers
     const stickerSearchInput = document.getElementById('stickerSearchInput');
@@ -1072,8 +1445,11 @@ function initFabricEditor() {
         c.on('selection:cleared', hideControls); 
         c.on('object:added', function(e) {
             const obj = e.target;
+            const side = c === canvasFront ? 'FRONT' : (c === canvasBack ? 'BACK' : (c === canvasLeft ? 'LEFT' : 'RIGHT'));
+            console.log('[CANVAS DEBUG] OBJECT ADDED event fired on canvas', side, obj);
             if (obj && !window.isHistoryAction && !obj.isClone && !window.isLoadingJSON) {
                 const size = obj.sablonSize || ((obj.type === 'i-text' || obj.customType === 'custom-svg') ? 'a5' : 'a4');
+                console.log('[CANVAS DEBUG] Calling resizeObjectToSablonSize with size:', size);
                 window.resizeObjectToSablonSize(obj, size);
             }
             if (obj && obj.isClone) {
@@ -1084,6 +1460,8 @@ function initFabricEditor() {
             if(typeof window.saveHistory === 'function') window.saveHistory();
         });
         c.on('object:removed', function(e) {
+            const side = c === canvasFront ? 'FRONT' : (c === canvasBack ? 'BACK' : (c === canvasLeft ? 'LEFT' : 'RIGHT'));
+            console.log('[CANVAS DEBUG] OBJECT REMOVED event fired on canvas', side, e.target);
             if(typeof window.recalculateTotalPrice === 'function') window.recalculateTotalPrice();
             if(typeof window.renderLayersList === 'function') window.renderLayersList();
             if(typeof window.saveHistory === 'function') window.saveHistory();
@@ -1096,38 +1474,95 @@ function initFabricEditor() {
         c.on('object:scaling', constrainObjectBounds);
     });
 
-    // Workspace Wheel Zoom (attached directly to scaler wrapper)
+    // Workspace Wheel: Touchpad 2-finger Pan & Pinch Zoom + Mouse Wheel Zoom
     if (_panWrapper) {
         _panWrapper.addEventListener('wheel', function(e) {
             if (window.innerWidth < 768) return;
             e.preventDefault();
-            
-            var delta = e.deltaY;
-            var oldZoom = window._desktopZoom || 1.0;
-            var factor = delta < 0 ? 1.1 : 0.9;
-            var newZoom = oldZoom * factor;
-            
-            if (newZoom > 3.5) newZoom = 3.5;
-            if (newZoom < 0.4) newZoom = 0.4;
-            
-            if (newZoom !== oldZoom) {
-                var rect = _panWrapper.getBoundingClientRect();
-                var centerX = rect.left + rect.width / 2;
-                var centerY = rect.top + rect.height / 2;
-                var mouseX = e.clientX - centerX;
-                var mouseY = e.clientY - centerY;
-                
-                var k = newZoom / oldZoom;
-                window._mockupPanX = (window._mockupPanX || 0) - (k - 1) * (mouseX - (window._mockupPanX || 0));
-                window._mockupPanY = (window._mockupPanY || 0) - (k - 1) * (mouseY - (window._mockupPanY || 0));
-                
-                window._desktopZoom = newZoom;
+
+            // 1. PINCH-TO-ZOOM on Touchpad or Ctrl+MouseWheel or Alt+MouseWheel
+            if (e.ctrlKey || e.metaKey || e.altKey) {
+                var oldZoom = window._desktopZoom || 1.0;
+                // Smooth continuous zoom for touchpad pinch gesture
+                var factor = Math.exp(-e.deltaY * 0.01);
+                var newZoom = Math.min(3.5, Math.max(0.4, oldZoom * factor));
+
+                if (newZoom !== oldZoom) {
+                    var rect = _panWrapper.getBoundingClientRect();
+                    var centerX = rect.left + rect.width / 2;
+                    var centerY = rect.top + rect.height / 2;
+                    var mouseX = e.clientX - centerX;
+                    var mouseY = e.clientY - centerY;
+
+                    var k = newZoom / oldZoom;
+                    window._mockupPanX = (window._mockupPanX || 0) - (k - 1) * (mouseX - (window._mockupPanX || 0));
+                    window._mockupPanY = (window._mockupPanY || 0) - (k - 1) * (mouseY - (window._mockupPanY || 0));
+
+                    window._desktopZoom = newZoom;
+                    if (typeof window.setupMobileCanvasScaler === 'function') {
+                        window.setupMobileCanvasScaler();
+                    }
+                    var resetBtn = document.getElementById('zoomResetBtn');
+                    if (resetBtn) {
+                        resetBtn.innerText = Math.round(window._desktopZoom * 100) + '%';
+                    }
+                }
+                return;
+            }
+
+            // 2. TOUCHPAD TWO-FINGER PAN (deltaX != 0 OR Shift held OR fractional/smooth delta)
+            if (e.shiftKey) {
+                // Shift + Wheel -> Horizontal Pan
+                window._mockupPanX = (window._mockupPanX || 0) - e.deltaY;
                 if (typeof window.setupMobileCanvasScaler === 'function') {
                     window.setupMobileCanvasScaler();
                 }
-                var resetBtn = document.getElementById('zoomResetBtn');
-                if (resetBtn) {
-                    resetBtn.innerText = Math.round(window._desktopZoom * 100) + '%';
+                return;
+            }
+
+            if (e.deltaX !== 0) {
+                // Diagonal / Horizontal Touchpad Two-Finger Pan
+                window._mockupPanX = (window._mockupPanX || 0) - e.deltaX;
+                window._mockupPanY = (window._mockupPanY || 0) - e.deltaY;
+                if (typeof window.setupMobileCanvasScaler === 'function') {
+                    window.setupMobileCanvasScaler();
+                }
+                return;
+            }
+
+            // 3. Pure Vertical Wheel (Mouse Wheel or Pure Vertical Touchpad Swipe)
+            // If deltaMode is 0 and abs(deltaY) is small/fractional, it's a touchpad vertical pan
+            var isTouchpadScroll = e.deltaMode === 0 && (Math.abs(e.deltaY) < 40 || !Number.isInteger(e.deltaY));
+            if (isTouchpadScroll) {
+                window._mockupPanY = (window._mockupPanY || 0) - e.deltaY;
+                if (typeof window.setupMobileCanvasScaler === 'function') {
+                    window.setupMobileCanvasScaler();
+                }
+            } else {
+                // Standard Physical Mouse Wheel Scroll -> Zoom
+                var oldZoom = window._desktopZoom || 1.0;
+                var factor = e.deltaY < 0 ? 1.1 : 0.9;
+                var newZoom = Math.min(3.5, Math.max(0.4, oldZoom * factor));
+
+                if (newZoom !== oldZoom) {
+                    var rect = _panWrapper.getBoundingClientRect();
+                    var centerX = rect.left + rect.width / 2;
+                    var centerY = rect.top + rect.height / 2;
+                    var mouseX = e.clientX - centerX;
+                    var mouseY = e.clientY - centerY;
+
+                    var k = newZoom / oldZoom;
+                    window._mockupPanX = (window._mockupPanX || 0) - (k - 1) * (mouseX - (window._mockupPanX || 0));
+                    window._mockupPanY = (window._mockupPanY || 0) - (k - 1) * (mouseY - (window._mockupPanY || 0));
+
+                    window._desktopZoom = newZoom;
+                    if (typeof window.setupMobileCanvasScaler === 'function') {
+                        window.setupMobileCanvasScaler();
+                    }
+                    var resetBtn = document.getElementById('zoomResetBtn');
+                    if (resetBtn) {
+                        resetBtn.innerText = Math.round(window._desktopZoom * 100) + '%';
+                    }
                 }
             }
         }, { passive: false });
@@ -1521,7 +1956,7 @@ function initFabricEditor() {
     if(imageOpacityControl) imageOpacityControl.addEventListener('input', function() {
         document.getElementById('imageOpacityVal').textContent = this.value;
         const o = window.activeCanvas.getActiveObject();
-        if(o) { o.set('opacity', this.value / 100); window.activeCanvas.requestRenderAll(); }
+        if(o) { o.set('opacity', this.value / 100); window.activeCanvas.requestRenderAll(); if(typeof window.saveHistory === 'function') window.saveHistory(); }
     });
 
     if(flipHBtn) flipHBtn.addEventListener('click', function() {
@@ -1540,6 +1975,7 @@ function initFabricEditor() {
             if(o && o.type === 'i-text') {
                 o.set('text', this.value);
                 window.activeCanvas.renderAll();
+                if(typeof window.saveHistory === 'function') window.saveHistory();
             }
         });
     }
@@ -1547,6 +1983,17 @@ function initFabricEditor() {
     // --- SUBMIT SAVE TO SERVER ---
     const saveBtn = document.getElementById('saveDesignBtn');
     if(saveBtn) saveBtn.addEventListener('click', function() {
+        if (!navigator.onLine) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Sedang Offline',
+                text: 'Koneksi internet Anda terputus. Desain Anda aman tersimpan di perangkat ini. Silakan sambungkan kembali internet untuk menyimpan ke keranjang belanja.',
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: 'Mengerti'
+            });
+            return;
+        }
+
         canvasFront.discardActiveObject(); canvasFront.renderAll();
         canvasBack.discardActiveObject(); canvasBack.renderAll();
         if(canvasLeft) { canvasLeft.discardActiveObject(); canvasLeft.renderAll(); }
@@ -1559,8 +2006,6 @@ function initFabricEditor() {
         if(totalObjects === 0) { Swal.fire({ icon: 'warning', title: 'Kanvas Kosong!', text: 'Silakan tambahkan objek desain terlebih dahulu.', confirmButtonColor: '#ef4444' }); return; }
 
         const activeBaseColor = window.activeBaseColorLocal || '#ffffff';
-        
-
 
         let frontDataURL = canvasFront.toDataURL({ format: 'png', quality: 1, multiplier: 4 });
         let backDataURL = '', leftDataURL = '', rightDataURL = '';
@@ -1604,7 +2049,10 @@ function initFabricEditor() {
         fetch(submitUrl, { method: httpMethod, headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(payload) })
         .then(res => res.json())
         .then(data => {
-            if(data.success) { window.location.href = data.redirect_url; }
+            if(data.success) { 
+                try { localStorage.removeItem(DRAFT_KEY); } catch(e) {}
+                window.location.href = data.redirect_url; 
+            }
             else { Swal.fire({ icon: 'error', title: 'Oops...', text: 'Gagal menyimpan desain!' }); }
         })
         .catch(error => { console.error('Error:', error); Swal.fire({ icon: 'error', title: 'Kesalahan Koneksi', text: 'Terjadi kesalahan saat menghubungi server.' }); })

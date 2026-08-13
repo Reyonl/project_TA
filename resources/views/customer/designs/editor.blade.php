@@ -12,7 +12,7 @@
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Dancing+Script:wght@700&family=Lobster&family=Montserrat:wght@400;700&family=Pacifico&family=Playfair+Display:wght@700&family=Roboto:wght@400;700&family=Oswald:wght@500&family=Anton&display=swap" rel="stylesheet">
 
-    <div id="editor-alpine" class="min-h-screen bg-slate-50" 
+    <div id="editor-alpine" wire:ignore class="min-h-screen bg-slate-50" 
          x-data="{ 
              currentStep: {{ $desainRevisi ? 2 : 1 }},
              totalSteps: {{ in_array($produk->jenis_produk, ['hoodie', 'kaos']) ? 6 : 4 }},
@@ -38,6 +38,7 @@
                      if(typeof window.setupMobileCanvasScaler === 'function') window.setupMobileCanvasScaler();
                      if(window.activeCanvas) window.activeCanvas.calcOffset();
                  }, 80);
+                 if(typeof window.saveLocalDraft === 'function') window.saveLocalDraft();
                  if(step === this.totalSteps && window.generatePreviews) { setTimeout(() => window.generatePreviews(), 300); }
              },
              getColorName(hex) {
@@ -59,6 +60,12 @@
                         <img src="{{ asset('images/logo-dailyco.png') }}" class="h-8 w-auto" alt="Logo">
                     </a>
                     <div class="flex items-center gap-2">
+                        <!-- Draft Autosave & Connection Status Badge -->
+                        <div id="draftStatusBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border transition-all duration-300 bg-slate-100 border-slate-200 text-slate-500">
+                            <span id="draftStatusDot" class="w-2 h-2 rounded-full bg-slate-400 transition-colors duration-300"></span>
+                            <span id="draftStatusText">Draft Siap</span>
+                        </div>
+
                         <button id="btnUndoAction" onclick="if(typeof window.undoHistory === 'function') window.undoHistory()" disabled class="p-2 text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition opacity-50 cursor-not-allowed" title="Undo (Ctrl+Z)">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
                         </button>
