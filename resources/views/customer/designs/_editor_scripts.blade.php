@@ -142,10 +142,10 @@ function initFabricEditor() {
                     baseColor: currentBaseColor,
                     currentStep: currentStep,
                     canvases: {
-                        front: canvasFront ? canvasFront.toJSON(['customType', 'sablonSize', 'locked']) : null,
-                        back: canvasBack && countBack > 0 ? canvasBack.toJSON(['customType', 'sablonSize', 'locked']) : null,
-                        left: canvasLeft && countLeft > 0 ? canvasLeft.toJSON(['customType', 'sablonSize', 'locked']) : null,
-                        right: canvasRight && countRight > 0 ? canvasRight.toJSON(['customType', 'sablonSize', 'locked']) : null
+                        front: canvasFront ? canvasFront.toJSON(['customType', 'sablonSize', 'locked', 'curvature']) : null,
+                        back: canvasBack && countBack > 0 ? canvasBack.toJSON(['customType', 'sablonSize', 'locked', 'curvature']) : null,
+                        left: canvasLeft && countLeft > 0 ? canvasLeft.toJSON(['customType', 'sablonSize', 'locked', 'curvature']) : null,
+                        right: canvasRight && countRight > 0 ? canvasRight.toJSON(['customType', 'sablonSize', 'locked', 'curvature']) : null
                     }
                 };
 
@@ -194,6 +194,9 @@ function initFabricEditor() {
                     o.set({ objectCaching: false });
                     if (o.type === 'image') {
                         o.set({ imageSmoothing: true });
+                    }
+                    if ((o.type === 'i-text' || o.type === 'text') && o.curvature && o.curvature !== 0) {
+                        window.applyTextCurvature(o, o.curvature);
                     }
                 });
                 canvas.renderAll();
@@ -375,7 +378,7 @@ function initFabricEditor() {
         else if(window.activeCanvas === canvasRight) side = 'right';
 
         if(window.activeCanvas) {
-            const json = window.activeCanvas.toJSON(['customType', 'sablonSize']);
+            const json = window.activeCanvas.toJSON(['customType', 'sablonSize', 'locked', 'curvature']);
             window.historyStates[side].undo.push(JSON.stringify(json));
             window.historyStates[side].redo = []; // clear redo on new action
             if(typeof window.updateHistoryButtons === 'function') window.updateHistoryButtons();
@@ -391,7 +394,7 @@ function initFabricEditor() {
 
         if(window.historyStates[side].undo.length > 0) {
             window.isHistoryAction = true;
-            const currentJson = window.activeCanvas.toJSON(['customType', 'sablonSize']);
+            const currentJson = window.activeCanvas.toJSON(['customType', 'sablonSize', 'locked', 'curvature']);
             window.historyStates[side].redo.push(JSON.stringify(currentJson));
             
             const previousState = window.historyStates[side].undo.pop();
@@ -400,6 +403,9 @@ function initFabricEditor() {
                     o.set({ objectCaching: false });
                     if (o.type === 'image') {
                         o.set({ imageSmoothing: true });
+                    }
+                    if ((o.type === 'i-text' || o.type === 'text') && o.curvature && o.curvature !== 0) {
+                        window.applyTextCurvature(o, o.curvature);
                     }
                 });
                 window.activeCanvas.renderAll();
@@ -419,7 +425,7 @@ function initFabricEditor() {
 
         if(window.historyStates[side].redo.length > 0) {
             window.isHistoryAction = true;
-            const currentJson = window.activeCanvas.toJSON(['customType', 'sablonSize']);
+            const currentJson = window.activeCanvas.toJSON(['customType', 'sablonSize', 'locked', 'curvature']);
             window.historyStates[side].undo.push(JSON.stringify(currentJson));
             
             const nextState = window.historyStates[side].redo.pop();
@@ -428,6 +434,9 @@ function initFabricEditor() {
                     o.set({ objectCaching: false });
                     if (o.type === 'image') {
                         o.set({ imageSmoothing: true });
+                    }
+                    if ((o.type === 'i-text' || o.type === 'text') && o.curvature && o.curvature !== 0) {
+                        window.applyTextCurvature(o, o.curvature);
                     }
                 });
                 window.activeCanvas.renderAll();
@@ -766,6 +775,9 @@ function initFabricEditor() {
     const textStrokeColor = document.getElementById('textStrokeColor');
     const textStrokeWidth = document.getElementById('textStrokeWidth');
     const textShadowToggle = document.getElementById('textShadowToggle');
+    const textCurvatureControl = document.getElementById('textCurvatureControl');
+    const textCurvatureVal = document.getElementById('textCurvatureVal');
+    const resetCurvatureBtn = document.getElementById('resetCurvatureBtn');
     const imageControls = document.getElementById('imageControls');
     const removeBgBtn = document.getElementById('removeBgBtn');
     const removeColorTarget = document.getElementById('removeColorTarget');
@@ -774,6 +786,42 @@ function initFabricEditor() {
     const resetBgBtn = document.getElementById('resetBgBtn');
     const svgControls = document.getElementById('svgControls');
     const svgColorControl = document.getElementById('svgColorControl');
+
+    // Helper for Curved Text
+    window.applyTextCurvature = function(textObj, curvatureVal) {
+        if (!textObj || (textObj.type !== 'i-text' && textObj.type !== 'text')) return;
+        
+        const val = parseInt(curvatureVal) || 0;
+        textObj.curvature = val;
+        
+        if (val === 0) {
+            textObj.set({ path: null });
+        } else {
+            const w = Math.max(textObj.width || 120, 60);
+            const h = (Math.abs(val) / 100) * (w * 0.45);
+            let pathStr = '';
+            
+            if (val > 0) {
+                // Curved Upward (Arch)
+                pathStr = `M 0 ${h} Q ${w / 2} ${-h * 0.9} ${w} ${h}`;
+            } else {
+                // Curved Downward (Smile)
+                pathStr = `M 0 0 Q ${w / 2} ${h * 1.9} ${w} 0`;
+            }
+            
+            const path = new fabric.Path(pathStr, {
+                visible: false,
+                fill: '',
+                stroke: ''
+            });
+            textObj.set({ path: path });
+        }
+        
+        textObj.setCoords();
+        if (textObj.canvas) {
+            textObj.canvas.requestRenderAll();
+        }
+    };
 
     // Fabric global styles
     fabric.Object.prototype.transparentCorners = false;
@@ -860,7 +908,18 @@ function initFabricEditor() {
     }
 
     // Font controls
-    if(fontFamilyControl) fontFamilyControl.addEventListener('change', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set('fontFamily', this.value); window.activeCanvas.renderAll(); if(typeof window.saveHistory === 'function') window.saveHistory(); } });
+    if(fontFamilyControl) fontFamilyControl.addEventListener('change', function() { 
+        const o = window.activeCanvas.getActiveObject(); 
+        if(o && o.type === 'i-text') { 
+            o.set('fontFamily', this.value); 
+            if(o.curvature && o.curvature !== 0) {
+                window.applyTextCurvature(o, o.curvature);
+            } else {
+                window.activeCanvas.renderAll(); 
+            }
+            if(typeof window.saveHistory === 'function') window.saveHistory(); 
+        } 
+    });
     if(textColorControl) textColorControl.addEventListener('input', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set('fill', this.value); window.activeCanvas.renderAll(); if(typeof window.saveHistory === 'function') window.saveHistory(); } });
     if(textStrokeColor) textStrokeColor.addEventListener('input', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set({ stroke: this.value, strokeWidth: parseInt(textStrokeWidth.value) }); window.activeCanvas.renderAll(); if(typeof window.saveHistory === 'function') window.saveHistory(); } });
     if(textStrokeWidth) textStrokeWidth.addEventListener('input', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set({ stroke: textStrokeColor.value, strokeWidth: parseInt(this.value) }); window.activeCanvas.renderAll(); if(typeof window.saveHistory === 'function') window.saveHistory(); } });
@@ -1726,6 +1785,11 @@ function initFabricEditor() {
             
             textStrokeWidth.value = activeObj.strokeWidth || 0;
             textShadowToggle.checked = !!activeObj.shadow;
+            
+            if(textCurvatureControl) {
+                textCurvatureControl.value = activeObj.curvature || 0;
+                if(textCurvatureVal) textCurvatureVal.textContent = (activeObj.curvature || 0) + '°';
+            }
         } else if(activeObj.type === 'image' && activeObj.customType === 'custom-image') {
             imageControls.classList.remove('hidden'); imageControls.classList.add('flex');
         } else if((activeObj.type === 'group' || activeObj.type === 'path') && activeObj.customType === 'custom-svg') {
@@ -1945,8 +2009,39 @@ function initFabricEditor() {
     if(charSpacingControl) charSpacingControl.addEventListener('input', function() {
         document.getElementById('charSpacingVal').textContent = this.value;
         const o = window.activeCanvas.getActiveObject(); 
-        if(o && o.type === 'i-text') { o.set('charSpacing', parseInt(this.value)); window.activeCanvas.requestRenderAll(); } 
+        if(o && o.type === 'i-text') { 
+            o.set('charSpacing', parseInt(this.value)); 
+            if(o.curvature && o.curvature !== 0) {
+                window.applyTextCurvature(o, o.curvature);
+            } else {
+                window.activeCanvas.requestRenderAll(); 
+            }
+            if(typeof window.saveHistory === 'function') window.saveHistory();
+        } 
     });
+
+    if(textCurvatureControl) {
+        textCurvatureControl.addEventListener('input', function() {
+            if(textCurvatureVal) textCurvatureVal.textContent = this.value + '°';
+            const o = window.activeCanvas.getActiveObject();
+            if(o && (o.type === 'i-text' || o.type === 'text')) {
+                window.applyTextCurvature(o, this.value);
+                if(typeof window.saveHistory === 'function') window.saveHistory();
+            }
+        });
+    }
+
+    if(resetCurvatureBtn) {
+        resetCurvatureBtn.addEventListener('click', function() {
+            if(textCurvatureControl) textCurvatureControl.value = 0;
+            if(textCurvatureVal) textCurvatureVal.textContent = '0°';
+            const o = window.activeCanvas.getActiveObject();
+            if(o && (o.type === 'i-text' || o.type === 'text')) {
+                window.applyTextCurvature(o, 0);
+                if(typeof window.saveHistory === 'function') window.saveHistory();
+            }
+        });
+    }
 
     // Image Properties (Opacity, Flip)
     const imageOpacityControl = document.getElementById('imageOpacityControl');
@@ -1974,7 +2069,11 @@ function initFabricEditor() {
             const o = window.activeCanvas.getActiveObject();
             if(o && o.type === 'i-text') {
                 o.set('text', this.value);
-                window.activeCanvas.renderAll();
+                if(o.curvature && o.curvature !== 0) {
+                    window.applyTextCurvature(o, o.curvature);
+                } else {
+                    window.activeCanvas.renderAll();
+                }
                 if(typeof window.saveHistory === 'function') window.saveHistory();
             }
         });
@@ -2026,10 +2125,10 @@ function initFabricEditor() {
             file_desain_belakang: backDataURL,
             file_desain_kiri: leftDataURL,
             file_desain_kanan: rightDataURL,
-            canvas_front: JSON.stringify(canvasFront.toJSON(['customType', 'sablonSize'])),
-            canvas_back: canvasBack && canvasBack.getObjects().length > 0 ? JSON.stringify(canvasBack.toJSON(['customType', 'sablonSize'])) : null,
-            canvas_left: canvasLeft && canvasLeft.getObjects().length > 0 ? JSON.stringify(canvasLeft.toJSON(['customType', 'sablonSize'])) : null,
-            canvas_right: canvasRight && canvasRight.getObjects().length > 0 ? JSON.stringify(canvasRight.toJSON(['customType', 'sablonSize'])) : null,
+            canvas_front: JSON.stringify(canvasFront.toJSON(['customType', 'sablonSize', 'locked', 'curvature'])),
+            canvas_back: canvasBack && canvasBack.getObjects().length > 0 ? JSON.stringify(canvasBack.toJSON(['customType', 'sablonSize', 'locked', 'curvature'])) : null,
+            canvas_left: canvasLeft && canvasLeft.getObjects().length > 0 ? JSON.stringify(canvasLeft.toJSON(['customType', 'sablonSize', 'locked', 'curvature'])) : null,
+            canvas_right: canvasRight && canvasRight.getObjects().length > 0 ? JSON.stringify(canvasRight.toJSON(['customType', 'sablonSize', 'locked', 'curvature'])) : null,
             warna_baju: activeBaseColor,
             raw_assets: rawAssets,
             harga_desain: window.currentHargaDesain || 0,

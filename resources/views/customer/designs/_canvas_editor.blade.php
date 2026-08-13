@@ -307,6 +307,18 @@
                     <input type="range" id="charSpacingControl" min="-50" max="300" value="0" class="w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer accent-red-600">
                 </div>
                 <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Lengkungan Teks (<span id="textCurvatureVal">0°</span>)</label>
+                        <button type="button" id="resetCurvatureBtn" class="text-[10px] font-bold text-red-500 hover:text-red-700 transition">Reset</button>
+                    </div>
+                    <input type="range" id="textCurvatureControl" min="-100" max="100" value="0" class="w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer accent-red-600">
+                    <div class="flex justify-between text-[9px] font-bold text-slate-400">
+                        <span>⌒ Lengkung Bawah</span>
+                        <span>Lurus (0)</span>
+                        <span>◡ Lengkung Atas</span>
+                    </div>
+                </div>
+                <div class="space-y-3">
                     <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Warna Teks</label>
                     <div class="flex items-center gap-4">
                         <input type="color" id="textColorControl" class="w-12 h-12 p-1 border border-slate-200 rounded-xl cursor-pointer bg-white shadow-sm" value="#000000">
