@@ -823,6 +823,31 @@ function initFabricEditor() {
         }
     };
 
+    // Helper for Text Gradient
+    window.applyTextGradient = function(textObj, color1, color2, dir) {
+        if (!textObj || (textObj.type !== 'i-text' && textObj.type !== 'text')) return;
+        const w = textObj.width || 120;
+        const h = textObj.height || 40;
+        let coords = { x1: 0, y1: 0, x2: w, y2: 0 }; // horizontal default
+        if (dir === 'v') {
+            coords = { x1: 0, y1: 0, x2: 0, y2: h };
+        } else if (dir === 'd') {
+            coords = { x1: 0, y1: 0, x2: w, y2: h };
+        }
+        
+        textObj.set('fill', new fabric.Gradient({
+            type: 'linear',
+            gradientUnits: 'pixels',
+            coords: coords,
+            colorStops: [
+                { offset: 0, color: color1 },
+                { offset: 1, color: color2 }
+            ]
+        }));
+        textObj.gradientConfig = { color1, color2, dir };
+        if (textObj.canvas) textObj.canvas.requestRenderAll();
+    };
+
     // Fabric global styles
     fabric.Object.prototype.transparentCorners = false;
     fabric.Object.prototype.cornerColor = '#ffffff';
@@ -922,8 +947,16 @@ function initFabricEditor() {
     });
     if(textColorControl) textColorControl.addEventListener('input', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set('fill', this.value); window.activeCanvas.renderAll(); if(typeof window.saveHistory === 'function') window.saveHistory(); } });
     if(textStrokeColor) textStrokeColor.addEventListener('input', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set({ stroke: this.value, strokeWidth: parseInt(textStrokeWidth.value) }); window.activeCanvas.renderAll(); if(typeof window.saveHistory === 'function') window.saveHistory(); } });
-    if(textStrokeWidth) textStrokeWidth.addEventListener('input', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set({ stroke: textStrokeColor.value, strokeWidth: parseInt(this.value) }); window.activeCanvas.renderAll(); if(typeof window.saveHistory === 'function') window.saveHistory(); } });
-    if(textShadowToggle) textShadowToggle.addEventListener('change', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set('shadow', this.checked ? new fabric.Shadow({ color: 'rgba(0,0,0,0.6)', blur: 4, offsetX: 2, offsetY: 2 }) : null); window.activeCanvas.renderAll(); if(typeof window.saveHistory === 'function') window.saveHistory(); } });
+    if(textShadowToggle) textShadowToggle.addEventListener('change', function() { 
+        const o = window.activeCanvas.getActiveObject(); 
+        if(o && o.type === 'i-text') { 
+            const sc = (document.getElementById('textShadowColor') && document.getElementById('textShadowColor').value) || '#000000';
+            o.set('shadow', this.checked ? new fabric.Shadow({ color: sc, blur: 6, offsetX: 3, offsetY: 3 }) : null); 
+            window.activeCanvas.renderAll(); 
+            showControls();
+            if(typeof window.saveHistory === 'function') window.saveHistory(); 
+        } 
+    });
 
     // Layer management
     if(bringForwardBtn) bringForwardBtn.addEventListener('click', function() { const o = window.activeCanvas.getActiveObject(); if(o) { window.activeCanvas.bringForward(o); if(typeof window.saveHistory === 'function') window.saveHistory(); } });
@@ -1765,6 +1798,10 @@ function initFabricEditor() {
             if(textValueControl) textValueControl.value = activeObj.text || '';
             fontFamilyControl.value = activeObj.fontFamily.replace(/["']/g, "");
             
+            if(typeof window.updateTextAlignButtons === 'function') {
+                window.updateTextAlignButtons(activeObj.textAlign || 'center');
+            }
+            
             const lhControl = document.getElementById('lineHeightControl');
             if(lhControl) { lhControl.value = (activeObj.lineHeight || 1.16) * 10; document.getElementById('lineHeightVal').textContent = (lhControl.value / 10).toFixed(1); }
             const csControl = document.getElementById('charSpacingControl');
@@ -1784,7 +1821,85 @@ function initFabricEditor() {
             textStrokeColor.value = strokeHex.substring(0, 7);
             
             textStrokeWidth.value = activeObj.strokeWidth || 0;
-            textShadowToggle.checked = !!activeObj.shadow;
+            
+            // Sync Quick Format Buttons
+            const isBold = activeObj.fontWeight === 'bold' || activeObj.fontWeight === '700' || activeObj.fontWeight === 700;
+            const isItalic = activeObj.fontStyle === 'italic';
+            const isUnderline = !!activeObj.underline;
+            const isLinethrough = !!activeObj.linethrough;
+
+            const updateBtnStyle = (btn, active) => {
+                if(!btn) return;
+                if(active) {
+                    btn.className = 'flex-1 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-xs ring-1 ring-slate-900/10 transition';
+                } else {
+                    btn.className = 'flex-1 py-1.5 rounded-lg text-xs font-medium text-slate-500 hover:bg-white/60 hover:text-slate-800 transition';
+                }
+            };
+
+            updateBtnStyle(document.getElementById('toggleBoldBtn'), isBold);
+            updateBtnStyle(document.getElementById('toggleItalicBtn'), isItalic);
+            updateBtnStyle(document.getElementById('toggleUnderlineBtn'), isUnderline);
+            updateBtnStyle(document.getElementById('toggleLinethroughBtn'), isLinethrough);
+
+            // Sync Color / Gradient Mode
+            const isGradient = activeObj.fill && typeof activeObj.fill === 'object' && activeObj.fill.type === 'linear';
+            const solidColorGroup = document.getElementById('solidColorGroup');
+            const gradientColorGroup = document.getElementById('gradientColorGroup');
+            const solidModeBtn = document.getElementById('textColorModeSolid');
+            const gradModeBtn = document.getElementById('textColorModeGradient');
+
+            if (isGradient) {
+                if(solidColorGroup) solidColorGroup.classList.add('hidden');
+                if(gradientColorGroup) gradientColorGroup.classList.remove('hidden');
+                if(solidModeBtn) { solidModeBtn.className = 'px-2 py-0.5 rounded text-slate-500 hover:text-slate-800'; }
+                if(gradModeBtn) { gradModeBtn.className = 'px-2 py-0.5 rounded bg-white text-slate-800 shadow-xs'; }
+                if(activeObj.gradientConfig) {
+                    const c1 = document.getElementById('textGradColor1');
+                    const c2 = document.getElementById('textGradColor2');
+                    if(c1) c1.value = activeObj.gradientConfig.color1;
+                    if(c2) c2.value = activeObj.gradientConfig.color2;
+                }
+            } else {
+                if(solidColorGroup) solidColorGroup.classList.remove('hidden');
+                if(gradientColorGroup) gradientColorGroup.classList.add('hidden');
+                if(solidModeBtn) { solidModeBtn.className = 'px-2 py-0.5 rounded bg-white text-slate-800 shadow-xs'; }
+                if(gradModeBtn) { gradModeBtn.className = 'px-2 py-0.5 rounded text-slate-500 hover:text-slate-800'; }
+            }
+
+            // Sync Text Background (Badge Box)
+            const textBgToggle = document.getElementById('textBgToggle');
+            const textBgColorGroup = document.getElementById('textBgColorGroup');
+            const textBgColorControl = document.getElementById('textBgColorControl');
+            const hasBg = !!activeObj.textBackgroundColor && activeObj.textBackgroundColor !== '';
+            if (textBgToggle) textBgToggle.checked = hasBg;
+            if (textBgColorGroup) {
+                if(hasBg) { textBgColorGroup.classList.remove('hidden'); textBgColorGroup.classList.add('flex'); }
+                else { textBgColorGroup.classList.add('hidden'); textBgColorGroup.classList.remove('flex'); }
+            }
+            if (hasBg && textBgColorControl) {
+                try {
+                    let bgHex = new fabric.Color(activeObj.textBackgroundColor).toHex();
+                    textBgColorControl.value = '#' + bgHex.substring(0, 6);
+                } catch(e) {}
+            }
+
+            // Sync Shadow & Shadow Color
+            const textShadowToggle = document.getElementById('textShadowToggle');
+            const textShadowColorGroup = document.getElementById('textShadowColorGroup');
+            const textShadowColor = document.getElementById('textShadowColor');
+            const hasShadow = !!activeObj.shadow;
+            if (textShadowToggle) textShadowToggle.checked = hasShadow;
+            if (textShadowColorGroup) {
+                if(hasShadow) { textShadowColorGroup.classList.remove('hidden'); textShadowColorGroup.classList.add('flex'); }
+                else { textShadowColorGroup.classList.add('hidden'); textShadowColorGroup.classList.remove('flex'); }
+            }
+            if (hasShadow && textShadowColor && activeObj.shadow.color) {
+                try {
+                    let sHex = new fabric.Color(activeObj.shadow.color).toHex();
+                    textShadowColor.value = '#' + sHex.substring(0, 6);
+                } catch(e) {}
+            }
             
             if(textCurvatureControl) {
                 textCurvatureControl.value = activeObj.curvature || 0;
@@ -1996,9 +2111,21 @@ function initFabricEditor() {
     const lineHeightControl = document.getElementById('lineHeightControl');
     const charSpacingControl = document.getElementById('charSpacingControl');
     
-    if(textAlignLeft) textAlignLeft.addEventListener('click', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set('textAlign', 'left'); window.activeCanvas.requestRenderAll(); } });
-    if(textAlignCenter) textAlignCenter.addEventListener('click', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set('textAlign', 'center'); window.activeCanvas.requestRenderAll(); } });
-    if(textAlignRight) textAlignRight.addEventListener('click', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set('textAlign', 'right'); window.activeCanvas.requestRenderAll(); } });
+    window.updateTextAlignButtons = function(align) {
+        const leftBtn = document.getElementById('textAlignLeft');
+        const centerBtn = document.getElementById('textAlignCenter');
+        const rightBtn = document.getElementById('textAlignRight');
+        if(!leftBtn || !centerBtn || !rightBtn) return;
+        const activeClass = 'flex-1 py-1.5 bg-white text-slate-800 rounded-lg text-xs font-bold shadow-xs transition';
+        const inactiveClass = 'flex-1 py-1.5 text-slate-500 rounded-lg text-xs font-medium hover:bg-white/60 hover:text-slate-800 transition';
+        leftBtn.className = align === 'left' ? activeClass : inactiveClass;
+        centerBtn.className = align === 'center' ? activeClass : inactiveClass;
+        rightBtn.className = align === 'right' ? activeClass : inactiveClass;
+    };
+
+    if(textAlignLeft) textAlignLeft.addEventListener('click', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set('textAlign', 'left'); window.activeCanvas.requestRenderAll(); window.updateTextAlignButtons('left'); if(typeof window.saveHistory === 'function') window.saveHistory(); } });
+    if(textAlignCenter) textAlignCenter.addEventListener('click', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set('textAlign', 'center'); window.activeCanvas.requestRenderAll(); window.updateTextAlignButtons('center'); if(typeof window.saveHistory === 'function') window.saveHistory(); } });
+    if(textAlignRight) textAlignRight.addEventListener('click', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set('textAlign', 'right'); window.activeCanvas.requestRenderAll(); window.updateTextAlignButtons('right'); if(typeof window.saveHistory === 'function') window.saveHistory(); } });
     
     if(lineHeightControl) lineHeightControl.addEventListener('input', function() {
         document.getElementById('lineHeightVal').textContent = (this.value / 10).toFixed(1);
@@ -2038,6 +2165,236 @@ function initFabricEditor() {
             const o = window.activeCanvas.getActiveObject();
             if(o && (o.type === 'i-text' || o.type === 'text')) {
                 window.applyTextCurvature(o, 0);
+                if(typeof window.saveHistory === 'function') window.saveHistory();
+            }
+        });
+    }
+
+    // Quick Format Buttons (B, I, U, S, TT)
+    const toggleBoldBtn = document.getElementById('toggleBoldBtn');
+    if(toggleBoldBtn) {
+        toggleBoldBtn.addEventListener('click', function() {
+            const o = window.activeCanvas.getActiveObject();
+            if(o && (o.type === 'i-text' || o.type === 'text')) {
+                const isBold = o.fontWeight === 'bold' || o.fontWeight === '700' || o.fontWeight === 700;
+                o.set('fontWeight', isBold ? 'normal' : 'bold');
+                if(o.curvature && o.curvature !== 0) window.applyTextCurvature(o, o.curvature);
+                else window.activeCanvas.renderAll();
+                showControls();
+                if(typeof window.saveHistory === 'function') window.saveHistory();
+            }
+        });
+    }
+
+    const toggleItalicBtn = document.getElementById('toggleItalicBtn');
+    if(toggleItalicBtn) {
+        toggleItalicBtn.addEventListener('click', function() {
+            const o = window.activeCanvas.getActiveObject();
+            if(o && (o.type === 'i-text' || o.type === 'text')) {
+                const isItalic = o.fontStyle === 'italic';
+                o.set('fontStyle', isItalic ? 'normal' : 'italic');
+                if(o.curvature && o.curvature !== 0) window.applyTextCurvature(o, o.curvature);
+                else window.activeCanvas.renderAll();
+                showControls();
+                if(typeof window.saveHistory === 'function') window.saveHistory();
+            }
+        });
+    }
+
+    const toggleUnderlineBtn = document.getElementById('toggleUnderlineBtn');
+    if(toggleUnderlineBtn) {
+        toggleUnderlineBtn.addEventListener('click', function() {
+            const o = window.activeCanvas.getActiveObject();
+            if(o && (o.type === 'i-text' || o.type === 'text')) {
+                o.set('underline', !o.underline);
+                window.activeCanvas.renderAll();
+                showControls();
+                if(typeof window.saveHistory === 'function') window.saveHistory();
+            }
+        });
+    }
+
+    const toggleLinethroughBtn = document.getElementById('toggleLinethroughBtn');
+    if(toggleLinethroughBtn) {
+        toggleLinethroughBtn.addEventListener('click', function() {
+            const o = window.activeCanvas.getActiveObject();
+            if(o && (o.type === 'i-text' || o.type === 'text')) {
+                o.set('linethrough', !o.linethrough);
+                window.activeCanvas.renderAll();
+                showControls();
+                if(typeof window.saveHistory === 'function') window.saveHistory();
+            }
+        });
+    }
+
+    const toggleAllCapsBtn = document.getElementById('toggleAllCapsBtn');
+    if(toggleAllCapsBtn) {
+        toggleAllCapsBtn.addEventListener('click', function() {
+            const o = window.activeCanvas.getActiveObject();
+            if(o && (o.type === 'i-text' || o.type === 'text') && o.text) {
+                const isAllUpper = o.text === o.text.toUpperCase();
+                o.set('text', isAllUpper ? o.text.toLowerCase() : o.text.toUpperCase());
+                const tvc = document.getElementById('textValueControl');
+                if(tvc) tvc.value = o.text;
+                if(o.curvature && o.curvature !== 0) window.applyTextCurvature(o, o.curvature);
+                else window.activeCanvas.renderAll();
+                if(typeof window.saveHistory === 'function') window.saveHistory();
+            }
+        });
+    }
+
+    // 1-Click Preset Styles
+    document.querySelectorAll('.text-preset-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const preset = this.getAttribute('data-preset');
+            const o = window.activeCanvas.getActiveObject();
+            if(!o || (o.type !== 'i-text' && o.type !== 'text')) return;
+
+            if(preset === 'varsity') {
+                o.set({
+                    fontFamily: "'Bebas Neue'",
+                    fontWeight: 'bold',
+                    fontStyle: 'normal',
+                    underline: false,
+                    linethrough: false,
+                    fill: '#1e3a8a',
+                    stroke: '#ffffff',
+                    strokeWidth: 3,
+                    shadow: new fabric.Shadow({ color: '#0f172a', blur: 0, offsetX: 4, offsetY: 4 }),
+                    textBackgroundColor: ''
+                });
+                window.applyTextCurvature(o, 20);
+            } else if(preset === 'neon') {
+                o.set({
+                    fontFamily: 'Montserrat',
+                    fontWeight: 'bold',
+                    fontStyle: 'normal',
+                    underline: false,
+                    linethrough: false,
+                    fill: '#06b6d4',
+                    stroke: '#ffffff',
+                    strokeWidth: 1,
+                    shadow: new fabric.Shadow({ color: '#06b6d4', blur: 15, offsetX: 0, offsetY: 0 }),
+                    textBackgroundColor: ''
+                });
+                window.applyTextCurvature(o, 0);
+            } else if(preset === 'retro') {
+                o.set({
+                    fontFamily: 'Impact',
+                    fontWeight: 'normal',
+                    fontStyle: 'normal',
+                    underline: false,
+                    linethrough: false,
+                    fill: '#f59e0b',
+                    stroke: '#7c2d12',
+                    strokeWidth: 2,
+                    shadow: new fabric.Shadow({ color: '#dc2626', blur: 0, offsetX: 5, offsetY: 5 }),
+                    textBackgroundColor: ''
+                });
+                window.applyTextCurvature(o, 30);
+            } else if(preset === 'badge') {
+                o.set({
+                    fontFamily: "'Bebas Neue'",
+                    fontWeight: 'bold',
+                    fontStyle: 'normal',
+                    underline: false,
+                    linethrough: false,
+                    fill: '#ffffff',
+                    stroke: null,
+                    strokeWidth: 0,
+                    shadow: null,
+                    textBackgroundColor: '#dc2626'
+                });
+                window.applyTextCurvature(o, 0);
+            }
+
+            window.activeCanvas.renderAll();
+            showControls();
+            if(typeof window.saveHistory === 'function') window.saveHistory();
+        });
+    });
+
+    // Color & Gradient Mode
+    const textColorModeSolid = document.getElementById('textColorModeSolid');
+    const textColorModeGradient = document.getElementById('textColorModeGradient');
+    const textGradColor1 = document.getElementById('textGradColor1');
+    const textGradColor2 = document.getElementById('textGradColor2');
+    const gradDirH = document.getElementById('gradDirH');
+    const gradDirV = document.getElementById('gradDirV');
+    const gradDirD = document.getElementById('gradDirD');
+
+    if(textColorModeSolid) {
+        textColorModeSolid.addEventListener('click', function() {
+            const o = window.activeCanvas.getActiveObject();
+            if(o && (o.type === 'i-text' || o.type === 'text')) {
+                o.set('fill', textColorControl ? textColorControl.value : '#000000');
+                o.gradientConfig = null;
+                window.activeCanvas.renderAll();
+                showControls();
+                if(typeof window.saveHistory === 'function') window.saveHistory();
+            }
+        });
+    }
+
+    let currentGradDir = 'h';
+    function updateCurrentGradient() {
+        const o = window.activeCanvas.getActiveObject();
+        if(o && (o.type === 'i-text' || o.type === 'text')) {
+            const c1 = textGradColor1 ? textGradColor1.value : '#f97316';
+            const c2 = textGradColor2 ? textGradColor2.value : '#ef4444';
+            window.applyTextGradient(o, c1, c2, currentGradDir);
+            if(typeof window.saveHistory === 'function') window.saveHistory();
+        }
+    }
+
+    if(textColorModeGradient) {
+        textColorModeGradient.addEventListener('click', function() {
+            updateCurrentGradient();
+            showControls();
+        });
+    }
+
+    if(textGradColor1) textGradColor1.addEventListener('input', updateCurrentGradient);
+    if(textGradColor2) textGradColor2.addEventListener('input', updateCurrentGradient);
+    if(gradDirH) gradDirH.addEventListener('click', () => { currentGradDir = 'h'; updateCurrentGradient(); });
+    if(gradDirV) gradDirV.addEventListener('click', () => { currentGradDir = 'v'; updateCurrentGradient(); });
+    if(gradDirD) gradDirD.addEventListener('click', () => { currentGradDir = 'd'; updateCurrentGradient(); });
+
+    // Text Background (Badge Box)
+    const textBgToggle = document.getElementById('textBgToggle');
+    const textBgColorControl = document.getElementById('textBgColorControl');
+
+    if(textBgToggle) {
+        textBgToggle.addEventListener('change', function() {
+            const o = window.activeCanvas.getActiveObject();
+            if(o && (o.type === 'i-text' || o.type === 'text')) {
+                o.set('textBackgroundColor', this.checked ? (textBgColorControl ? textBgColorControl.value : '#dc2626') : '');
+                window.activeCanvas.renderAll();
+                showControls();
+                if(typeof window.saveHistory === 'function') window.saveHistory();
+            }
+        });
+    }
+
+    if(textBgColorControl) {
+        textBgColorControl.addEventListener('input', function() {
+            const o = window.activeCanvas.getActiveObject();
+            if(o && (o.type === 'i-text' || o.type === 'text')) {
+                o.set('textBackgroundColor', this.value);
+                window.activeCanvas.renderAll();
+                if(typeof window.saveHistory === 'function') window.saveHistory();
+            }
+        });
+    }
+
+    // Text Shadow Color
+    const textShadowColor = document.getElementById('textShadowColor');
+    if(textShadowColor) {
+        textShadowColor.addEventListener('input', function() {
+            const o = window.activeCanvas.getActiveObject();
+            if(o && (o.type === 'i-text' || o.type === 'text') && o.shadow) {
+                o.shadow.color = this.value;
+                window.activeCanvas.renderAll();
                 if(typeof window.saveHistory === 'function') window.saveHistory();
             }
         });

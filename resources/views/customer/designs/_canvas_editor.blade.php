@@ -278,6 +278,30 @@
 
             {{-- Text Properties --}}
             <div id="textControls" class="hidden flex-col gap-5 md:gap-6">
+                {{-- 1-Click Preset Styles --}}
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Preset Tipografi</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" class="text-preset-btn group p-3 bg-white border border-slate-200 hover:border-red-500 rounded-xl flex flex-col items-center justify-center gap-1 transition-all duration-200 hover:shadow-xs" data-preset="varsity">
+                            <span class="font-black text-xs uppercase tracking-wider text-slate-800" style="font-family: 'Bebas Neue', sans-serif;">ATHLETIC</span>
+                            <span class="text-[9px] font-semibold text-slate-400 group-hover:text-red-500 transition-colors">Varsity Arch</span>
+                        </button>
+                        <button type="button" class="text-preset-btn group p-3 bg-slate-900 border border-slate-800 hover:border-cyan-400 rounded-xl flex flex-col items-center justify-center gap-1 transition-all duration-200 hover:shadow-xs" data-preset="neon">
+                            <span class="font-bold text-xs uppercase text-cyan-400" style="text-shadow: 0 0 8px rgba(6,182,212,0.8);">GLOWING</span>
+                            <span class="text-[9px] font-semibold text-slate-400 group-hover:text-cyan-300 transition-colors">Neon Cyber</span>
+                        </button>
+                        <button type="button" class="text-preset-btn group p-3 bg-white border border-slate-200 hover:border-red-500 rounded-xl flex flex-col items-center justify-center gap-1 transition-all duration-200 hover:shadow-xs" data-preset="retro">
+                            <span class="font-black text-xs uppercase text-amber-600" style="font-family: Impact, sans-serif;">VINTAGE</span>
+                            <span class="text-[9px] font-semibold text-slate-400 group-hover:text-red-500 transition-colors">Retro 80s</span>
+                        </button>
+                        <button type="button" class="text-preset-btn group p-3 bg-white border border-slate-200 hover:border-red-500 rounded-xl flex flex-col items-center justify-center gap-1 transition-all duration-200 hover:shadow-xs" data-preset="badge">
+                            <span class="bg-red-600 text-white font-bold text-[10px] px-2 py-0.5 rounded uppercase tracking-wider">BOX LABEL</span>
+                            <span class="text-[9px] font-semibold text-slate-400 group-hover:text-red-500 transition-colors">Streetwear</span>
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Font Family --}}
                 <div class="space-y-3">
                     <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pilih Gaya Font</label>
                     <select id="fontFamilyControl" class="w-full text-sm font-bold border-slate-200 rounded-xl py-3 pl-4 focus:ring-red-500 focus:border-red-500 bg-slate-50 cursor-pointer shadow-sm">
@@ -286,18 +310,36 @@
                         <optgroup label="Script & Elegant"><option value="Pacifico">Pacifico</option><option value="Lobster">Lobster</option><option value="'Dancing Script'">Dancing Script</option><option value="'Playfair Display'">Playfair Display</option></optgroup>
                     </select>
                 </div>
+
+                {{-- Quick Typography Styles (B, I, U, S, TT) --}}
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Format Huruf</label>
+                    <div class="flex items-center gap-1 bg-slate-100/90 p-1 rounded-xl border border-slate-200/50">
+                        <button type="button" id="toggleBoldBtn" class="flex-1 py-1.5 rounded-lg font-bold text-xs text-slate-600 hover:bg-white hover:text-slate-900 transition" title="Tebal (Bold)">B</button>
+                        <button type="button" id="toggleItalicBtn" class="flex-1 py-1.5 rounded-lg font-serif italic font-semibold text-xs text-slate-600 hover:bg-white hover:text-slate-900 transition" title="Miring (Italic)">I</button>
+                        <button type="button" id="toggleUnderlineBtn" class="flex-1 py-1.5 rounded-lg underline font-medium text-xs text-slate-600 hover:bg-white hover:text-slate-900 transition" title="Garis Bawah (Underline)">U</button>
+                        <button type="button" id="toggleLinethroughBtn" class="flex-1 py-1.5 rounded-lg line-through font-medium text-xs text-slate-600 hover:bg-white hover:text-slate-900 transition" title="Coret (Strikethrough)">S</button>
+                        <button type="button" id="toggleAllCapsBtn" class="flex-1 py-1.5 rounded-lg font-black text-[10px] text-slate-600 hover:bg-white hover:text-slate-900 transition" title="Kapital Semua (ALL CAPS)">TT</button>
+                    </div>
+                </div>
+
+                {{-- Text Content --}}
                 <div class="space-y-3">
                     <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Isi Teks</label>
                     <textarea id="textValueControl" rows="2" class="w-full text-sm font-bold border-slate-200 rounded-xl py-3 px-4 focus:ring-red-500 focus:border-red-500 bg-slate-50 shadow-sm" placeholder="Ketik teks di sini..."></textarea>
                 </div>
-                <div class="space-y-3">
+
+                {{-- Alignment --}}
+                <div class="space-y-2">
                     <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Perataan Teks</label>
-                    <div class="flex gap-2">
-                        <button type="button" id="textAlignLeft" class="flex-1 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition text-slate-600 text-center font-bold">Kiri</button>
-                        <button type="button" id="textAlignCenter" class="flex-1 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition text-slate-600 text-center font-bold">Tengah</button>
-                        <button type="button" id="textAlignRight" class="flex-1 py-2 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition text-slate-600 text-center font-bold">Kanan</button>
+                    <div class="flex items-center gap-1 bg-slate-100/90 p-1 rounded-xl border border-slate-200/50">
+                        <button type="button" id="textAlignLeft" class="flex-1 py-1.5 bg-white text-slate-800 rounded-lg text-xs font-bold shadow-xs hover:bg-white transition">Kiri</button>
+                        <button type="button" id="textAlignCenter" class="flex-1 py-1.5 text-slate-600 rounded-lg text-xs font-bold hover:bg-white hover:text-slate-800 transition">Tengah</button>
+                        <button type="button" id="textAlignRight" class="flex-1 py-1.5 text-slate-600 rounded-lg text-xs font-bold hover:bg-white hover:text-slate-800 transition">Kanan</button>
                     </div>
                 </div>
+
+                {{-- Spacing --}}
                 <div class="space-y-3">
                     <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Spasi Baris (<span id="lineHeightVal">1.2</span>)</label>
                     <input type="range" id="lineHeightControl" min="5" max="30" value="12" class="w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer accent-red-600">
@@ -306,38 +348,92 @@
                     <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Spasi Huruf (<span id="charSpacingVal">0</span>)</label>
                     <input type="range" id="charSpacingControl" min="-50" max="300" value="0" class="w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer accent-red-600">
                 </div>
-                <div class="space-y-3">
+
+                {{-- Curvature --}}
+                <div class="space-y-2.5">
                     <div class="flex justify-between items-center">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Lengkungan Teks (<span id="textCurvatureVal">0°</span>)</label>
-                        <button type="button" id="resetCurvatureBtn" class="text-[10px] font-bold text-red-500 hover:text-red-700 transition">Reset</button>
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Lengkungan Teks (<span id="textCurvatureVal" class="text-slate-800 font-bold">0°</span>)</label>
+                        <button type="button" id="resetCurvatureBtn" class="text-[10px] font-bold text-slate-400 hover:text-red-600 transition">Reset</button>
                     </div>
                     <input type="range" id="textCurvatureControl" min="-100" max="100" value="0" class="w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer accent-red-600">
-                    <div class="flex justify-between text-[9px] font-bold text-slate-400">
-                        <span>⌒ Lengkung Bawah</span>
-                        <span>Lurus (0)</span>
-                        <span>◡ Lengkung Atas</span>
+                    <div class="flex justify-between text-[9px] font-semibold text-slate-400">
+                        <span>Cekung</span>
+                        <span>Lurus</span>
+                        <span>Cembung</span>
                     </div>
                 </div>
-                <div class="space-y-3">
-                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Warna Teks</label>
-                    <div class="flex items-center gap-4">
+
+                {{-- Text Color & Gradient Mode --}}
+                <div class="space-y-3 pt-2 border-t border-slate-100">
+                    <div class="flex justify-between items-center">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Warna Teks</label>
+                        <div class="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg text-[10px] font-bold">
+                            <button type="button" id="textColorModeSolid" class="px-2 py-0.5 rounded bg-white text-slate-800 shadow-xs">Solid</button>
+                            <button type="button" id="textColorModeGradient" class="px-2 py-0.5 rounded text-slate-500 hover:text-slate-800">Gradasi</button>
+                        </div>
+                    </div>
+                    {{-- Solid Color Picker --}}
+                    <div id="solidColorGroup" class="flex items-center gap-4">
                         <input type="color" id="textColorControl" class="w-12 h-12 p-1 border border-slate-200 rounded-xl cursor-pointer bg-white shadow-sm" value="#000000">
                         <div class="flex flex-col text-xs font-bold text-slate-400"><span>HEX</span><span class="text-slate-800" id="textColorVal">#000000</span></div>
                     </div>
+                    {{-- Gradient Color Pickers --}}
+                    <div id="gradientColorGroup" class="hidden space-y-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="textGradColor1" class="w-8 h-8 p-0.5 border border-slate-200 rounded-lg cursor-pointer bg-white" value="#f97316">
+                                <span class="text-[11px] font-bold text-slate-600">Warna 1</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="textGradColor2" class="w-8 h-8 p-0.5 border border-slate-200 rounded-lg cursor-pointer bg-white" value="#ef4444">
+                                <span class="text-[11px] font-bold text-slate-600">Warna 2</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="button" id="gradDirH" class="flex-1 py-1 text-[10px] font-bold bg-white border border-slate-200 rounded-md text-slate-700 hover:bg-slate-50">Horizontal</button>
+                            <button type="button" id="gradDirV" class="flex-1 py-1 text-[10px] font-bold bg-white border border-slate-200 rounded-md text-slate-700 hover:bg-slate-50">Vertikal</button>
+                            <button type="button" id="gradDirD" class="flex-1 py-1 text-[10px] font-bold bg-white border border-slate-200 rounded-md text-slate-700 hover:bg-slate-50">Diagonal</button>
+                        </div>
+                    </div>
                 </div>
+
+                {{-- Text Background Box (Badge) --}}
+                <div class="space-y-3 pt-2 border-t border-slate-100">
+                    <div class="flex justify-between items-center">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Kotak Latar (Badge)</label>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="textBgToggle" class="sr-only peer">
+                            <div class="w-9 h-5 bg-gray-200 peer-focus:ring-4 peer-focus:ring-red-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-red-600"></div>
+                        </label>
+                    </div>
+                    <div id="textBgColorGroup" class="hidden items-center gap-3 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                        <input type="color" id="textBgColorControl" class="w-8 h-8 p-0.5 border border-slate-200 rounded-lg cursor-pointer bg-white" value="#dc2626">
+                        <span class="text-xs font-bold text-slate-700">Warna Latar</span>
+                    </div>
+                </div>
+
+                {{-- Outline / Stroke --}}
                 <div class="space-y-4 pt-4 md:pt-2 border-t border-slate-100">
                     <div class="flex justify-between items-center">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Outline</label>
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Outline / Garis Tepi</label>
                         <input type="color" id="textStrokeColor" class="w-8 h-8 p-0.5 border border-slate-200 rounded-lg cursor-pointer bg-white" value="#ffffff">
                     </div>
                     <input type="range" id="textStrokeWidth" min="0" max="10" value="0" class="w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer accent-red-600">
                 </div>
-                <div class="flex items-center justify-between pt-4 md:pt-2 border-t border-slate-100">
-                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Bayangan</label>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" id="textShadowToggle" class="sr-only peer">
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:ring-4 peer-focus:ring-red-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
-                    </label>
+
+                {{-- Shadow --}}
+                <div class="space-y-3 pt-4 md:pt-2 border-t border-slate-100">
+                    <div class="flex items-center justify-between">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Bayangan / Glow</label>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="textShadowToggle" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:ring-4 peer-focus:ring-red-100 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                        </label>
+                    </div>
+                    <div id="textShadowColorGroup" class="hidden items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                        <span class="text-xs font-bold text-slate-700">Warna Bayangan</span>
+                        <input type="color" id="textShadowColor" class="w-8 h-8 p-0.5 border border-slate-200 rounded-lg cursor-pointer bg-white" value="#000000">
+                    </div>
                 </div>
             </div>
             {{-- Image Properties --}}
