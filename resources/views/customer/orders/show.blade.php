@@ -100,6 +100,22 @@
                 </dl>
             </div>
 
+            {{-- ===== Status Review Banner ===== --}}
+            @if($order->status_order === 'reviewing')
+            <div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-3xl p-6 shadow-sm flex items-start gap-4">
+                <div class="w-10 h-10 bg-amber-500 text-white rounded-2xl flex items-center justify-center font-bold shadow-md shadow-amber-200 shrink-0 text-lg">
+                    ⏳
+                </div>
+                <div class="flex-1">
+                    <h4 class="font-black text-amber-900 text-sm uppercase tracking-wide mb-1">Desain Sedang Diverifikasi Tim Sablon</h4>
+                    <p class="text-xs text-amber-800 leading-relaxed font-medium">
+                        Kami sedang memeriksa resolusi gambar, posisi, dan kelayakan cetak sablon kaos Anda (Estimasi 5-15 menit pada jam kerja). 
+                        <strong>Nomor rekening pembayaran akan aktif otomatis di halaman ini setelah desain dinyatakan siap cetak.</strong>
+                    </p>
+                </div>
+            </div>
+            @endif
+
             {{-- ===== Form Upload Pembayaran ===== --}}
             @if($order->payment_status === 'awaiting_payment' || $order->payment_status === 'failed')
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-2xl border border-slate-100 p-6">

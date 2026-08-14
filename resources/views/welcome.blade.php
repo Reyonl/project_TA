@@ -101,7 +101,7 @@
                         </a>
                     @endauth
                     <a href="#produk" class="px-8 py-4 bg-white text-slate-900 border border-slate-200 rounded-full font-black hover:border-red-600 hover:text-red-600 transition-all duration-300 flex items-center gap-2 w-full sm:w-auto justify-center shadow-sm">
-                        Lihat Katalog Katalog
+                        Lihat Katalog Produk
                     </a>
                 </div>
             </div>

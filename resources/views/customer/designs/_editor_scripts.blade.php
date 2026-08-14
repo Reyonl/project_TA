@@ -212,7 +212,7 @@ function initFabricEditor() {
                 const rootEl = document.getElementById('editor-alpine') || document.querySelector('[x-data]');
                 const alpineData = window.Alpine && rootEl ? window.Alpine.$data(rootEl) : null;
                 const currentBaseColor = alpineData ? alpineData.baseColor : (window.activeBaseColorLocal || '#ffffff');
-                const currentStep = alpineData ? alpineData.currentStep : 2;
+                const currentActiveSide = alpineData ? alpineData.activeSide : 'front';
 
                 const draftData = {
                     version: 2,
@@ -222,7 +222,7 @@ function initFabricEditor() {
                     dateFormatted: new Date().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }),
                     totalObjects: totalObjs,
                     baseColor: currentBaseColor,
-                    currentStep: currentStep,
+                    activeSide: currentActiveSide,
                     canvases: {
                         front: canvasFront ? canvasFront.toJSON(['customType', 'sablonSize', 'locked', 'curvature']) : null,
                         back: canvasBack && countBack > 0 ? canvasBack.toJSON(['customType', 'sablonSize', 'locked', 'curvature']) : null,
@@ -353,18 +353,32 @@ function initFabricEditor() {
             await Promise.all(loadPromises);
         }
 
-        // Restore step
-        if (draft.currentStep && draft.currentStep > 1) {
-            console.log('[CANVAS DEBUG] restoreDraftData restoring currentStep to:', draft.currentStep);
+        // Restore active canvas side
+        if (draft.activeSide) {
+            console.log('[CANVAS DEBUG] restoreDraftData restoring activeSide to:', draft.activeSide);
             try {
                 const rootEl = document.getElementById('editor-alpine') || document.querySelector('[x-data]');
                 if (rootEl && window.Alpine) {
                     const data = window.Alpine.$data(rootEl);
-                    data.currentStep = draft.currentStep;
-                    if (draft.currentStep === 2) { data.activeSide = 'front'; if (window.switchCanvasSide) window.switchCanvasSide('front'); }
-                    else if (draft.currentStep === 3) { data.activeSide = 'back'; if (window.switchCanvasSide) window.switchCanvasSide('back'); }
-                    else if (draft.currentStep === 4 && data.totalSteps === 6) { data.activeSide = 'left'; if (window.switchCanvasSide) window.switchCanvasSide('left'); }
-                    else if (draft.currentStep === 5 && data.totalSteps === 6) { data.activeSide = 'right'; if (window.switchCanvasSide) window.switchCanvasSide('right'); }
+                    if (typeof data.selectSide === 'function') {
+                        data.selectSide(draft.activeSide);
+                    } else {
+                        data.activeSide = draft.activeSide;
+                        if (window.switchCanvasSide) window.switchCanvasSide(draft.activeSide);
+                    }
+                }
+            } catch(e) {}
+        } else if (draft.currentStep && draft.currentStep > 1) {
+            // Backward compatibility with legacy step drafts
+            let side = 'front';
+            if (draft.currentStep === 3) side = 'back';
+            else if (draft.currentStep === 4) side = 'left';
+            else if (draft.currentStep === 5) side = 'right';
+            try {
+                const rootEl = document.getElementById('editor-alpine') || document.querySelector('[x-data]');
+                if (rootEl && window.Alpine) {
+                    const data = window.Alpine.$data(rootEl);
+                    if (typeof data.selectSide === 'function') data.selectSide(side);
                 }
             } catch(e) {}
         }
@@ -862,21 +876,39 @@ function initFabricEditor() {
 
     window.generatePreviews = function() {
         try {
-            compositePreview('preview-front', canvasFront, mockupFrontUrl, true);
-            compositePreview('preview-back', canvasBack, mockupBackUrl, canvasBack && canvasBack.getObjects().length > 0);
+            const hasFront = canvasFront && canvasFront.getObjects().length > 0;
+            const hasBack = canvasBack && canvasBack.getObjects().length > 0;
+            const hasLeft = canvasLeft && canvasLeft.getObjects().length > 0;
+            const hasRight = canvasRight && canvasRight.getObjects().length > 0;
+
+            const rootEl = document.getElementById('editor-alpine') || document.querySelector('[x-data]');
+            if(rootEl && window.Alpine) {
+                const data = window.Alpine.$data(rootEl);
+                data.hasFrontDesign = hasFront;
+                data.hasBackDesign = hasBack;
+                data.hasLeftDesign = hasLeft;
+                data.hasRightDesign = hasRight;
+            }
+
+            compositePreview('preview-front', canvasFront, mockupFrontUrl, hasFront);
+            if(document.getElementById('preview-back')) {
+                compositePreview('preview-back', canvasBack, mockupBackUrl, hasBack);
+            }
             if(document.getElementById('preview-left')) {
-                compositePreview('preview-left', canvasLeft, mockupLeftUrl, canvasLeft && canvasLeft.getObjects().length > 0);
-                compositePreview('preview-right', canvasRight, mockupRightUrl, canvasRight && canvasRight.getObjects().length > 0);
+                compositePreview('preview-left', canvasLeft, mockupLeftUrl, hasLeft);
+            }
+            if(document.getElementById('preview-right')) {
+                compositePreview('preview-right', canvasRight, mockupRightUrl, hasRight);
             }
         } catch(e) { console.warn('Preview generation error:', e); }
     };
 
-    // Watch for step changes to generate previews
+    // Watch for mode changes to generate previews
     const rootEl = document.getElementById('editor-alpine') || document.querySelector('[x-data]');
     if(rootEl && window.Alpine) {
         Alpine.effect(() => {
             const data = Alpine.$data(rootEl);
-            if(data.currentStep === data.totalSteps) { setTimeout(() => window.generatePreviews(), 300); }
+            if(data.currentMode === 'preview') { setTimeout(() => window.generatePreviews(), 100); }
         });
     }
 
