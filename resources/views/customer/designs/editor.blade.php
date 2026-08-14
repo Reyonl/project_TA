@@ -279,5 +279,6 @@
 
     @include('customer.designs._editor_styles')
     <script src="{{ asset('js/fabric.min.js') }}"></script>
+    <script src="{{ asset('js/fabric-smart-guides.js') }}"></script>
     @include('customer.designs._editor_scripts')
 </x-app-layout>

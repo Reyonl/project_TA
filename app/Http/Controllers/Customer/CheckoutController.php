@@ -99,6 +99,6 @@ class CheckoutController extends Controller
             return $order;
         });
 
-        return redirect()->route('customer.orders.index')->with('success', 'Pesanan sablon Anda berhasil dibuat! Tim kami sedang memverifikasi pembayaran Anda.');
+        return redirect()->route('customer.orders.index')->with('success', 'Pesanan Anda berhasil dibuat dan desain sedang menunggu verifikasi admin. Silakan pantau status pesanan Anda di sini.');
     }
 }

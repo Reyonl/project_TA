@@ -14,6 +14,72 @@ function initFabricEditor() {
   try {
     console.log('[CANVAS DEBUG] initFabricEditor starting...');
 
+    // ===== FABRIC 5.3.0 IText / Textbox DESERIALIZATION FIX =====
+    // Upstream Fabric 5.3.0 fails to enliven `path` on IText and Textbox objects during loadFromJSON.
+    const origITextFromObject = fabric.IText.fromObject;
+    fabric.IText.fromObject = function(object, callback) {
+        var cloned = fabric.util.object.clone(object);
+        var pathData = object.path;
+        delete cloned.path;
+        cloned.styles = fabric.util.stylesFromArray(object.styles, object.text);
+
+        return fabric.Object._fromObject("IText", cloned, function(textInstance) {
+            if (pathData) {
+                fabric.Object._fromObject("Path", pathData, function(pathInstance) {
+                    textInstance.set("path", pathInstance);
+                    if (callback) callback(textInstance);
+                }, "path");
+            } else {
+                if (callback) callback(textInstance);
+            }
+        }, "text");
+    };
+
+    if (fabric.Textbox && fabric.Textbox.fromObject) {
+        fabric.Textbox.fromObject = function(object, callback) {
+            var cloned = fabric.util.object.clone(object);
+            var pathData = object.path;
+            delete cloned.path;
+            cloned.styles = fabric.util.stylesFromArray(object.styles, object.text);
+
+            return fabric.Object._fromObject("Textbox", cloned, function(textInstance) {
+                if (pathData) {
+                    fabric.Object._fromObject("Path", pathData, function(pathInstance) {
+                        textInstance.set("path", pathInstance);
+                        if (callback) callback(textInstance);
+                    }, "path");
+                } else {
+                    if (callback) callback(textInstance);
+                }
+            }, "text");
+        };
+    }
+
+    // Defensive guards for Text rendering and serialization (in case of corrupt raw path object from legacy drafts)
+    const origTextRender = fabric.Text.prototype._render;
+    fabric.Text.prototype._render = function(ctx) {
+        if (this.path && typeof this.path.isNotVisible !== 'function') {
+            if (this.path.path && Array.isArray(this.path.path)) {
+                this.path = new fabric.Path(this.path.path, { visible: false, fill: '', stroke: '' });
+            } else {
+                this.path = null;
+            }
+        }
+        return origTextRender.call(this, ctx);
+    };
+
+    const origTextToObject = fabric.Text.prototype.toObject;
+    fabric.Text.prototype.toObject = function(propertiesToInclude) {
+        if (this.path && typeof this.path.toObject !== 'function') {
+            if (this.path.path && Array.isArray(this.path.path)) {
+                this.path = new fabric.Path(this.path.path, { visible: false, fill: '', stroke: '' });
+            } else {
+                this.path = null;
+            }
+        }
+        return origTextToObject.call(this, propertiesToInclude);
+    };
+
     // High-resolution Retina & Zoom rendering multiplier (minimum 4x to ensure razor-sharp image rendering even at 350% zoom on high-DPI screens)
     fabric.devicePixelRatio = Math.max((window.devicePixelRatio || 1) * 2, 4);
 
@@ -120,11 +186,27 @@ function initFabricEditor() {
                 const countRight = canvasRight ? canvasRight.getObjects().length : 0;
                 const totalObjs = countFront + countBack + countLeft + countRight;
 
-                console.log('[CANVAS DEBUG] saveLocalDraft executing doSave() - totalObjects:', totalObjs, {
-                    front: countFront,
-                    back: countBack,
-                    left: countLeft,
-                    right: countRight
+                // Detailed Transformation Debug Logging for each canvas object
+                [canvasFront, canvasBack, canvasLeft, canvasRight].forEach((c) => {
+                    if (!c) return;
+                    const sideName = c === canvasFront ? 'FRONT' : (c === canvasBack ? 'BACK' : (c === canvasLeft ? 'LEFT' : 'RIGHT'));
+                    c.getObjects().forEach((obj, index) => {
+                        console.log('[DRAFT SAVE] ' + sideName + ' Object ' + index, {
+                            type: obj.type,
+                            left: obj.left,
+                            top: obj.top,
+                            scaleX: obj.scaleX,
+                            scaleY: obj.scaleY,
+                            angle: obj.angle,
+                            width: obj.width,
+                            height: obj.height,
+                            flipX: obj.flipX,
+                            flipY: obj.flipY,
+                            sablonSize: obj.sablonSize,
+                            customType: obj.customType,
+                            curvature: obj.curvature
+                        });
+                    });
                 });
 
                 const rootEl = document.getElementById('editor-alpine') || document.querySelector('[x-data]');
@@ -181,47 +263,68 @@ function initFabricEditor() {
 
     window.isLoadingJSON = false;
     function safeLoadCanvas(canvas, jsonStr) {
-        const sideLabel = canvas === canvasFront ? 'FRONT' : (canvas === canvasBack ? 'BACK' : (canvas === canvasLeft ? 'LEFT' : 'RIGHT'));
-        console.log('[CANVAS DEBUG] safeLoadCanvas CALLED on canvas:', sideLabel, 'jsonStr:', jsonStr ? (typeof jsonStr === 'string' ? jsonStr.substring(0, 50) + '...' : 'object') : 'null');
-        if (!jsonStr || jsonStr === 'null') return;
-        try {
-            const jsonObj = typeof jsonStr === 'string' ? JSON.parse(jsonStr) : jsonStr;
-            window.isLoadingJSON = true;
-            console.log('[CANVAS DEBUG] canvas.loadFromJSON CALLED for', sideLabel);
-            canvas.loadFromJSON(jsonObj, function() {
-                console.log('[CANVAS DEBUG] canvas.loadFromJSON COMPLETED for', sideLabel, 'objects count:', canvas.getObjects().length);
-                canvas.getObjects().forEach(function(o) {
-                    o.set({ objectCaching: false });
-                    if (o.type === 'image') {
-                        o.set({ imageSmoothing: true });
-                    }
-                    if ((o.type === 'i-text' || o.type === 'text') && o.curvature && o.curvature !== 0) {
-                        window.applyTextCurvature(o, o.curvature);
-                    }
+        return new Promise((resolve) => {
+            const sideLabel = canvas === canvasFront ? 'FRONT' : (canvas === canvasBack ? 'BACK' : (canvas === canvasLeft ? 'LEFT' : 'RIGHT'));
+            console.log('[CANVAS DEBUG] safeLoadCanvas CALLED on canvas:', sideLabel, 'jsonStr:', jsonStr ? (typeof jsonStr === 'string' ? jsonStr.substring(0, 50) + '...' : 'object') : 'null');
+            if (!jsonStr || jsonStr === 'null' || !canvas) {
+                resolve();
+                return;
+            }
+            try {
+                const jsonObj = typeof jsonStr === 'string' ? JSON.parse(jsonStr) : jsonStr;
+                console.log('[CANVAS DEBUG] canvas.loadFromJSON CALLED for', sideLabel);
+                canvas.loadFromJSON(jsonObj, function() {
+                    console.log('[CANVAS DEBUG] canvas.loadFromJSON COMPLETED for', sideLabel, 'objects count:', canvas.getObjects().length);
+                    canvas.getObjects().forEach(function(o, index) {
+                        o.set({ objectCaching: false });
+                        if (o.type === 'image') {
+                            o.set({ imageSmoothing: true });
+                        }
+                        if ((o.type === 'i-text' || o.type === 'text') && o.curvature && o.curvature !== 0) {
+                            window.applyTextCurvature(o, o.curvature);
+                        }
+                        console.log('[DRAFT RESTORE] ' + sideLabel + ' Object ' + index, {
+                            type: o.type,
+                            left: o.left,
+                            top: o.top,
+                            scaleX: o.scaleX,
+                            scaleY: o.scaleY,
+                            angle: o.angle,
+                            width: o.width,
+                            height: o.height,
+                            flipX: o.flipX,
+                            flipY: o.flipY,
+                            sablonSize: o.sablonSize,
+                            customType: o.customType,
+                            curvature: o.curvature
+                        });
+                    });
+                    canvas.renderAll();
+                    resolve();
                 });
-                canvas.renderAll();
-                if(typeof window.renderLayersList === 'function') window.renderLayersList();
-                if(typeof window.saveHistory === 'function') window.saveHistory();
-                window.isLoadingJSON = false;
-            });
-        } catch (e) {
-            console.error("[CANVAS DEBUG] Error loading canvas JSON", e);
-            window.isLoadingJSON = false;
-        }
+            } catch (e) {
+                console.error("[CANVAS DEBUG] Error loading canvas JSON for " + sideLabel, e);
+                resolve();
+            }
+        });
     }
 
-    function loadInitialServerData() {
+    async function loadInitialServerData() {
         console.log('[CANVAS DEBUG] loadInitialServerData CALLED');
-        safeLoadCanvas(canvasFront, savedData.front);
-        safeLoadCanvas(canvasBack, savedData.back);
-        if(canvasLeft) {
-            safeLoadCanvas(canvasLeft, savedData.left);
-            safeLoadCanvas(canvasRight, savedData.right);
-        }
+        window.isLoadingJSON = true;
+        await Promise.all([
+            safeLoadCanvas(canvasFront, savedData.front),
+            safeLoadCanvas(canvasBack, savedData.back),
+            canvasLeft ? safeLoadCanvas(canvasLeft, savedData.left) : Promise.resolve(),
+            canvasRight ? safeLoadCanvas(canvasRight, savedData.right) : Promise.resolve()
+        ]);
+        window.isLoadingJSON = false;
+        if (typeof window.recalculateTotalPrice === 'function') window.recalculateTotalPrice();
+        if (typeof window.renderLayersList === 'function') window.renderLayersList();
         updateDraftStatusBadge('saved', 'Draft Siap');
     }
 
-    function restoreDraftData(draft) {
+    async function restoreDraftData(draft) {
         console.log('[CANVAS DEBUG] restoreDraftData CALLED with draft:', draft);
         window.isLoadingJSON = true;
 
@@ -238,13 +341,16 @@ function initFabricEditor() {
             } catch(e) {}
         }
 
-        // Restore canvases
+        // Restore all canvases concurrently and wait for all to complete
         if (draft.canvases) {
             console.log('[CANVAS DEBUG] restoreDraftData restoring canvases...');
-            if (draft.canvases.front) safeLoadCanvas(canvasFront, draft.canvases.front);
-            if (draft.canvases.back) safeLoadCanvas(canvasBack, draft.canvases.back);
-            if (canvasLeft && draft.canvases.left) safeLoadCanvas(canvasLeft, draft.canvases.left);
-            if (canvasRight && draft.canvases.right) safeLoadCanvas(canvasRight, draft.canvases.right);
+            const loadPromises = [];
+            if (draft.canvases.front) loadPromises.push(safeLoadCanvas(canvasFront, draft.canvases.front));
+            if (draft.canvases.back) loadPromises.push(safeLoadCanvas(canvasBack, draft.canvases.back));
+            if (canvasLeft && draft.canvases.left) loadPromises.push(safeLoadCanvas(canvasLeft, draft.canvases.left));
+            if (canvasRight && draft.canvases.right) loadPromises.push(safeLoadCanvas(canvasRight, draft.canvases.right));
+            
+            await Promise.all(loadPromises);
         }
 
         // Restore step
@@ -254,12 +360,18 @@ function initFabricEditor() {
                 const rootEl = document.getElementById('editor-alpine') || document.querySelector('[x-data]');
                 if (rootEl && window.Alpine) {
                     const data = window.Alpine.$data(rootEl);
-                    data.goToStep(draft.currentStep);
+                    data.currentStep = draft.currentStep;
+                    if (draft.currentStep === 2) { data.activeSide = 'front'; if (window.switchCanvasSide) window.switchCanvasSide('front'); }
+                    else if (draft.currentStep === 3) { data.activeSide = 'back'; if (window.switchCanvasSide) window.switchCanvasSide('back'); }
+                    else if (draft.currentStep === 4 && data.totalSteps === 6) { data.activeSide = 'left'; if (window.switchCanvasSide) window.switchCanvasSide('left'); }
+                    else if (draft.currentStep === 5 && data.totalSteps === 6) { data.activeSide = 'right'; if (window.switchCanvasSide) window.switchCanvasSide('right'); }
                 }
             } catch(e) {}
         }
 
+        // Entire draft restore is done!
         window.isLoadingJSON = false;
+
         if (typeof window.recalculateTotalPrice === 'function') window.recalculateTotalPrice();
         if (typeof window.renderLayersList === 'function') window.renderLayersList();
 
@@ -394,6 +506,7 @@ function initFabricEditor() {
 
         if(window.historyStates[side].undo.length > 0) {
             window.isHistoryAction = true;
+            window.isLoadingJSON = true;
             const currentJson = window.activeCanvas.toJSON(['customType', 'sablonSize', 'locked', 'curvature']);
             window.historyStates[side].redo.push(JSON.stringify(currentJson));
             
@@ -409,6 +522,7 @@ function initFabricEditor() {
                     }
                 });
                 window.activeCanvas.renderAll();
+                window.isLoadingJSON = false;
                 window.isHistoryAction = false;
                 if(typeof window.recalculateTotalPrice === 'function') window.recalculateTotalPrice();
                 if(typeof window.renderLayersList === 'function') window.renderLayersList();
@@ -425,6 +539,7 @@ function initFabricEditor() {
 
         if(window.historyStates[side].redo.length > 0) {
             window.isHistoryAction = true;
+            window.isLoadingJSON = true;
             const currentJson = window.activeCanvas.toJSON(['customType', 'sablonSize', 'locked', 'curvature']);
             window.historyStates[side].undo.push(JSON.stringify(currentJson));
             
@@ -440,6 +555,7 @@ function initFabricEditor() {
                     }
                 });
                 window.activeCanvas.renderAll();
+                window.isLoadingJSON = false;
                 window.isHistoryAction = false;
                 if(typeof window.recalculateTotalPrice === 'function') window.recalculateTotalPrice();
                 if(typeof window.renderLayersList === 'function') window.renderLayersList();
@@ -910,6 +1026,9 @@ function initFabricEditor() {
 
             console.log('[CANVAS DEBUG] calling canvas.add()', text);
             window.activeCanvas.add(text);
+            if (typeof window.resizeObjectToSablonSize === 'function') {
+                window.resizeObjectToSablonSize(text, 'a5');
+            }
             console.log('[CANVAS DEBUG] objects after:', window.activeCanvas.getObjects().length);
 
             window.activeCanvas.setActiveObject(text);
@@ -987,9 +1106,10 @@ function initFabricEditor() {
                     img2.set({ left: 10, top: 10, objectCaching: false, imageSmoothing: true });
                     img2.customType = 'custom-image';
                     img2.sablonSize = 'a4';
-                    if (img2.width > pa_width) img2.scaleToWidth(pa_width - 20);
-                    else if (img2.width < 40) img2.scaleToWidth(80);
                     window.activeCanvas.add(img2);
+                    if (typeof window.resizeObjectToSablonSize === 'function') {
+                        window.resizeObjectToSablonSize(img2, 'a4');
+                    }
                     window.activeCanvas.setActiveObject(img2);
                     window.activeCanvas.requestRenderAll();
                     console.log('[CANVAS DEBUG] Fallback image added. objects after:', window.activeCanvas.getObjects().length);
@@ -999,9 +1119,10 @@ function initFabricEditor() {
             img.set({ left: 10, top: 10, objectCaching: false, imageSmoothing: true });
             img.customType = 'custom-image';
             img.sablonSize = 'a4';
-            if (img.width > pa_width) img.scaleToWidth(pa_width - 20);
-            else if (img.width < 40) img.scaleToWidth(80);
             window.activeCanvas.add(img);
+            if (typeof window.resizeObjectToSablonSize === 'function') {
+                window.resizeObjectToSablonSize(img, 'a4');
+            }
             window.activeCanvas.setActiveObject(img);
             window.activeCanvas.requestRenderAll();
             console.log('[CANVAS DEBUG] Image added. objects after:', window.activeCanvas.getObjects().length);
@@ -1022,12 +1143,13 @@ function initFabricEditor() {
             console.log('[CANVAS DEBUG] fabric.loadSVGFromURL callback received, objects count:', objects ? objects.length : 0);
             if(objects && objects.length > 0) {
                 const group = fabric.util.groupSVGElements(objects, options);
-                const targetSize = Math.min(60, (window.activeCanvas.width || 220) - 20);
-                group.scale(targetSize / Math.max(group.width || 1, group.height || 1));
                 group.set({ left: 10, top: 10, objectCaching: false }); 
                 group.customType = 'custom-svg';
                 group.sablonSize = 'a5';
                 window.activeCanvas.add(group); 
+                if (typeof window.resizeObjectToSablonSize === 'function') {
+                    window.resizeObjectToSablonSize(group, 'a5');
+                }
                 window.activeCanvas.setActiveObject(group); 
                 window.activeCanvas.requestRenderAll();
                 console.log('[CANVAS DEBUG] SVG group added. objects after:', window.activeCanvas.getObjects().length);
@@ -1539,28 +1661,29 @@ function initFabricEditor() {
             const obj = e.target;
             const side = c === canvasFront ? 'FRONT' : (c === canvasBack ? 'BACK' : (c === canvasLeft ? 'LEFT' : 'RIGHT'));
             console.log('[CANVAS DEBUG] OBJECT ADDED event fired on canvas', side, obj);
-            if (obj && !window.isHistoryAction && !obj.isClone && !window.isLoadingJSON) {
-                const size = obj.sablonSize || ((obj.type === 'i-text' || obj.customType === 'custom-svg') ? 'a5' : 'a4');
-                console.log('[CANVAS DEBUG] Calling resizeObjectToSablonSize with size:', size);
-                window.resizeObjectToSablonSize(obj, size);
-            }
             if (obj && obj.isClone) {
                 delete obj.isClone;
             }
-            if(typeof window.recalculateTotalPrice === 'function') window.recalculateTotalPrice();
-            if(typeof window.renderLayersList === 'function') window.renderLayersList();
-            if(typeof window.saveHistory === 'function') window.saveHistory();
+            if (!window.isLoadingJSON && !window.isHistoryAction) {
+                if(typeof window.recalculateTotalPrice === 'function') window.recalculateTotalPrice();
+                if(typeof window.renderLayersList === 'function') window.renderLayersList();
+                if(typeof window.saveHistory === 'function') window.saveHistory();
+            }
         });
         c.on('object:removed', function(e) {
             const side = c === canvasFront ? 'FRONT' : (c === canvasBack ? 'BACK' : (c === canvasLeft ? 'LEFT' : 'RIGHT'));
             console.log('[CANVAS DEBUG] OBJECT REMOVED event fired on canvas', side, e.target);
-            if(typeof window.recalculateTotalPrice === 'function') window.recalculateTotalPrice();
-            if(typeof window.renderLayersList === 'function') window.renderLayersList();
-            if(typeof window.saveHistory === 'function') window.saveHistory();
+            if (!window.isLoadingJSON && !window.isHistoryAction) {
+                if(typeof window.recalculateTotalPrice === 'function') window.recalculateTotalPrice();
+                if(typeof window.renderLayersList === 'function') window.renderLayersList();
+                if(typeof window.saveHistory === 'function') window.saveHistory();
+            }
         });
         c.on('object:modified', function(e) {
-            if(typeof window.renderLayersList === 'function') window.renderLayersList();
-            if(typeof window.saveHistory === 'function') window.saveHistory();
+            if (!window.isLoadingJSON && !window.isHistoryAction) {
+                if(typeof window.renderLayersList === 'function') window.renderLayersList();
+                if(typeof window.saveHistory === 'function') window.saveHistory();
+            }
         });
         c.on('object:moving', constrainObjectBounds);
         c.on('object:scaling', constrainObjectBounds);
