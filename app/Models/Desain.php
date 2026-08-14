@@ -14,13 +14,20 @@ class Desain extends Model
         'id_template',
         'file_desain',
         'file_desain_belakang',
-        'lebar_cm',
-        'lebar_cm_belakang',
-        'tinggi_cm',
-        'tinggi_cm_belakang',
+        'file_desain_kiri',
+        'file_desain_kanan',
         'harga_desain',
-        'tanggal_upload',
         'warna_baju',
+        'canvas_front',
+        'canvas_back',
+        'canvas_left',
+        'canvas_right',
+        'raw_assets',
+        'detail_sablon',
+    ];
+
+    protected $casts = [
+        'raw_assets' => 'array',
     ];
 
     public function customer()

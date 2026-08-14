@@ -1,0 +1,45 @@
+@startuml act_08_Kelola_Template_Desain
+skinparam Style strictuml
+skinparam ActivityFontName Times New Roman
+skinparam ActivityFontSize 12
+skinparam ActivityBorderColor Black
+skinparam ActivityBackgroundColor White
+skinparam ArrowColor Black
+skinparam ArrowFontName Times New Roman
+skinparam ArrowFontSize 10
+skinparam SwimlaneBorderColor Black
+skinparam SwimlaneTitleFontName Times New Roman
+skinparam SwimlaneTitleFontSize 14
+skinparam SwimlaneTitleFontStyle bold
+
+|Admin|
+start
+:Mengakses Menu Kelola Template;
+
+|Sistem|
+:Mengambil Data Template Aset Gambar;
+:Menampilkan Galeri Daftar Template Aset;
+
+|Admin|
+if (Pilih Tindakan Template?) then (Upload Template)
+  :Mengisi Formulir Template Baru\n(Nama, Kategori, & Pilih File Gambar);
+  :Klik Tombol "Upload";
+  |Sistem|
+  :Melakukan Validasi File Format (SVG/PNG/JPG);
+  :Menyimpan File Gambar Template ke Storage;
+  :Menyimpan Metadata Aset ke Tabel 'templates';
+else (Hapus Template)
+  |Admin|
+  :Memilih "Hapus" pada Template Tertentu;
+  |Sistem|
+  :Menghapus File Gambar Template dari Storage;
+  :Menghapus Record Template dari Database;
+endif
+
+|Sistem|
+:Mengarahkan Kembali ke Halaman Utama Template;
+:Menampilkan Notifikasi Aksi Sukses;
+|Admin|
+:Menerima Tampilan Galeri Terbaru;
+stop
+@enduml

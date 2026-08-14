@@ -1,0 +1,426 @@
+@startuml 01_Registrasi_Akun
+hide footbox
+skinparam backgroundColor white
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 12
+
+actor "Pelanggan" as Customer
+boundary "Halaman Registrasi" as View
+control "Kontroler Registrasi" as Controller
+entity "Basis Data\n(Pelanggan)" as DB
+
+Customer -> View : Membuka halaman registrasi
+View --> Customer : Menampilkan formulir registrasi
+Customer -> View : Mengisi formulir data diri
+Customer -> View : Klik tombol "Daftar"
+View -> Controller : Mengirim data pendaftaran
+activate Controller
+
+Controller -> Controller : Melakukan validasi data
+
+alt [Data Tidak Valid]
+    Controller --> View : Mengarahkan dengan pesan kesalahan
+    View --> Customer : Menampilkan pesan kesalahan
+else [Data Valid]
+    Controller -> DB : Menyimpan data ke basis data
+    activate DB
+    DB --> Controller : Data tersimpan
+    deactivate DB
+    Controller -> Controller : Melakukan otentikasi (login)
+    Controller --> View : Mengarahkan ke halaman dasbor
+    View --> Customer : Menampilkan halaman dasbor
+end
+deactivate Controller
+@enduml
+
+@startuml 02_Membuat_Desain
+hide footbox
+skinparam monochrome true
+skinparam shadowing false
+
+actor "Pelanggan" as Customer
+boundary "Editor Desain" as View
+control "Kontroler Desain" as Controller
+boundary "Penyimpanan\n(Storage)" as Storage
+entity "Basis Data" as DB
+
+Customer -> View : Membuka Editor Desain
+Customer -> View : Langkah 1: Memilih Warna Pakaian
+Customer -> View : Langkah 2 & 3: Membuat Desain Depan/Belakang
+Customer -> View : Langkah 4: Tinjau Desain & Harga
+Customer -> View : Klik "Simpan Desain"
+View -> Controller : Mengirim data gambar Base64 (Depan & Belakang)
+activate Controller
+Controller -> Controller : Menerjemahkan data Base64
+Controller -> Storage : Mengunggah file gambar mockup
+activate Storage
+Storage --> Controller : Mengembalikan lokasi gambar
+deactivate Storage
+Controller -> DB : Menyimpan data desain & menambah ke keranjang
+activate DB
+DB --> Controller : Data tersimpan
+deactivate DB
+Controller --> View : Mengembalikan status sukses & ID Desain
+deactivate Controller
+View --> Customer : Mengarahkan ke halaman Keranjang
+@enduml
+
+@startuml 03_Kelola_Keranjang
+hide footbox
+skinparam monochrome true
+skinparam shadowing false
+
+actor "Pelanggan" as Customer
+boundary "Halaman Keranjang" as View
+control "Kontroler Keranjang" as Controller
+entity "Basis Data\n(Keranjang)" as DB
+
+Customer -> View : Membuka keranjang
+View -> Controller : Meminta data keranjang
+activate Controller
+Controller -> DB : Mengambil data keranjang
+activate DB
+DB --> Controller : Data keranjang belanja
+deactivate DB
+Controller --> View : Menampilkan keranjang
+deactivate Controller
+
+alt [Hapus Barang]
+    Customer -> View : Klik "Hapus"
+    View -> Controller : Meminta penghapusan data
+    activate Controller
+    Controller -> DB : Menghapus data keranjang
+    Controller --> View : Mengarahkan kembali
+    deactivate Controller
+else [Lanjut Checkout]
+    Customer -> View : Klik "Checkout"
+    View -> Controller : Mengarahkan ke halaman Checkout
+end
+@enduml
+
+@startuml 04_Checkout_Pesanan
+hide footbox
+skinparam monochrome true
+skinparam shadowing false
+
+actor "Pelanggan" as Customer
+boundary "Halaman Checkout" as View
+control "Kontroler Checkout" as Controller
+boundary "Penyimpanan\n(Storage)" as Storage
+entity "Basis Data\n(Pesanan)" as DB
+
+Customer -> View : Mengunggah bukti & klik buat pesanan
+View -> Controller : Mengirim bukti pembayaran
+activate Controller
+Controller -> Controller : Memvalidasi file gambar
+Controller -> Storage : Mengunggah bukti pembayaran
+activate Storage
+Storage --> Controller : Mengembalikan lokasi bukti
+deactivate Storage
+Controller -> DB : Memulai Transaksi Basis Data
+activate DB
+Controller -> DB : Menyimpan data pesanan & detail
+Controller -> DB : Menghapus data dari keranjang
+DB --> Controller : Menyelesaikan Transaksi
+deactivate DB
+Controller --> View : Mengarahkan ke halaman Riwayat
+deactivate Controller
+@enduml
+
+@startuml 05_Lacak_Pesanan
+hide footbox
+skinparam monochrome true
+skinparam shadowing false
+
+actor "Pelanggan" as Customer
+boundary "Halaman Riwayat" as View
+control "Kontroler Pesanan" as Controller
+entity "Basis Data" as DB
+
+Customer -> View : Membuka riwayat pesanan
+View -> Controller : Meminta riwayat pesanan
+activate Controller
+Controller -> DB : Mengambil data pesanan
+activate DB
+DB --> Controller : Data riwayat pesanan
+deactivate DB
+Controller --> View : Menampilkan daftar pesanan
+deactivate Controller
+
+Customer -> View : Klik detail pesanan
+View -> Controller : Meminta detail pesanan
+activate Controller
+Controller -> DB : Mengambil detail & status
+activate DB
+DB --> Controller : Data pesanan lengkap
+deactivate DB
+Controller --> View : Menampilkan halaman detail
+deactivate Controller
+@enduml
+
+@startuml 06_Login
+hide footbox
+skinparam monochrome true
+skinparam shadowing false
+
+actor "Pengguna" as Actor
+boundary "Halaman Masuk (Login)" as View
+control "Kontroler Otentikasi" as Controller
+entity "Basis Data" as DB
+
+Actor -> View : Membuka formulir masuk
+Actor -> View : Mengisi email & kata sandi
+View -> Controller : Mengirim data masuk
+activate Controller
+Controller -> DB : Memeriksa kredensial
+activate DB
+DB --> Controller : Hasil pemeriksaan
+deactivate DB
+
+alt [Gagal]
+    Controller --> View : Pesan kesalahan kredensial
+else [Berhasil]
+    Controller -> Controller : Menyimpan sesi pengguna
+    Controller --> View : Mengarahkan ke Dasbor
+end
+deactivate Controller
+@enduml
+
+@startuml 07_Kelola_Produk
+hide footbox
+skinparam monochrome true
+skinparam shadowing false
+
+actor "Admin" as Admin
+boundary "Halaman Produk" as View
+control "Kontroler Produk" as Controller
+entity "Basis Data" as DB
+
+Admin -> View : Mengakses menu produk
+View -> Controller : Meminta daftar produk
+activate Controller
+Controller -> DB : Mengambil semua produk
+activate DB
+DB --> Controller : Data produk
+deactivate DB
+Controller --> View : Menampilkan tabel produk
+deactivate Controller
+
+alt [Tambah/Perbarui]
+    Admin -> View : Mengirim formulir produk
+    View -> Controller : Mengirim data produk
+    activate Controller
+    Controller -> DB : Menyimpan/Memperbarui produk
+    Controller --> View : Mengarahkan kembali
+    deactivate Controller
+else [Hapus]
+    Admin -> View : Klik hapus
+    View -> Controller : Meminta penghapusan produk
+    activate Controller
+    Controller -> DB : Menghapus produk
+    Controller --> View : Mengarahkan kembali
+    deactivate Controller
+end
+@enduml
+
+@startuml 08_Kelola_Template
+hide footbox
+skinparam monochrome true
+skinparam shadowing false
+
+actor "Admin" as Admin
+boundary "Halaman Templat" as View
+control "Kontroler Templat" as Controller
+boundary "Penyimpanan" as Storage
+entity "Basis Data" as DB
+
+Admin -> View : Mengunggah gambar templat
+View -> Controller : Mengirim gambar
+activate Controller
+Controller -> Storage : Mengunggah gambar ke sistem
+activate Storage
+Storage --> Controller : Mengembalikan lokasi gambar
+deactivate Storage
+Controller -> DB : Menyimpan data templat
+Controller --> View : Mengarahkan kembali
+deactivate Controller
+
+Admin -> View : Menghapus templat
+View -> Controller : Meminta penghapusan templat
+activate Controller
+Controller -> Storage : Menghapus file gambar
+Controller -> DB : Menghapus data templat
+Controller --> View : Mengarahkan kembali
+deactivate Controller
+@enduml
+
+@startuml 09_Review_Desain
+hide footbox
+skinparam monochrome true
+skinparam shadowing false
+
+actor "Admin" as Admin
+actor "Pelanggan" as Customer
+boundary "Detail Pesanan" as View
+control "Kontroler Pesanan\n(Admin / Customer)" as Controller
+boundary "Penyimpanan\n(Storage)" as Storage
+entity "Basis Data" as DB
+
+Admin -> View : Memeriksa detail desain pesanan
+
+alt [Perlu Direvisi (Admin)]
+    Admin -> View : Mengisi formulir & kirim catatan revisi
+    View -> Controller : Minta tolak desain & kirim catatan
+    activate Controller
+    Controller -> DB : Memperbarui status_desain 'revisi' & catatan_admin di tabel order_details
+    activate DB
+    DB --> Controller : Status & catatan tersimpan
+    deactivate DB
+    Controller --> View : Mengarahkan kembali dengan pesan sukses
+    deactivate Controller
+end
+
+Customer -> View : Membuka detail pesanan
+View --> Customer : Menampilkan rincian pesanan & catatan revisi dari Admin
+
+alt [Mengirim Perbaikan (Customer)]
+    Customer -> View : Klik tombol "Perbaiki Sekarang"
+    View --> Customer : Membuka Editor Desain dengan data revisi
+    Customer -> View : Melakukan edit desain baju & simpan
+    View -> Controller : Mengirim data gambar Base64 perbaikan
+    activate Controller
+    Controller -> Storage : Mengunggah file gambar mockup baru
+    activate Storage
+    Storage --> Controller : Mengembalikan lokasi gambar
+    deactivate Storage
+    Controller -> DB : Menyimpan data desain baru di tabel desains
+    activate DB
+    Controller -> DB : Memperbarui status_desain 'pending' di tabel order_details
+    DB --> Controller : Data tersimpan
+    deactivate DB
+    Controller --> View : Mengarahkan kembali ke halaman Riwayat
+    deactivate Controller
+end
+
+alt [Desain Disetujui Akhir (Admin)]
+    Admin -> View : Klik "Setujui Desain"
+    View -> Controller : Mengirim status disetujui
+    activate Controller
+    Controller -> DB : Memperbarui status_desain 'disetujui' di tabel order_details
+    activate DB
+    DB --> Controller : Status terupdate
+    deactivate DB
+    Controller --> View : Mengarahkan kembali
+    deactivate Controller
+end
+@enduml
+
+@startuml 11_Laporan
+hide footbox
+skinparam monochrome true
+skinparam shadowing false
+
+actor "Pemilik" as Owner
+boundary "Halaman Laporan\n(Browser)" as View
+control "Kontroler Laporan" as Controller
+entity "Basis Data" as DB
+
+Owner -> View : Memilih rentang tanggal & Filter
+View -> Controller : Meminta laporan sesuai tanggal
+activate Controller
+Controller -> DB : Mengambil ringkasan pesanan & metrics
+activate DB
+DB --> Controller : Data laporan & statistik penjualan
+deactivate DB
+Controller --> View : Menampilkan grafik, KPI, & tabel transaksi
+deactivate Controller
+
+alt [Cetak PDF / Print Laporan]
+    Owner -> View : Klik "Surat Cetak"
+    View -> View : Memicu fungsi window.print() browser
+    note over View : CSS @media print memformat layout\nserta kop surat laporan secara dinamis
+    View --> Owner : Menampilkan dialog cetak / Simpan PDF
+else [Ekspor Excel / CSV]
+    Owner -> View : Klik "Download Excel"
+    View -> Controller : Meminta unduhan file CSV (export_csv=1)
+    activate Controller
+    Controller -> DB : Mengambil semua data pesanan periode filter
+    activate DB
+    DB --> Controller : Data pesanan
+    deactivate DB
+    Controller -> View : Mengirimkan file stream CSV/Excel
+    deactivate Controller
+    View --> Owner : Memicu unduhan file Excel/CSV
+end
+@enduml
+
+@startuml 10_Kelola_Pesanan
+hide footbox
+skinparam monochrome true
+skinparam shadowing false
+
+actor "Admin" as Admin
+boundary "Manajemen Pesanan" as View
+control "Kontroler Pesanan" as Controller
+entity "Basis Data" as DB
+
+Admin -> View : Melihat tabel pesanan masuk
+
+alt [Bukti Tidak Valid]
+    Admin -> View : Memilih status "Dibatalkan"
+    View -> Controller : Mengirim pembaruan status
+    activate Controller
+    Controller -> DB : Memperbarui pesanan dibatalkan
+    Controller --> View : Mengarahkan kembali
+    deactivate Controller
+else [Bukti Valid]
+    Admin -> View : Memilih status "Diproses"
+    View -> Controller : Mengirim pembaruan status
+    activate Controller
+    Controller -> DB : Memperbarui pesanan diproses
+    Controller --> View : Mengarahkan kembali
+    deactivate Controller
+end
+
+Admin -> View : Memperbarui jadi Selesai/Dikirim
+View -> Controller : Mengirim pembaruan status selesai
+activate Controller
+Controller -> DB : Memperbarui pesanan selesai
+Controller --> View : Mengarahkan kembali
+deactivate Controller
+@enduml
+
+@startuml 11_Laporan
+hide footbox
+skinparam monochrome true
+skinparam shadowing false
+
+actor "Pemilik" as Owner
+boundary "Halaman Laporan" as View
+control "Kontroler Laporan" as Controller
+boundary "Pembuat PDF" as PDF
+entity "Basis Data" as DB
+
+Owner -> View : Memilih rentang tanggal & Filter
+View -> Controller : Meminta laporan sesuai tanggal
+activate Controller
+Controller -> DB : Mengambil ringkasan pesanan
+activate DB
+DB --> Controller : Data laporan penjualan
+deactivate DB
+Controller --> View : Menampilkan grafik & tabel
+deactivate Controller
+
+Owner -> View : Klik Ekspor PDF
+View -> Controller : Meminta pembuatan PDF
+activate Controller
+Controller -> DB : Mengambil data pesanan
+Controller -> PDF : Memerintahkan pembuatan PDF
+activate PDF
+PDF --> Controller : Mengembalikan file PDF
+deactivate PDF
+Controller --> View : Memicu unduhan file PDF
+deactivate Controller
+@enduml

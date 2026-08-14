@@ -36,12 +36,22 @@ class NewPasswordController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        $isCustomer = \App\Models\Customer::where('email', $request->email)->exists();
+        $isAdmin = \App\Models\Admin::where('email', $request->email)->exists();
+
+        $broker = 'users';
+        if ($isCustomer) {
+            $broker = 'customers';
+        } elseif ($isAdmin) {
+            $broker = 'admins';
+        }
+
         // Here we will attempt to reset the user's password. If it is successful we
         // will update the password on an actual user model and persist it to the
         // database. Otherwise we will parse the error and return the response.
-        $status = Password::reset(
+        $status = Password::broker($broker)->reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
-            function (User $user) use ($request) {
+            function ($user) use ($request) {
                 $user->forceFill([
                     'password' => Hash::make($request->password),
                     'remember_token' => Str::random(60),

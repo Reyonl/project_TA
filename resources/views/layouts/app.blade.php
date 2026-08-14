@@ -6,21 +6,32 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'Laravel') }}</title>
+        <link rel="icon" href="{{ asset('images/logo-dailyco.png') }}" type="image/png">
 
         <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800;900&display=swap" rel="stylesheet">
+
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <style>
+            .font-outfit { font-family: 'Outfit', sans-serif; }
+            body { font-family: 'Inter', sans-serif; }
+        </style>
+        @stack('styles')
     </head>
     <body class="font-sans antialiased text-slate-900">
-        <div class="min-h-screen bg-slate-50">
+        <div class="min-h-screen bg-slate-50 relative overflow-x-hidden">
+            <!-- Deco Background Subtle -->
+            <div class="absolute top-0 right-0 w-full h-[500px] bg-gradient-to-b from-red-50/50 to-transparent pointer-events-none"></div>
+
             @include('layouts.navigation')
 
             <!-- Page Heading -->
             @isset($header)
-                <header class="bg-white shadow">
+                <header class="bg-white/80 backdrop-blur-xl border-b border-white/20 sticky top-0 z-30 shadow-sm">
                     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                         {{ $header }}
                     </div>
@@ -32,5 +43,6 @@
                 {{ $slot }}
             </main>
         </div>
+        @stack('scripts')
     </body>
 </html>

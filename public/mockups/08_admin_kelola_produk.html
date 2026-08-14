@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mockup - 08 Admin Kelola Produk</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
+        body { font-family: 'Patrick Hand', 'Comic Sans MS', cursive; background-color: #e5e5e5; color: #000; display: flex; justify-content: center; padding: 40px; }
+        .wf-container { width: 1024px; min-height: 768px; background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; display: flex; flex-direction: column; }
+        .wf-border { border: 2px solid #000; }
+        .wf-border-b { border-bottom: 2px solid #000; }
+        .wf-border-r { border-right: 2px solid #000; }
+        .wf-btn { border: 2px solid #000; padding: 4px 12px; background: #fff; border-radius: 4px; font-weight: bold; cursor: pointer; box-shadow: 2px 2px 0 #000; }
+        .icon-placeholder { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: 2px solid #000; border-radius: 50%; font-size: 10px; }
+        .browser-header { border-bottom: 2px solid #000; padding: 8px 16px; display: flex; align-items: center; gap: 8px; background: #fff; }
+        .browser-dot { width: 12px; height: 12px; border: 2px solid #000; border-radius: 50%; }
+        .browser-address { border: 2px solid #000; flex-grow: 1; padding: 2px 8px; font-size: 14px; border-radius: 12px; display: flex; align-items: center; gap: 8px; margin-left: 16px; }
+        .wf-input { border: 2px solid #000; padding: 4px 8px; outline: none; border-radius: 4px; }
+        .img-placeholder { border: 2px solid #000; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; background: #fff; }
+        .img-placeholder::before, .img-placeholder::after { content: ''; position: absolute; background: #000; }
+        .img-placeholder::before { width: 150%; height: 2px; transform: rotate(45deg); }
+        .img-placeholder::after { width: 150%; height: 2px; transform: rotate(-45deg); }
+    </style>
+</head>
+<body>
+    <div class="wf-container">
+        <!-- Browser UI -->
+        <div class="browser-header">
+            <div class="flex gap-2"><div class="browser-dot"></div><div class="browser-dot"></div><div class="browser-dot"></div></div>
+            <div class="browser-address"><span>🔒</span> https://sistem-sablon.com/admin/products</div>
+            <div class="browser-dot rounded-sm"></div>
+        </div>
+
+        <!-- Top Navbar -->
+        <div class="wf-border-b p-3 flex justify-between items-center px-8">
+            <div class="flex items-center gap-4">
+                <div class="relative border-2 border-black bg-white" style="width: 60px; height: 30px;">
+                    <svg class="absolute inset-0 w-full h-full text-gray-300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                        <line x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="1" />
+                        <line x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="1" />
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center font-bold text-xs z-10">
+                        <span class="bg-white px-1">Logo</span>
+                    </div>
+                </div>
+                <h1 class="text-lg font-bold uppercase tracking-widest">DAILY.CO</h1>
+            </div>
+            <div class="flex items-center gap-4 font-bold text-sm">
+                <span>🏠 Dashboard</span>
+                <span class="underline wf-border px-3 py-1 bg-white" style="box-shadow: 2px 2px 0 #000;">🛍️ Kelola Produk</span>
+                <span>🎨 Template</span>
+                <span>📦 Kelola Order</span>
+                <span>📊 Laporan</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="wf-border px-2 py-0.5 text-[10px] font-bold bg-gray-100 rounded">ADMIN</span>
+                <span class="font-bold text-sm">Administrator ▾</span>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 p-8 bg-white">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl font-bold">Data Produk Baju</h1>
+                <button class="wf-btn text-lg">+ Tambah Produk</button>
+            </div>
+
+            <div class="flex justify-between mb-4">
+                <div class="flex gap-2">
+                    <select class="wf-input w-48"><option>Semua Kategori</option></select>
+                    <select class="wf-input w-48"><option>Semua Tipe</option></select>
+                    <button class="wf-btn" style="box-shadow:none;">Filter</button>
+                </div>
+                <div>
+                    <input type="text" class="wf-input" placeholder="Cari nama produk...">
+                </div>
+            </div>
+
+            <!-- Products Table -->
+            <div class="wf-border rounded-lg overflow-hidden">
+                <table class="w-full text-left">
+                    <thead class="wf-border-b bg-gray-50">
+                        <tr>
+                            <th class="p-3 wf-border-r w-12 text-center">No</th>
+                            <th class="p-3 wf-border-r w-24">Gambar</th>
+                            <th class="p-3 wf-border-r">Nama Produk</th>
+                            <th class="p-3 wf-border-r">Kategori</th>
+                            <th class="p-3 wf-border-r">Tipe</th>
+                            <th class="p-3 wf-border-r">Harga Dasar</th>
+                            <th class="p-3 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="wf-border-b">
+                            <td class="p-3 wf-border-r text-center">1</td>
+                            <td class="p-3 wf-border-r"><div class="img-placeholder w-16 h-16 text-[10px]"><span class="bg-white px-1 font-bold z-10">Mockup</span></div></td>
+                            <td class="p-3 wf-border-r font-bold">Kaos Lengan Pendek</td>
+                            <td class="p-3 wf-border-r">Kaos</td>
+                            <td class="p-3 wf-border-r">Kustom</td>
+                            <td class="p-3 wf-border-r">Rp 50.000</td>
+                            <td class="p-3 text-center">
+                                <button class="wf-btn text-xs mb-1">Edit</button>
+                                <button class="wf-btn text-xs bg-gray-200 text-black">Hapus</button>
+                            </td>
+                        </tr>
+                        <tr class="wf-border-b">
+                            <td class="p-3 wf-border-r text-center">2</td>
+                            <td class="p-3 wf-border-r"><div class="img-placeholder w-16 h-16 text-[10px]"><span class="bg-white px-1 font-bold z-10">Desain</span></div></td>
+                            <td class="p-3 wf-border-r font-bold">Kaos Anime Naruto</td>
+                            <td class="p-3 wf-border-r">Kaos</td>
+                            <td class="p-3 wf-border-r">Jadi</td>
+                            <td class="p-3 wf-border-r">Rp 85.000</td>
+                            <td class="p-3 text-center">
+                                <button class="wf-btn text-xs mb-1">Edit</button>
+                                <button class="wf-btn text-xs bg-gray-200 text-black">Hapus</button>
+                            </td>
+                        </tr>
+                        <tr class="wf-border-b">
+                            <td class="p-3 wf-border-r text-center">3</td>
+                            <td class="p-3 wf-border-r"><div class="img-placeholder w-16 h-16 text-[10px]"><span class="bg-white px-1 font-bold z-10">Mockup</span></div></td>
+                            <td class="p-3 wf-border-r font-bold">Hoodie Jumper</td>
+                            <td class="p-3 wf-border-r">Hoodie</td>
+                            <td class="p-3 wf-border-r">Kustom</td>
+                            <td class="p-3 wf-border-r">Rp 120.000</td>
+                            <td class="p-3 text-center">
+                                <button class="wf-btn text-xs mb-1">Edit</button>
+                                <button class="wf-btn text-xs bg-gray-200 text-black">Hapus</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

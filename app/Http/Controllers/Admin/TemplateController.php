@@ -26,7 +26,6 @@ class TemplateController extends Controller
         $request->validate([
             'nama_template' => 'required',
             'file_template' => 'required|image|mimes:jpeg,png,jpg,svg|max:2048',
-            'kategori' => 'required'
         ]);
 
         $path = $request->file('file_template')->store('templates', 'public');
@@ -35,7 +34,6 @@ class TemplateController extends Controller
             'id_admin' => auth()->guard('admin')->id(),
             'nama_template' => $request->nama_template,
             'file_template' => $path,
-            'kategori' => $request->kategori
         ]);
 
         return redirect()->route('admin.templates.index')->with('success', 'Template berhasil diunggah.');
@@ -51,12 +49,10 @@ class TemplateController extends Controller
         $request->validate([
             'nama_template' => 'required',
             'file_template' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
-            'kategori' => 'required'
         ]);
 
         $data = [
             'nama_template' => $request->nama_template,
-            'kategori' => $request->kategori
         ];
 
         if ($request->hasFile('file_template')) {

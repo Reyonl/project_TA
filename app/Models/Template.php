@@ -13,7 +13,6 @@ class Template extends Model
         'id_admin',
         'nama_template',
         'file_template',
-        'kategori',
     ];
 
     public function admin()

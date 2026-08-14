@@ -1,0 +1,146 @@
+@startuml
+
+title DailyCo — Complete System Diagram
+
+' =============================
+' ACTORS
+' =============================
+actor "Customer" as C
+actor "Admin" as A
+actor "Owner" as O
+actor "Guest" as G
+
+' =============================
+' AUTHENTICATION
+' =============================
+package "Authentication" {
+    usecase "Register" as UC_REG
+    usecase "Login (Customer)" as UC_LOGIN_C
+    usecase "Login (Admin/Owner)" as UC_LOGIN_A
+    usecase "Logout" as UC_LOGOUT
+}
+
+C --> UC_REG
+C --> UC_LOGIN_C
+A --> UC_LOGIN_A
+O --> UC_LOGIN_A
+C --> UC_LOGOUT
+A --> UC_LOGOUT
+O --> UC_LOGOUT
+
+' =============================
+' CATALOG (PUBLIC)
+' =============================
+package "Katalog Publik" {
+    usecase "Lihat Landing Page" as UC_LANDING
+    usecase "Lihat Detail Produk" as UC_PRODUK_DETAIL
+}
+
+G --> UC_LANDING
+G --> UC_PRODUK_DETAIL
+C --> UC_LANDING
+C --> UC_PRODUK_DETAIL
+
+' =============================
+' DESIGN EDITOR
+' =============================
+package "Design Editor" {
+    usecase "Buka Editor Canvas" as UC_EDITOR
+    usecase "Pilih Warna Baju" as UC_WARNA
+    usecase "Desain Depan" as UC_DEPAN
+    usecase "Desain Belakang/Kiri/Kanan" as UC_SISI
+    usecase "Upload Gambar" as UC_UPLOAD_IMG
+    usecase "Tambah Teks" as UC_TEKS
+    usecase "Gunakan Template" as UC_TEMPLATE
+    usecase "Cari & Pasang Stiker" as UC_STIKER
+    usecase "Undo / Redo" as UC_UNDOREDO
+    usecase "Zoom & Pan" as UC_ZOOM
+    usecase "Review & Simpan Desain" as UC_SIMPAN
+    usecase "Revisi Desain" as UC_REVISI
+}
+
+C --> UC_EDITOR
+UC_EDITOR ..> UC_WARNA : include
+UC_EDITOR ..> UC_DEPAN : include
+UC_DEPAN ..> UC_SISI : include (opsional)
+UC_DEPAN ..> UC_UPLOAD_IMG : extend
+UC_DEPAN ..> UC_TEKS : extend
+UC_DEPAN ..> UC_TEMPLATE : extend
+UC_DEPAN ..> UC_STIKER : extend
+UC_DEPAN ..> UC_UNDOREDO : extend
+UC_EDITOR ..> UC_ZOOM : extend
+UC_EDITOR ..> UC_SIMPAN : include
+C --> UC_REVISI
+
+' =============================
+' CART & CHECKOUT
+' =============================
+package "Keranjang & Checkout" {
+    usecase "Lihat Keranjang" as UC_CART
+    usecase "Tambah Produk Jadi ke Cart" as UC_CART_DIRECT
+    usecase "Hapus/Update Quantity Cart" as UC_CART_EDIT
+    usecase "Checkout" as UC_CHECKOUT
+    usecase "Konfirmasi Pesanan" as UC_KONFIRMASI
+}
+
+C --> UC_CART
+C --> UC_CART_DIRECT
+C --> UC_CART_EDIT
+C --> UC_CHECKOUT
+UC_CHECKOUT ..> UC_KONFIRMASI : include
+
+' =============================
+' ORDERS (CUSTOMER)
+' =============================
+package "Pesanan Customer" {
+    usecase "Lihat Riwayat Pesanan" as UC_ORDER_LIST
+    usecase "Lihat Detail Pesanan" as UC_ORDER_DETAIL
+    usecase "Upload Bukti Pembayaran" as UC_UPLOAD_BAYAR
+}
+
+C --> UC_ORDER_LIST
+C --> UC_ORDER_DETAIL
+C --> UC_UPLOAD_BAYAR
+
+' =============================
+' ADMIN: PRODUK & TEMPLATE
+' =============================
+package "Admin: Master Data" {
+    usecase "CRUD Produk" as UC_PRODUK_CRUD
+    usecase "CRUD Template Desain" as UC_TEMPLATE_CRUD
+}
+
+A --> UC_PRODUK_CRUD
+A --> UC_TEMPLATE_CRUD
+
+' =============================
+' ADMIN: ORDER MANAGEMENT
+' =============================
+package "Admin: Kelola Pesanan" {
+    usecase "Lihat Semua Pesanan" as UC_ADMIN_ORDERS
+    usecase "Review Desain" as UC_REVIEW_DESAIN
+    usecase "Approve / Request Revisi Desain" as UC_APPROVE_DESAIN
+    usecase "Verifikasi Pembayaran" as UC_VERIF_BAYAR
+    usecase "Update Status Order" as UC_UPDATE_STATUS
+}
+
+A --> UC_ADMIN_ORDERS
+A --> UC_REVIEW_DESAIN
+A --> UC_APPROVE_DESAIN
+A --> UC_VERIF_BAYAR
+A --> UC_UPDATE_STATUS
+
+' =============================
+' OWNER: REPORTS
+' =============================
+package "Owner: Laporan" {
+    usecase "Lihat Laporan Penjualan" as UC_LAPORAN
+    usecase "Export CSV" as UC_EXPORT_CSV
+}
+
+O --> UC_LAPORAN
+A --> UC_LAPORAN
+O --> UC_EXPORT_CSV
+A --> UC_EXPORT_CSV
+
+@enduml

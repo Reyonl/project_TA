@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mockup - 13 Admin Kelola Template Desain</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
+        body { font-family: 'Patrick Hand', 'Comic Sans MS', cursive; background-color: #e5e5e5; color: #000; display: flex; justify-content: center; padding: 40px; }
+        .wf-container { width: 1024px; min-height: 768px; background: #f9fafb; border: 2px solid #000; box-shadow: 4px 4px 0 #000; display: flex; flex-direction: column; }
+        .wf-border { border: 2px solid #000; }
+        .wf-border-b { border-bottom: 2px solid #000; }
+        .wf-border-r { border-right: 2px solid #000; }
+        .wf-btn { border: 2px solid #000; padding: 6px 16px; background: #fff; border-radius: 6px; font-weight: bold; cursor: pointer; box-shadow: 2px 2px 0 #000; transition: all 0.1s; }
+        .wf-btn:active { box-shadow: 0 0 0 #000; transform: translate(2px, 2px); }
+        .browser-header { border-bottom: 2px solid #000; padding: 8px 16px; display: flex; align-items: center; gap: 8px; background: #fff; }
+        .browser-dot { width: 12px; height: 12px; border: 2px solid #000; border-radius: 50%; }
+        .browser-address { border: 2px solid #000; flex-grow: 1; padding: 2px 8px; font-size: 14px; border-radius: 12px; display: flex; align-items: center; gap: 8px; margin-left: 16px; }
+        .img-placeholder { border: 2px solid #000; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; background: #fff; }
+        .img-placeholder::before, .img-placeholder::after { content: ''; position: absolute; background: #000; }
+        .img-placeholder::before { width: 150%; height: 2px; transform: rotate(35deg); }
+        .img-placeholder::after { width: 150%; height: 2px; transform: rotate(-35deg); }
+    </style>
+</head>
+<body>
+    <div class="wf-container">
+        <!-- Browser UI -->
+        <div class="browser-header">
+            <div class="flex gap-2"><div class="browser-dot"></div><div class="browser-dot"></div><div class="browser-dot"></div></div>
+            <div class="browser-address"><span>🔒</span> https://sistem-sablon.com/admin/templates</div>
+            <div class="browser-dot rounded-sm"></div>
+        </div>
+
+        <!-- Top Navbar -->
+        <div class="wf-border-b p-3 flex justify-between items-center px-8 bg-white">
+            <div class="flex items-center gap-4">
+                <div class="relative border-2 border-black rounded-full overflow-hidden bg-white" style="width: 40px; height: 40px;">
+                    <div class="absolute inset-0 flex items-center justify-center font-bold text-[10px] z-10 text-center leading-tight">
+                        <span class="bg-white px-1">Logo<br>Toko</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-6 font-bold text-sm ml-4">
+                    <span class="text-gray-500">🏠 Dashboard</span>
+                    <span class="text-gray-500">🛍️ Kelola Produk</span>
+                    <span class="underline wf-border px-3 py-1 bg-white" style="box-shadow: 2px 2px 0 #000;">🎨 Template</span>
+                    <span class="text-gray-500">📦 Kelola Order</span>
+                    <span class="text-gray-500">📊 Laporan</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="border border-red-200 text-red-500 px-2 py-0.5 text-[10px] font-bold bg-red-50 rounded">ADMIN</span>
+                <span class="font-bold text-sm">Administrator ▾</span>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 p-8">
+            <h1 class="text-2xl font-bold mb-6">Kelola Template Desain</h1>
+            
+            <div class="bg-white wf-border p-6 rounded-xl" style="box-shadow: 4px 4px 0 #000;">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-xl font-bold">Daftar Template</h2>
+                    <button class="wf-btn bg-indigo-100">+ Tambah Template</button>
+                </div>
+
+                <!-- Card Grid -->
+                <div class="grid grid-cols-4 gap-6">
+                    
+                    <!-- Card 1 -->
+                    <div class="wf-border rounded-xl p-4 flex flex-col items-center bg-white transition-transform hover:-translate-y-1">
+                        <div class="img-placeholder w-full h-36 rounded-lg mb-4 text-xs"><span class="bg-white px-2 py-1 border-2 border-black rounded font-bold z-10">Foto</span></div>
+                        <h3 class="font-bold text-lg mb-4">Nama Template</h3>
+                        <div class="flex gap-2 w-full mt-auto">
+                            <button class="wf-btn flex-1 text-sm bg-gray-50 shadow-none border-[1px] py-1">✏️ Edit</button>
+                            <button class="wf-btn flex-1 text-sm bg-red-50 text-red-600 shadow-none border-[1px] py-1">🗑️ Hapus</button>
+                        </div>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="wf-border rounded-xl p-4 flex flex-col items-center bg-white transition-transform hover:-translate-y-1">
+                        <div class="img-placeholder w-full h-36 rounded-lg mb-4 text-xs"><span class="bg-white px-2 py-1 border-2 border-black rounded font-bold z-10">Foto</span></div>
+                        <h3 class="font-bold text-lg mb-4">Nama Template</h3>
+                        <div class="flex gap-2 w-full mt-auto">
+                            <button class="wf-btn flex-1 text-sm bg-gray-50 shadow-none border-[1px] py-1">✏️ Edit</button>
+                            <button class="wf-btn flex-1 text-sm bg-red-50 text-red-600 shadow-none border-[1px] py-1">🗑️ Hapus</button>
+                        </div>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="wf-border rounded-xl p-4 flex flex-col items-center bg-white transition-transform hover:-translate-y-1">
+                        <div class="img-placeholder w-full h-36 rounded-lg mb-4 text-xs"><span class="bg-white px-2 py-1 border-2 border-black rounded font-bold z-10">Foto</span></div>
+                        <h3 class="font-bold text-lg mb-4">Nama Template</h3>
+                        <div class="flex gap-2 w-full mt-auto">
+                            <button class="wf-btn flex-1 text-sm bg-gray-50 shadow-none border-[1px] py-1">✏️ Edit</button>
+                            <button class="wf-btn flex-1 text-sm bg-red-50 text-red-600 shadow-none border-[1px] py-1">🗑️ Hapus</button>
+                        </div>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div class="wf-border rounded-xl p-4 flex flex-col items-center bg-white transition-transform hover:-translate-y-1">
+                        <div class="img-placeholder w-full h-36 rounded-lg mb-4 text-xs"><span class="bg-white px-2 py-1 border-2 border-black rounded font-bold z-10">Foto</span></div>
+                        <h3 class="font-bold text-lg mb-4">Nama Template</h3>
+                        <div class="flex gap-2 w-full mt-auto">
+                            <button class="wf-btn flex-1 text-sm bg-gray-50 shadow-none border-[1px] py-1">✏️ Edit</button>
+                            <button class="wf-btn flex-1 text-sm bg-red-50 text-red-600 shadow-none border-[1px] py-1">🗑️ Hapus</button>
+                        </div>
+                    </div>
+
+                    <!-- Card 5 -->
+                    <div class="wf-border rounded-xl p-4 flex flex-col items-center bg-white transition-transform hover:-translate-y-1">
+                        <div class="img-placeholder w-full h-36 rounded-lg mb-4 text-xs"><span class="bg-white px-2 py-1 border-2 border-black rounded font-bold z-10">Foto</span></div>
+                        <h3 class="font-bold text-lg mb-4">Nama Template</h3>
+                        <div class="flex gap-2 w-full mt-auto">
+                            <button class="wf-btn flex-1 text-sm bg-gray-50 shadow-none border-[1px] py-1">✏️ Edit</button>
+                            <button class="wf-btn flex-1 text-sm bg-red-50 text-red-600 shadow-none border-[1px] py-1">🗑️ Hapus</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Card 6 -->
+                    <div class="wf-border rounded-xl p-4 flex flex-col items-center bg-white transition-transform hover:-translate-y-1">
+                        <div class="img-placeholder w-full h-36 rounded-lg mb-4 text-xs"><span class="bg-white px-2 py-1 border-2 border-black rounded font-bold z-10">Foto</span></div>
+                        <h3 class="font-bold text-lg mb-4">Nama Template</h3>
+                        <div class="flex gap-2 w-full mt-auto">
+                            <button class="wf-btn flex-1 text-sm bg-gray-50 shadow-none border-[1px] py-1">✏️ Edit</button>
+                            <button class="wf-btn flex-1 text-sm bg-red-50 text-red-600 shadow-none border-[1px] py-1">🗑️ Hapus</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Card 7 -->
+                    <div class="wf-border rounded-xl p-4 flex flex-col items-center bg-white transition-transform hover:-translate-y-1">
+                        <div class="img-placeholder w-full h-36 rounded-lg mb-4 text-xs"><span class="bg-white px-2 py-1 border-2 border-black rounded font-bold z-10">Foto</span></div>
+                        <h3 class="font-bold text-lg mb-4">Nama Template</h3>
+                        <div class="flex gap-2 w-full mt-auto">
+                            <button class="wf-btn flex-1 text-sm bg-gray-50 shadow-none border-[1px] py-1">✏️ Edit</button>
+                            <button class="wf-btn flex-1 text-sm bg-red-50 text-red-600 shadow-none border-[1px] py-1">🗑️ Hapus</button>
+                        </div>
+                    </div>
+
+                    <!-- Card 8 -->
+                    <div class="wf-border rounded-xl p-4 flex flex-col items-center bg-white transition-transform hover:-translate-y-1">
+                        <div class="img-placeholder w-full h-36 rounded-lg mb-4 text-xs"><span class="bg-white px-2 py-1 border-2 border-black rounded font-bold z-10">Foto</span></div>
+                        <h3 class="font-bold text-lg mb-4">Nama Template</h3>
+                        <div class="flex gap-2 w-full mt-auto">
+                            <button class="wf-btn flex-1 text-sm bg-gray-50 shadow-none border-[1px] py-1">✏️ Edit</button>
+                            <button class="wf-btn flex-1 text-sm bg-red-50 text-red-600 shadow-none border-[1px] py-1">🗑️ Hapus</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pagination Placeholder -->
+                <div class="flex justify-center mt-8">
+                    <div class="flex gap-2">
+                        <button class="wf-btn text-xs px-3 shadow-none border-[1px]">&lt;</button>
+                        <button class="wf-btn text-xs px-3 bg-gray-200 shadow-none border-[1px]">1</button>
+                        <button class="wf-btn text-xs px-3 shadow-none border-[1px]">2</button>
+                        <button class="wf-btn text-xs px-3 shadow-none border-[1px]">&gt;</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

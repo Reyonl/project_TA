@@ -1,0 +1,52 @@
+=========================================
+ATURAN BISNIS & PENINGKATAN ALUR SISTEM
+=========================================
+Sistem: Aplikasi Pemesanan Sablon Kaos Custom
+
+1. MULTI-AUTHENTICATION
+- Terdapat 3 Role/Guard: Customer, Admin, dan Owner.
+- Customer: Bisa mendaftar (register), login, membuat desain, memasukkan ke keranjang, checkout, dan melihat riwayat pesanan serta revisi desain.
+- Admin: Mengelola produk, template, memverifikasi pembayaran, mereview desain (setuju/revisi), dan mengupdate status pesanan.
+- Owner: Hanya melihat laporan penjualan dan transaksi.
+
+2. ATURAN PRODUK & HARGA
+- Sistem difokuskan hanya untuk produk "Baju/Kaos" (Fitur/kategori Topi ditiadakan agar logika editor desain lebih terpusat).
+- Pemesanan custom desain dikenakan tarif tetap desain sebesar Rp. 20.000, yang ditambahkan ke harga dasar produk.
+- Ada opsi "Pesan Langsung" tanpa desain custom (produk jadi).
+
+=========================================
+USULAN PENINGKATAN (IMPROVED FLOW)
+(Terapkan ini untuk versi final)
+=========================================
+
+1. PENINGKATAN DESIGN EDITOR (STEP-BY-STEP WIZARD)
+Alur editor desain saat ini terlalu menumpuk di satu halaman. Untuk versi final, buatlah menjadi Step-by-Step (Wizard):
+- Step 1: Pilih Produk & Warna Baju.
+- Step 2: Desain Bagian Depan (Wajib) -> Upload/Tambah stiker Iconify/Dicebear, tentukan ukuran (cm).
+- Step 3: Desain Bagian Belakang, Kiri, Kanan (Opsional).
+- Step 4: Review Hasil Mockup (Summary) & Pilih Teknik (Sablon/Bordir).
+- Step 5: Simpan dan Masukkan ke Keranjang.
+*Note teknis: Gunakan state management JS (seperti Alpine.js atau Vue) untuk menyimpan state antar step sebelum final submit base64 ke controller.
+
+2. PENINGKATAN KOMUNIKASI REVISI DESAIN
+Saat ini revisi hanya mengubah status menjadi 'revisi' dan ada 1 kolom 'catatan_admin'.
+Peningkatan: Buat fitur mini-chat (Timeline Komunikasi) pada Order Detail.
+- Saat Admin menolak desain, Admin bisa memberikan catatan detail (bisa multi-chat).
+- Customer mendapat notifikasi, bisa membalas chat, lalu mengupload ulang desain.
+- Desain lama (sebelum revisi) di-arsipkan (history) sehingga Admin bisa melihat perbandingan "Sebelum" dan "Sesudah" direvisi.
+
+3. SIKLUS STATUS ORDER YANG LEBIH JELAS
+Ubah ENUM status order menjadi lebih spesifik agar pelanggan tahu barangnya sampai di mana:
+- pending (Menunggu Pembayaran)
+- dibayar (Menunggu Verifikasi Admin)
+- review_desain (Admin sedang cek desain)
+- produksi (Sedang disablon/dibordir)
+- dikirim (Barang dalam perjalanan)
+- selesai (Barang diterima)
+- dibatalkan
+
+4. KEAMANAN TRANSAKSI (ATOMIC TRANSACTION)
+Pastikan saat proses perpindahan data dari `carts` ke `orders` dan `order_details`, selalu dibungkus menggunakan `DB::transaction`. Jika upload bukti pembayaran gagal, maka Cart tidak boleh terhapus.
+
+5. CLEAN CODE ARCHITECTURE
+Terapkan pola FormRequest untuk validasi (jangan gunakan $request->validate() langsung di Controller) dan pindahkan logika bisnis kalkulasi harga ke Service Class (misalnya `OrderService`), agar Controller tetap ramping (Fat Model/Service, Skinny Controller).

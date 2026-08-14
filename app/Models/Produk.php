@@ -14,6 +14,8 @@ class Produk extends Model
         'jenis_produk',
         'harga_dasar',
         'deskripsi',
+        'tipe_produk',
+        'gambar_produk',
     ];
 
     public function orderDetails()

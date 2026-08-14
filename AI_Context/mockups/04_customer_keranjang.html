@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mockup - 04 Keranjang Belanja</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
+        body { font-family: 'Patrick Hand', 'Comic Sans MS', cursive; background-color: #e5e5e5; color: #000; display: flex; justify-content: center; padding: 40px; }
+        .wf-container { width: 1024px; min-height: 768px; background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; display: flex; flex-direction: column; }
+        .wf-border { border: 2px solid #000; }
+        .wf-border-b { border-bottom: 2px solid #000; }
+        .wf-border-r { border-right: 2px solid #000; }
+        .wf-btn { border: 2px solid #000; padding: 6px 16px; background: #fff; border-radius: 4px; font-weight: bold; cursor: pointer; box-shadow: 2px 2px 0 #000; }
+        .icon-placeholder { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 2px solid #000; border-radius: 50%; font-size: 10px; }
+        .img-placeholder { border: 2px solid #000; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; background: #fff; }
+        .img-placeholder::before, .img-placeholder::after { content: ''; position: absolute; background: #000; }
+        .img-placeholder::before { width: 150%; height: 2px; transform: rotate(45deg); }
+        .img-placeholder::after { width: 150%; height: 2px; transform: rotate(-45deg); }
+        .browser-header { border-bottom: 2px solid #000; padding: 8px 16px; display: flex; align-items: center; gap: 8px; background: #fff; }
+        .browser-dot { width: 12px; height: 12px; border: 2px solid #000; border-radius: 50%; }
+        .browser-address { border: 2px solid #000; flex-grow: 1; padding: 2px 8px; font-size: 14px; border-radius: 12px; display: flex; align-items: center; gap: 8px; margin-left: 16px; }
+    </style>
+</head>
+<body>
+    <div class="wf-container">
+        <!-- Browser UI -->
+        <div class="browser-header">
+            <div class="flex gap-2"><div class="browser-dot"></div><div class="browser-dot"></div><div class="browser-dot"></div></div>
+            <div class="browser-address"><span>🔒</span> https://sistem-sablon.com/customer/cart</div>
+            <div class="browser-dot rounded-sm"></div>
+        </div>
+
+        <!-- Navbar Logged In -->
+        <div class="wf-border-b p-4 flex justify-between items-center px-8">
+            <div class="flex items-center gap-4">
+                <div class="icon-placeholder">Logo</div>
+                <h1 class="text-xl font-bold uppercase tracking-widest">SISTEM SABLON</h1>
+            </div>
+            <div class="flex items-center gap-6 font-bold text-lg">
+                <span>Katalog</span>
+                <span>Pesanan Saya (0)</span>
+                <span class="underline">Keranjang (2)</span>
+                <div class="flex items-center gap-2 ml-4">
+                    <div class="icon-placeholder">U</div>
+                    <span>Halo, Pelanggan</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex-1 p-8">
+            <h2 class="text-3xl font-bold mb-6">Keranjang Belanja</h2>
+
+            <div class="flex gap-8">
+                <!-- Cart Items -->
+                <div class="flex-1 flex flex-col gap-4">
+                    <!-- Item 1 -->
+                    <div class="wf-border p-4 flex gap-4 bg-white rounded-lg">
+                        <div class="img-placeholder w-24 h-24 rounded"><span class="bg-white px-1 text-xs z-10">Gambar</span></div>
+                        <div class="flex-1">
+                            <div class="flex justify-between">
+                                <h3 class="font-bold text-lg">Kaos Lengan Pendek (Kustom)</h3>
+                                <button class="text-black font-bold underline">X Hapus</button>
+                            </div>
+                            <p class="text-gray-600">Warna: Hitam | Ukuran: M</p>
+                            <p class="text-gray-600">Sablon: Depan Saja</p>
+                            <div class="flex justify-between items-center mt-4">
+                                <div class="flex items-center gap-2">
+                                    <button class="wf-border w-8 h-8 rounded bg-gray-100">-</button>
+                                    <span class="font-bold w-6 text-center">1</span>
+                                    <button class="wf-border w-8 h-8 rounded bg-gray-100">+</button>
+                                </div>
+                                <span class="font-bold text-xl">Rp 65.000</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Item 2 -->
+                    <div class="wf-border p-4 flex gap-4 bg-white rounded-lg">
+                        <div class="img-placeholder w-24 h-24 rounded"><span class="bg-white px-1 text-xs z-10">Gambar</span></div>
+                        <div class="flex-1">
+                            <div class="flex justify-between">
+                                <h3 class="font-bold text-lg">Kaos Anime Naruto (Jadi)</h3>
+                                <button class="text-black font-bold underline">X Hapus</button>
+                            </div>
+                            <p class="text-gray-600">Warna: Putih | Ukuran: L</p>
+                            <div class="flex justify-between items-center mt-4">
+                                <div class="flex items-center gap-2">
+                                    <button class="wf-border w-8 h-8 rounded bg-gray-100">-</button>
+                                    <span class="font-bold w-6 text-center">2</span>
+                                    <button class="wf-border w-8 h-8 rounded bg-gray-100">+</button>
+                                </div>
+                                <span class="font-bold text-xl">Rp 170.000</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary Panel -->
+                <div class="w-80 wf-border p-6 rounded-lg bg-gray-50 h-fit">
+                    <h3 class="font-bold text-xl mb-4">Ringkasan Belanja</h3>
+                    <div class="flex justify-between mb-2">
+                        <span>Total Harga (3 Barang)</span>
+                        <span>Rp 235.000</span>
+                    </div>
+                    <div class="wf-border-b my-4"></div>
+                    <div class="flex justify-between mb-6 font-bold text-2xl">
+                        <span>Total:</span>
+                        <span>Rp 235.000</span>
+                    </div>
+                    <button class="wf-btn w-full text-lg py-3">Lanjut Checkout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

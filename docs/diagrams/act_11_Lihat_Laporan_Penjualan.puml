@@ -1,0 +1,52 @@
+@startuml act_11_Lihat_Laporan_Penjualan
+skinparam Style strictuml
+skinparam ActivityFontName Times New Roman
+skinparam ActivityFontSize 12
+skinparam ActivityBorderColor Black
+skinparam ActivityBackgroundColor White
+skinparam ArrowColor Black
+skinparam ArrowFontName Times New Roman
+skinparam ArrowFontSize 10
+skinparam SwimlaneBorderColor Black
+skinparam SwimlaneTitleFontName Times New Roman
+skinparam SwimlaneTitleFontSize 14
+skinparam SwimlaneTitleFontStyle bold
+
+|Pemilik|
+start
+:Mengakses Menu Laporan Penjualan (Analytics);
+
+|Sistem|
+:Memuat Dasbor Laporan Default (30 Hari Terakhir);
+
+|Pemilik|
+:Menentukan Rentang Tanggal Mulai & Akhir;\n(<<include>> Filter Periode Laporan);
+:Klik Tombol "Filter Data";
+
+|Sistem|
+:Mengambil Ringkasan Transaksi di Rentang Tanggal;
+:Menghitung Omzet Pendapatan & Growth Metrics;
+:Merender Grafik Pertumbuhan & Kategori Produk Terpopuler;
+:Menampilkan Update KPI, Grafik, & Ledger Tabel;
+
+|Pemilik|
+if (Pilih Tindakan Laporan?) then (Download Excel)
+  :Klik Tombol "Download Excel";
+  |Sistem|
+  :Memproses Seluruh Baris Transaksi Periode Terkait;
+  :Menyusun Aliran Data CSV/Excel;
+  :Mengirim File Download CSV ke Browser;
+  |Pemilik|
+  :Menerima Unduhan File Excel;
+  stop
+else (Cetak PDF / Print)
+  |Pemilik|
+  :Klik Tombol "Surat Cetak" (Print Laporan);
+  |Sistem|
+  :Memicu Aksi window.print() Peramban;
+  note right: CSS @media print memformat layout laporan\nserta menyembunyikan elemen navigasi
+  |Pemilik|
+  :Menyimpan Laporan sebagai PDF Lokal / Mencetak Kertas;
+  stop
+endif
+@enduml

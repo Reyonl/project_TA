@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mockup - 10 Laporan Owner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
+        body { font-family: 'Patrick Hand', 'Comic Sans MS', cursive; background-color: #e5e5e5; color: #000; display: flex; justify-content: center; padding: 40px; }
+        .wf-container { width: 1024px; min-height: 768px; background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; display: flex; flex-direction: column; }
+        .wf-border { border: 2px solid #000; }
+        .wf-border-b { border-bottom: 2px solid #000; }
+        .wf-border-r { border-right: 2px solid #000; }
+        .wf-btn { border: 2px solid #000; padding: 4px 12px; background: #fff; border-radius: 4px; font-weight: bold; cursor: pointer; box-shadow: 2px 2px 0 #000; }
+        .icon-placeholder { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: 2px solid #000; border-radius: 50%; font-size: 10px; }
+        .browser-header { border-bottom: 2px solid #000; padding: 8px 16px; display: flex; align-items: center; gap: 8px; background: #fff; }
+        .browser-dot { width: 12px; height: 12px; border: 2px solid #000; border-radius: 50%; }
+        .browser-address { border: 2px solid #000; flex-grow: 1; padding: 2px 8px; font-size: 14px; border-radius: 12px; display: flex; align-items: center; gap: 8px; margin-left: 16px; }
+        .wf-input { border: 2px solid #000; padding: 4px 8px; outline: none; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="wf-container">
+        <!-- Browser UI -->
+        <div class="browser-header">
+            <div class="flex gap-2"><div class="browser-dot"></div><div class="browser-dot"></div><div class="browser-dot"></div></div>
+            <div class="browser-address"><span>🔒</span> https://sistem-sablon.com/admin/reports</div>
+            <div class="browser-dot rounded-sm"></div>
+        </div>
+
+        <!-- Top Navbar -->
+        <div class="wf-border-b p-3 flex justify-between items-center px-8">
+            <div class="flex items-center gap-4">
+                <div class="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white text-sm font-bold">D</div>
+                <h1 class="text-lg font-bold uppercase tracking-widest">DAILY.CO</h1>
+            </div>
+            <div class="flex items-center gap-4 font-bold text-sm">
+                <span>🏠 Dashboard</span>
+                <span class="underline wf-border px-3 py-1 bg-white" style="box-shadow: 2px 2px 0 #000;">📊 Laporan</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="wf-border px-2 py-0.5 text-[10px] font-bold bg-gray-100 rounded">OWNER</span>
+                <span class="font-bold text-sm">Pemilik Toko ▾</span>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 p-8 bg-white">
+            <h1 class="text-3xl font-bold mb-2">Laporan Penjualan</h1>
+            <p class="text-gray-600 mb-6">Pantau rekapitulasi pendapatan dan transaksi sistem.</p>
+
+            <!-- Filter Section -->
+            <div class="wf-border p-4 rounded-lg bg-gray-50 mb-6">
+                <div class="font-bold text-sm mb-3">FILTER LAPORAN BULANAN</div>
+                <div class="flex gap-4 items-end justify-between">
+                    <div class="flex gap-4">
+                        <div class="w-36">
+                            <div class="text-xs font-bold mb-1">Status Pesanan</div>
+                            <select class="wf-input w-full bg-white text-sm"><option>Selesai</option></select>
+                        </div>
+                        <div class="w-28">
+                            <div class="text-xs font-bold mb-1">Tahun</div>
+                            <select class="wf-input w-full bg-white text-sm"><option>2026</option></select>
+                        </div>
+                        <div class="w-28">
+                            <div class="text-xs font-bold mb-1">Bulan Mulai</div>
+                            <select class="wf-input w-full bg-white text-sm"><option>April</option></select>
+                        </div>
+                        <div class="w-28">
+                            <div class="text-xs font-bold mb-1">Sampai Bulan</div>
+                            <select class="wf-input w-full bg-white text-sm"><option>Juni</option></select>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="wf-btn px-6 py-2 text-sm">Filter</button>
+                        <button class="wf-btn px-4 py-2 text-sm bg-black text-white">Download PDF</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Summary Cards -->
+            <div class="grid grid-cols-3 gap-4 mb-6">
+                <div class="wf-border p-4 rounded-lg bg-white text-center">
+                    <div class="text-sm text-gray-600 font-bold mb-1">Total Transaksi</div>
+                    <div class="text-3xl font-bold">15</div>
+                </div>
+                <div class="wf-border p-4 rounded-lg bg-white text-center">
+                    <div class="text-sm text-gray-600 font-bold mb-1">Total Pendapatan</div>
+                    <div class="text-3xl font-bold">Rp 4.250.000</div>
+                </div>
+                <div class="wf-border p-4 rounded-lg bg-white text-center">
+                    <div class="text-sm text-gray-600 font-bold mb-1">Rata-rata per Order</div>
+                    <div class="text-3xl font-bold">Rp 283.333</div>
+                </div>
+            </div>
+
+            <!-- Report Table -->
+            <div class="wf-border rounded-lg overflow-hidden">
+                <div class="wf-border-b bg-gray-50 p-3 font-bold flex justify-between items-center">
+                    <span>LAPORAN: APRIL 2026</span>
+                    <span class="text-sm font-normal text-gray-500">Ditemukan 3 transaksi berhasil</span>
+                </div>
+                <table class="w-full text-left">
+                    <thead class="wf-border-b">
+                        <tr>
+                            <th class="p-3 wf-border-r">ID Order</th>
+                            <th class="p-3 wf-border-r">Pelanggan</th>
+                            <th class="p-3 wf-border-r">Tanggal</th>
+                            <th class="p-3 wf-border-r">Total</th>
+                            <th class="p-3">Status Bayar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="wf-border-b">
+                            <td class="p-3 wf-border-r font-bold">ORD-001</td>
+                            <td class="p-3 wf-border-r">Budi Santoso</td>
+                            <td class="p-3 wf-border-r text-sm">01 Apr 2026</td>
+                            <td class="p-3 wf-border-r font-bold">Rp 235.000</td>
+                            <td class="p-3"><span class="wf-border px-2 py-1 text-xs font-bold bg-gray-200 rounded">Lunas</span></td>
+                        </tr>
+                        <tr class="wf-border-b">
+                            <td class="p-3 wf-border-r font-bold">ORD-002</td>
+                            <td class="p-3 wf-border-r">Andi Wijaya</td>
+                            <td class="p-3 wf-border-r text-sm">05 Apr 2026</td>
+                            <td class="p-3 wf-border-r font-bold">Rp 120.000</td>
+                            <td class="p-3"><span class="wf-border px-2 py-1 text-xs font-bold bg-gray-200 rounded">Lunas</span></td>
+                        </tr>
+                        <tr class="wf-border-b">
+                            <td class="p-3 wf-border-r font-bold">ORD-003</td>
+                            <td class="p-3 wf-border-r">Siti Aminah</td>
+                            <td class="p-3 wf-border-r text-sm">12 Apr 2026</td>
+                            <td class="p-3 wf-border-r font-bold">Rp 350.000</td>
+                            <td class="p-3"><span class="wf-border px-2 py-1 text-xs font-bold bg-gray-200 rounded">Lunas</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

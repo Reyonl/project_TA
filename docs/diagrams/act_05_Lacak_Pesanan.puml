@@ -1,0 +1,42 @@
+@startuml act_05_Lacak_Pesanan
+skinparam Style strictuml
+skinparam ActivityFontName Times New Roman
+skinparam ActivityFontSize 12
+skinparam ActivityBorderColor Black
+skinparam ActivityBackgroundColor White
+skinparam ArrowColor Black
+skinparam ArrowFontName Times New Roman
+skinparam ArrowFontSize 10
+skinparam SwimlaneBorderColor Black
+skinparam SwimlaneTitleFontName Times New Roman
+skinparam SwimlaneTitleFontSize 14
+skinparam SwimlaneTitleFontStyle bold
+
+|Pelanggan|
+start
+:Membuka Menu Riwayat Pesanan;
+
+|Sistem|
+:Mengambil Seluruh Data Pesanan Milik Customer;
+:Menampilkan Daftar Pesanan & Status Umum;
+
+|Pelanggan|
+:Klik Tombol "Detail / Tracking" pada Pesanan Tertentu;
+
+|Sistem|
+:Memuat Detail Rincian Barang & Status Desain;
+:Menampilkan Timeline Status Pesanan\n(Pending -> Diproses -> Dikirim -> Selesai);
+if (Ada Desain Berstatus "Revisi"?) then (Ya)
+  :Menampilkan Alert Kotak Merah & Catatan Admin;
+  :Menampilkan Tombol "Perbaiki Sekarang";
+  |Pelanggan|
+  :Melihat Catatan Revisi & Bersiap Memperbaiki;
+  stop
+else (Tidak)
+  |Sistem|
+  :Menampilkan Keterangan Desain Siap Produksi;
+  |Pelanggan|
+  :Melihat Rincian Saja;
+  stop
+endif
+@enduml

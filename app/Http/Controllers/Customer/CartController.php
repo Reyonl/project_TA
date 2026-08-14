@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Customer;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Cart;
+use App\Models\Produk;
 use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
@@ -20,6 +21,30 @@ class CartController extends Controller
                     ->latest()
                     ->get();
         return view('customer.cart.index', compact('carts'));
+    }
+
+    /**
+     * Store a ready-made product directly to cart.
+     */
+    public function storeDirect(Request $request, Produk $produk)
+    {
+        $request->validate([
+            'quantity' => 'required|integer|min:1',
+            // color and size can be stored in a JSON column or note in the future if needed, 
+            // but currently the Cart/OrderDetails table doesn't have size/color directly (it's in Desain).
+            // For now, we will just add the product. If size is critical, we might need a migration for carts.
+        ]);
+
+        $id_customer = Auth::guard('customer')->id();
+
+        Cart::create([
+            'id_customer' => $id_customer,
+            'id_produk' => $produk->id_produk,
+            'id_desain' => null, // No custom design for ready-made
+            'quantity' => $request->quantity,
+        ]);
+
+        return redirect()->route('customer.cart.index')->with('success', 'Produk berhasil ditambahkan ke keranjang.');
     }
 
     /**

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mockup - 05 Checkout</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
+        body { font-family: 'Patrick Hand', 'Comic Sans MS', cursive; background-color: #e5e5e5; color: #000; display: flex; justify-content: center; padding: 40px; }
+        .wf-container { width: 1024px; min-height: 768px; background: #fff; border: 2px solid #000; box-shadow: 4px 4px 0 #000; display: flex; flex-direction: column; }
+        .wf-border { border: 2px solid #000; }
+        .wf-border-b { border-bottom: 2px solid #000; }
+        .wf-border-r { border-right: 2px solid #000; }
+        .wf-input { border: 2px solid #000; padding: 8px 12px; background: #fff; border-radius: 4px; outline: none; width: 100%; }
+        .wf-btn { border: 2px solid #000; padding: 6px 16px; background: #fff; border-radius: 4px; font-weight: bold; cursor: pointer; box-shadow: 2px 2px 0 #000; }
+        .icon-placeholder { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 2px solid #000; border-radius: 50%; font-size: 10px; }
+        .img-placeholder { border: 2px solid #000; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; background: #fff; }
+        .img-placeholder::before, .img-placeholder::after { content: ''; position: absolute; background: #000; }
+        .img-placeholder::before { width: 150%; height: 2px; transform: rotate(45deg); }
+        .img-placeholder::after { width: 150%; height: 2px; transform: rotate(-45deg); }
+        .browser-header { border-bottom: 2px solid #000; padding: 8px 16px; display: flex; align-items: center; gap: 8px; background: #fff; }
+        .browser-dot { width: 12px; height: 12px; border: 2px solid #000; border-radius: 50%; }
+        .browser-address { border: 2px solid #000; flex-grow: 1; padding: 2px 8px; font-size: 14px; border-radius: 12px; display: flex; align-items: center; gap: 8px; margin-left: 16px; }
+    </style>
+</head>
+<body>
+    <div class="wf-container">
+        <!-- Browser UI -->
+        <div class="browser-header">
+            <div class="flex gap-2"><div class="browser-dot"></div><div class="browser-dot"></div><div class="browser-dot"></div></div>
+            <div class="browser-address"><span>🔒</span> https://sistem-sablon.com/customer/checkout</div>
+            <div class="browser-dot rounded-sm"></div>
+        </div>
+
+        <div class="wf-border-b p-4 flex justify-between items-center px-8">
+            <div class="flex items-center gap-3">
+                <div class="relative border-2 border-black bg-white" style="width: 60px; height: 30px;">
+                    <svg class="absolute inset-0 w-full h-full text-gray-300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                        <line x1="0" y1="0" x2="100%" y2="100%" stroke="currentColor" stroke-width="1" />
+                        <line x1="100%" y1="0" x2="0" y2="100%" stroke="currentColor" stroke-width="1" />
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center font-bold text-xs z-10">
+                        <span class="bg-white px-1">Logo</span>
+                    </div>
+                </div>
+                <h1 class="text-2xl font-bold uppercase tracking-widest">SISTEM SABLON - CHECKOUT</h1>
+            </div>
+            <a href="#" class="font-bold underline">Batal & Kembali ke Keranjang</a>
+        </div>
+
+        <div class="flex-1 p-8">
+            <div class="flex gap-8">
+                <!-- Sisi Kiri: Daftar Keranjang & Upload Bukti Pembayaran -->
+                <div class="flex-1 flex flex-col gap-6">
+                    
+                    <!-- Item yang Dibeli -->
+                    <div class="wf-border p-6 rounded-lg bg-white">
+                        <h3 class="font-bold text-xl mb-4 wf-border-b pb-4">Item yang Dibeli</h3>
+                        <div class="flex flex-col gap-4">
+                            <div class="flex items-center gap-4 p-4 wf-border rounded-lg bg-gray-50">
+                                <div class="w-16 h-16 rounded flex-shrink-0 bg-slate-100 border-2 border-black flex items-center justify-center overflow-hidden">
+                                    <div class="img-placeholder w-full h-full text-[10px] font-bold text-gray-400 flex items-center justify-center z-0">[Gambar Kaos]</div>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold">Kaos Lengan Pendek</h4>
+                                    <p class="text-xs text-gray-500">Tipe: Kustom | Warna: <span class="inline-block w-3 h-3 rounded-full border border-black bg-white translate-y-0.5 ml-1"></span></p>
+                                    <p class="text-sm font-bold mt-1">Rp 65.000 <span class="text-xs font-normal">x 1</span></p>
+                                </div>
+                                <div class="text-right font-bold">
+                                    Rp 65.000
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4 p-4 wf-border rounded-lg bg-gray-50">
+                                <div class="w-16 h-16 rounded flex-shrink-0 bg-slate-100 border-2 border-black flex items-center justify-center overflow-hidden">
+                                    <div class="img-placeholder w-full h-full text-[10px] font-bold text-gray-400 flex items-center justify-center z-0">[Gambar Hoodie]</div>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold">Hoodie Jumper</h4>
+                                    <p class="text-xs text-gray-500">Tipe: Kustom</p>
+                                    <p class="text-sm font-bold mt-1">Rp 170.000 <span class="text-xs font-normal">x 1</span></p>
+                                </div>
+                                <div class="text-right font-bold">
+                                    Rp 170.000
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Metode Pembayaran -->
+                    <div class="wf-border p-6 rounded-lg bg-white">
+                        <h3 class="font-bold text-xl mb-4 wf-border-b pb-4">Metode Pembayaran (Transfer Bank)</h3>
+                        <div class="wf-border p-4 bg-gray-50 flex items-start gap-4 rounded-lg mb-6">
+                            <div class="w-12 h-12 bg-white wf-border rounded-lg flex items-center justify-center font-bold">BCA</div>
+                            <div>
+                                <p class="text-sm mb-1">Silakan transfer sesuai total tagihan ke rekening berikut:</p>
+                                <div class="flex items-center gap-3">
+                                    <p class="text-lg font-bold">8273 1234 5678</p>
+                                    <button class="text-xs font-bold bg-white px-2 py-1 rounded wf-border">Salin</button>
+                                </div>
+                                <p class="text-sm font-bold mt-1">A.N: CustomSablon Nusantara</p>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="font-bold block mb-2">Upload Bukti Transfer *</label>
+                            <div class="wf-border border-dashed p-8 text-center bg-gray-50 rounded-lg cursor-pointer">
+                                <span class="font-bold text-gray-500">+ Klik untuk upload atau drag and drop (PNG/JPG)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sisi Kanan: Konfirmasi Total -->
+                <div class="w-80">
+                    <div class="wf-border p-6 rounded-lg bg-gray-900 text-white sticky top-8">
+                        <h3 class="font-bold text-xl mb-6 flex items-center gap-2">
+                            Konfirmasi Total
+                        </h3>
+                        
+                        <div class="flex justify-between mb-2 text-sm">
+                            <span>Total Item</span>
+                            <span class="font-bold">2 Produk</span>
+                        </div>
+                        <div class="flex justify-between mb-2 text-sm">
+                            <span>Subtotal Harga</span>
+                            <span class="font-bold">Rp 235.000</span>
+                        </div>
+                        <div class="flex justify-between mb-6 text-sm">
+                            <span>Biaya Layanan</span>
+                            <span class="font-bold text-xs py-0.5 px-2 bg-gray-700 rounded">Gratis</span>
+                        </div>
+                        
+                        <div class="wf-border-t border-gray-600 pt-4 mb-6">
+                            <div class="flex justify-between items-center text-lg">
+                                <span class="font-bold">Total Pembayaran</span>
+                                <span class="font-bold text-xl">Rp 235.000</span>
+                            </div>
+                        </div>
+                        
+                        <button class="wf-btn w-full text-lg py-3 text-black bg-white">Kirim & Konfirmasi Pembayaran</button>
+                        <p class="text-xs text-center text-gray-400 mt-4">Pesanan akan diproses maksimal 1x24 jam setelah bukti pembayaran valid.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
