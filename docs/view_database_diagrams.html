@@ -1,0 +1,92 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview ERD, LRS & Class Diagram (Revisi Skripsi) - DAILY.CO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background-color: #f3f4f6;
+            color: #000000;
+        }
+        .page {
+            width: 21cm;
+            min-height: 29.7cm;
+            padding: 2.5cm;
+            margin: 2rem auto;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-radius: 2px;
+        }
+        .diagram-container {
+            border: 1px solid #d1d5db;
+            padding: 1rem;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        .caption {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14px;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .title-sub {
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 1rem;
+            margin-bottom: 0.75rem;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .description-text {
+            font-size: 14px;
+            text-align: justify;
+            line-height: 1.5;
+            text-indent: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body class="p-6">
+
+    <!-- PETUNJUK PENGGUNA -->
+    <div class="max-w-4xl mx-auto mb-8 bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-lg shadow-sm">
+        <h2 class="font-bold text-blue-900 text-lg mb-1 font-sans">Diagram Struktur Data Baru (LRS & Class Diagram):</h2>
+        <p class="text-sm text-blue-800 font-sans leading-relaxed">
+            Diagram di bawah telah disinkronkan dengan skema database aktual (penambahan <code>payment_status</code>, <code>role</code>, <code>parent_id</code>, <code>canvas_*</code>, <code>tipe_produk</code>, dan penghapusan kolom yang tidak digunakan).
+            <br>Gunakan shortcut <strong>Win + Shift + S</strong> untuk menyalin gambar diagram ke dokumen skripsi Word Anda.
+        </p>
+    </div>
+
+    <!-- LRS -->
+    <div class="page">
+        <div class="title-sub">3.3.3 Logical Record Structure (LRS)</div>
+        <div class="diagram-container">
+            <img src="diagrams/lrs_diagram.png" alt="Logical Record Structure (LRS)" class="max-w-full h-auto">
+        </div>
+        <div class="caption">Gambar 3. 5 Logical Record Structure</div>
+        <p class="description-text">
+            Gambar 3.5 Logical Record Structure (LRS) menggambarkan struktur relasional data yang menghubungkan seluruh tabel utama dalam sistem informasi sablon baju DAILY.CO. Hubungan antara tabel <em>Customer</em> dengan <em>Order</em>, <em>Cart</em>, dan <em>Desain</em> menerapkan relasi satu-ke-banyak (<em>one-to-many</em>). Pada tabel <em>Desain</em> terdapat atribut khusus <em>parent_id</em> yang berelasi kembali ke tabel <em>Desain</em> itu sendiri (<em>recursive relationship</em>) untuk mendukung riwayat versi desain hasil revisi. Selain itu, tabel <em>Order</em> kini dilengkapi kolom <em>payment_status</em> yang terpisah dari <em>status_order</em> guna menjamin akurasi pelacakan status pembayaran transaksi.
+        </p>
+    </div>
+
+    <!-- CLASS DIAGRAM -->
+    <div class="page">
+        <div class="title-sub">3.4.4 Class Diagram</div>
+        <div class="diagram-container">
+            <img src="diagrams/class_diagram.png" alt="Class Diagram" class="max-w-full h-auto">
+        </div>
+        <div class="caption">Gambar 3. 29 Class Diagram</div>
+        <p class="description-text">
+            Gambar 3.29 Class Diagram menggambarkan struktur statis sistem berorientasi objek yang memetakan kelas-kelas utama (<em>Customer, Admin, Produk, Template, Desain, Cart, Order, dan OrderDetail</em>) beserta atribut dan metode (operasi) yang dimiliki. Diagram ini memodelkan relasi asosiasi, agregasi, dan dependensi antar entitas model dalam arsitektur MVC Laravel, sehingga memudahkan pemetaan logika backend ke dalam basis data relasional.
+        </p>
+    </div>
+
+</body>
+</html>
