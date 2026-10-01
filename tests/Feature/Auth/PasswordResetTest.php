@@ -2,72 +2,105 @@
 
 namespace Tests\Feature\Auth;
 
-use App\Models\User;
-use Illuminate\Auth\Notifications\ResetPassword;
+use App\Models\Admin;
+use App\Models\Customer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
+/**
+ * Password reset of the CURRENT custom flow (PasswordResetLinkController::store):
+ * identity is verified by the last 3 digits of the registered phone number and
+ * the password is updated immediately — no token/notification round-trip.
+ * Admin accounts are intentionally refused self-service reset.
+ */
 class PasswordResetTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_reset_password_link_screen_can_be_rendered(): void
+    private function makeCustomer(): Customer
+    {
+        return Customer::create([
+            'nama_customer' => 'Reset Customer',
+            'email' => 'reset@test.com',
+            'password' => Hash::make('old-password'),
+            'no_hp' => '08123456789', // last 3 digits: 789
+            'alamat' => 'Test Address',
+        ]);
+    }
+
+    public function test_reset_screen_can_be_rendered(): void
     {
         $response = $this->get('/forgot-password');
 
         $response->assertStatus(200);
     }
 
-    public function test_reset_password_link_can_be_requested(): void
+    public function test_unknown_email_is_rejected(): void
     {
-        Notification::fake();
+        $response = $this->post('/forgot-password', [
+            'email' => 'nobody@test.com',
+            'phone_last_3' => '789',
+            'password' => 'new-password',
+            'password_confirmation' => 'new-password',
+        ]);
 
-        $user = User::factory()->create();
-
-        $this->post('/forgot-password', ['email' => $user->email]);
-
-        Notification::assertSentTo($user, ResetPassword::class);
+        $response->assertSessionHasErrors('email');
     }
 
-    public function test_reset_password_screen_can_be_rendered(): void
+    public function test_admin_email_cannot_self_reset(): void
     {
-        Notification::fake();
+        Admin::create([
+            'nama_admin' => 'Admin',
+            'email' => 'admin@test.com',
+            'password' => Hash::make('secret'),
+            'role' => 'admin',
+        ]);
 
-        $user = User::factory()->create();
+        $response = $this->post('/forgot-password', [
+            'email' => 'admin@test.com',
+            'phone_last_3' => '789',
+            'password' => 'new-password',
+            'password_confirmation' => 'new-password',
+        ]);
 
-        $this->post('/forgot-password', ['email' => $user->email]);
-
-        Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
-            $response = $this->get('/reset-password/'.$notification->token);
-
-            $response->assertStatus(200);
-
-            return true;
-        });
+        $response->assertSessionHasErrors('email');
     }
 
-    public function test_password_can_be_reset_with_valid_token(): void
+    public function test_wrong_phone_digits_do_not_reset_password(): void
     {
-        Notification::fake();
+        $customer = $this->makeCustomer();
 
-        $user = User::factory()->create();
+        $response = $this->post('/forgot-password', [
+            'email' => $customer->email,
+            'phone_last_3' => '000',
+            'password' => 'new-password',
+            'password_confirmation' => 'new-password',
+        ]);
 
-        $this->post('/forgot-password', ['email' => $user->email]);
+        $response->assertSessionHasErrors('phone_last_3');
+        $this->assertTrue(Hash::check('old-password', $customer->fresh()->password));
+    }
 
-        Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
-            $response = $this->post('/reset-password', [
-                'token' => $notification->token,
-                'email' => $user->email,
-                'password' => 'password',
-                'password_confirmation' => 'password',
-            ]);
+    public function test_customer_can_reset_with_correct_phone_digits(): void
+    {
+        $customer = $this->makeCustomer();
 
-            $response
-                ->assertSessionHasNoErrors()
-                ->assertRedirect(route('login'));
+        $response = $this->post('/forgot-password', [
+            'email' => $customer->email,
+            'phone_last_3' => '789',
+            'password' => 'brand-new-password',
+            'password_confirmation' => 'brand-new-password',
+        ]);
 
-            return true;
-        });
+        $response->assertRedirect(route('login'));
+        $this->assertTrue(Hash::check('brand-new-password', $customer->fresh()->password));
+
+        // And the new password actually authenticates on the customer guard.
+        $login = $this->post('/login', [
+            'email' => $customer->email,
+            'password' => 'brand-new-password',
+        ]);
+        $login->assertRedirect(route('customer.dashboard', absolute: false));
     }
 }
