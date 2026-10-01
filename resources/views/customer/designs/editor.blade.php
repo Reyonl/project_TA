@@ -94,19 +94,34 @@
                         <!-- Quick Color Picker Dropdown -->
                         <div class="relative" x-data="{ open: false }">
                             <button @click="open = !open" @click.outside="open = false" type="button" class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition text-xs font-medium text-slate-700 shadow-xs" title="Ubah Warna Dasar Baju">
-                                <span class="w-3.5 h-3.5 rounded-full border border-slate-300 shadow-xs" :style="{ backgroundColor: baseColor }"></span>
+                                <span class="w-3.5 h-3.5 rounded-full border border-slate-300 shadow-xs flex-shrink-0" :style="{ backgroundColor: baseColor }"></span>
                                 <span class="hidden sm:inline" x-text="getColorName(baseColor)"></span>
                                 <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
-                            <div x-show="open" x-transition.origin.top.right class="absolute right-0 mt-2 p-3 bg-white border border-slate-200 rounded-xl shadow-lg z-50 w-60" style="display: none;">
-                                <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Warna Baju</p>
-                                <div class="grid grid-cols-4 gap-2">
+                            <div x-show="open" 
+                                 x-transition:enter="transition ease-out duration-150"
+                                 x-transition:enter-start="opacity-0 translate-y-1"
+                                 x-transition:enter-end="opacity-100 translate-y-0"
+                                 x-transition:leave="transition ease-in duration-100"
+                                 x-transition:leave-start="opacity-100 translate-y-0"
+                                 x-transition:leave-end="opacity-0 translate-y-1"
+                                 class="absolute right-0 mt-2 p-3 bg-white border border-slate-200 rounded-xl shadow-xl z-50"
+                                 style="width: 250px; min-width: 250px; right: 0; left: auto; display: none;">
+                                <div class="flex items-center justify-between mb-2.5 pb-2 border-b border-slate-100">
+                                    <span class="text-[11px] font-semibold text-slate-700">Warna Baju</span>
+                                    <span class="text-[10px] text-slate-400 font-medium" x-text="getColorName(baseColor)"></span>
+                                </div>
+                                <div class="grid grid-cols-4 gap-2" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
                                     <template x-for="(hex, name) in colorMap" :key="name">
-                                        <button @click="changeColor(hex); open = false" class="group flex flex-col items-center gap-1 p-1 rounded-md hover:bg-slate-50 transition" :title="name">
-                                            <div class="w-6 h-6 rounded-full border border-slate-300 transition-all shadow-xs"
+                                        <button type="button" @click="changeColor(hex); open = false" class="group flex flex-col items-center gap-1 p-1 rounded-lg hover:bg-slate-50 transition" :title="name">
+                                            <div class="w-7 h-7 rounded-full border border-slate-300 transition-all shadow-xs flex items-center justify-center flex-shrink-0"
                                                  :style="{ backgroundColor: hex }"
-                                                 :class="baseColor === hex ? 'ring-2 ring-slate-900 ring-offset-1 scale-105' : 'group-hover:scale-105'"></div>
-                                            <span class="text-[8px] font-medium text-slate-500 truncate w-full text-center" x-text="name"></span>
+                                                 :class="baseColor === hex ? 'ring-2 ring-slate-900 ring-offset-1 scale-105' : 'group-hover:scale-105'">
+                                                <svg x-show="baseColor === hex" class="w-3.5 h-3.5" :class="hex === '#ffffff' || hex === '#a7f3d0' || hex === '#facc15' ? 'text-slate-900' : 'text-white'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                                                </svg>
+                                            </div>
+                                            <span class="text-[9px] font-medium text-slate-600 truncate w-full text-center block" x-text="name"></span>
                                         </button>
                                     </template>
                                 </div>
