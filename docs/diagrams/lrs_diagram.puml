@@ -1,0 +1,118 @@
+﻿@startuml lrs_diagram
+hide empty members
+skinparam backgroundColor white
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 11
+
+entity "Admin" as Admin {
+  * id_admin (PK)
+  --
+  nama_admin
+  email
+  password
+  role
+}
+
+entity "Customer" as Customer {
+  * id_customer (PK)
+  --
+  nama_customer
+  email
+  password
+  no_hp
+  alamat
+}
+
+entity "Template" as Template {
+  * id_template (PK)
+  --
+  id_admin (FK)
+  nama_template
+  file_template
+}
+
+entity "Produk" as Produk {
+  * id_produk (PK)
+  --
+  nama_produk
+  jenis_produk
+  tipe_produk
+  harga_dasar
+  deskripsi
+  gambar_produk
+}
+
+entity "Desain" as Desain {
+  * id_desain (PK)
+  --
+  parent_id (FK, null)
+  id_customer (FK)
+  id_template (FK, null)
+  file_desain
+  file_desain_belakang
+  file_desain_kiri
+  file_desain_kanan
+  warna_baju
+  canvas_front
+  canvas_back
+  canvas_left
+  canvas_right
+  harga_desain
+  raw_assets
+  detail_sablon
+}
+
+entity "Cart" as Cart {
+  * id_cart (PK)
+  --
+  id_customer (FK)
+  id_produk (FK)
+  id_desain (FK, null)
+  quantity
+}
+
+entity "Order" as Order {
+  * id_order (PK)
+  --
+  id_customer (FK)
+  tanggal_order
+  status_order
+  payment_status
+  total_harga
+  bukti_pembayaran
+}
+
+entity "Order_detail" as OrderDetail {
+  * id_order_detail (PK)
+  --
+  id_order (FK)
+  id_produk (FK)
+  id_desain (FK, null)
+  quantity
+  harga_produk
+  harga_desain
+  subtotal
+  status_desain
+  catatan_admin
+}
+
+Admin ||--o{ Template : "mengunggah"
+Admin ||--o{ Produk : "mengelola"
+
+Customer ||--o{ Desain : "membuat"
+Customer ||--o{ Cart : "memiliki"
+Customer ||--o{ Order : "melakukan"
+
+Template ||--o{ Desain : "mendasari"
+Desain ||--o{ Desain : "versi_revisi (parent_id)"
+
+Produk ||--o{ Cart : "diisi"
+Desain ||--o{ Cart : "dimuat"
+
+Order ||--|{ OrderDetail : "memuat"
+Produk ||--o{ OrderDetail : "merinci"
+Desain ||--o{ OrderDetail : "merinci"
+
+@enduml

@@ -79,7 +79,9 @@ class OrderFlowTest extends TestCase
         // 4. Assert Order Created
         $order = Order::where('id_customer', $customer->id_customer)->first();
         $this->assertNotNull($order);
-        $this->assertEquals('pending', $order->status_order);
+        // Current application sets new orders to 'reviewing' (CheckoutController).
+        // The old Breeze-era expectation 'pending' no longer exists in the state machine.
+        $this->assertEquals('reviewing', $order->status_order);
         
         $totalHarga = ($produk->harga_dasar + 35000) * 1;
         $this->assertEquals($totalHarga, $order->total_harga);

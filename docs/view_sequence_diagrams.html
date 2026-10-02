@@ -1,0 +1,200 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview Sequence Diagram (Revisi Skripsi) - DAILY.CO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background-color: #f3f4f6;
+            color: #000000;
+        }
+        .page {
+            width: 21cm;
+            min-height: 29.7cm;
+            padding: 2.5cm;
+            margin: 2rem auto;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-radius: 2px;
+        }
+        .diagram-container {
+            border: 1px solid #d1d5db;
+            padding: 1.5rem;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        .caption {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14px;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .title-sub {
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 1rem;
+            margin-bottom: 0.75rem;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .description-text {
+            font-size: 14px;
+            text-align: justify;
+            line-height: 1.5;
+            text-indent: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body class="p-6">
+
+    <!-- PETUNJUK PENGGUNA -->
+    <div class="max-w-4xl mx-auto mb-8 bg-emerald-50 border-l-4 border-emerald-600 p-4 rounded-r-lg shadow-sm">
+        <h2 class="font-bold text-emerald-900 text-lg mb-1 font-sans">Dokumentasi Mockup Sequence Diagram (Hasil Revisi & Sinkronisasi):</h2>
+        <p class="text-sm text-emerald-800 font-sans leading-relaxed">
+            Seluruh diagram di bawah telah digenerate ulang dan disesuaikan 100% dengan kode program sistem aktual (Alur Checkout 2-Fase, Multi-guard Auth, Fabric.js state, dan Ekspor CSV/Cetak Laporan).
+            <br>Gunakan shortcut <strong>Win + Shift + S</strong> untuk menyalin gambar diagram langsung ke naskah skripsi Word Anda.
+        </p>
+    </div>
+
+    <!-- 1. REGISTRASI -->
+    <div class="page">
+        <div class="title-sub">3.4.3.1 Sequence Diagram Registrasi Akun</div>
+        <div class="diagram-container">
+            <img src="diagrams/01_Registrasi_Akun.png" alt="Sequence Diagram Registrasi Akun" class="max-w-full h-auto">
+        </div>
+        <div class="caption">Gambar 3. 18 Sequence Diagram Registrasi Akun</div>
+        <p class="description-text">
+            Gambar 3.18 sequence diagram menggambarkan alur interaksi antara pelanggan dengan sistem dalam proses pendaftaran akun baru. Alur dimulai ketika pelanggan membuka formulir registrasi dan mengisi data diri seperti nama, email, nomor telepon/WhatsApp, alamat lengkap, dan kata sandi. Kontroler kemudian memvalidasi isian formulir. Apabila data tidak valid, sistem mengembalikan pesan kesalahan. Jika valid, sistem menyimpan rekaman data ke tabel <em>customers</em>, melakukan autentikasi otomatis (<em>auto-login</em>), dan mengarahkan pelanggan langsung ke halaman katalog produk utama.
+        </p>
+    </div>
+
+    <!-- 2. LOGIN -->
+    <div class="page">
+        <div class="title-sub">3.4.3.2 Sequence Diagram Login</div>
+        <div class="diagram-container">
+            <img src="diagrams/06_Login.png" alt="Sequence Diagram Login" class="max-w-full h-auto">
+        </div>
+        <div class="caption">Gambar 3. 19 Sequence Diagram Login</div>
+        <p class="description-text">
+            Gambar 3.19 sequence diagram menggambarkan alur autentikasi seluruh aktor (Pelanggan, Admin, dan Owner). Pengguna memasukkan alamat email serta kata sandi terdaftar. Kontroler otentikasi memeriksa kecocokan kredensial pada basis data multi-guard. Apabila kredensial tidak cocok, sistem menampilkan pesan peringatan gagal. Jika valid, sistem membuat sesi login aktif dan mendistribusikan pengguna ke halaman dasbor yang sesuai dengan hak akses (<em>role</em>) masing-masing.
+        </p>
+    </div>
+
+    <!-- 3. MEMBUAT DESAIN -->
+    <div class="page">
+        <div class="title-sub">3.4.3.3 Sequence Diagram Membuat Desain</div>
+        <div class="diagram-container">
+            <img src="diagrams/02_Membuat_Desain.png" alt="Sequence Diagram Membuat Desain" class="max-w-full h-auto">
+        </div>
+        <div class="caption">Gambar 3. 20 Sequence Diagram Membuat Desain</div>
+        <p class="description-text">
+            Gambar 3.20 sequence diagram menggambarkan alur perancangan sablon kustom pada editor kanvas interaktif. Pelanggan memilih produk pakaian, mengatur warna dasar, serta menambahkan teks, gambar, atau stiker pada tiap sisi (Depan, Belakang, Lengan Kiri, Lengan Kanan). Saat pelanggan menekan tombol simpan, data kanvas dikonversi menjadi berkas gambar Base64 dan objek status JSON (<em>canvas_front, canvas_back, dll.</em>). Berkas gambar disimpan ke penyimpanan (<em>storage</em>), sedangkan data desain dan relasi keranjang belanja dicatat ke basis data.
+        </p>
+    </div>
+
+    <!-- 4. KELOLA KERANJANG -->
+    <div class="page">
+        <div class="title-sub">3.4.3.4 Sequence Diagram Kelola Keranjang</div>
+        <div class="diagram-container">
+            <img src="diagrams/03_Kelola_Keranjang.png" alt="Sequence Diagram Kelola Keranjang" class="max-w-full h-auto">
+        </div>
+        <div class="caption">Gambar 3. 21 Sequence Diagram Kelola Keranjang</div>
+        <p class="description-text">
+            Gambar 3.21 sequence diagram menggambarkan alur pengelolaan item pada keranjang belanja pelanggan. Pelanggan dapat melihat rincian produk dan desain yang telah disimpan. Pada halaman ini, pelanggan dapat memodifikasi kuantitas belanja, menghapus item tertentu yang tidak jadi dipesan, atau mencentang item terpilih untuk diteruskan ke tahap <em>checkout</em> pemesanan.
+        </p>
+    </div>
+
+    <!-- 5. CHECKOUT PESANAN (REVISI SINKRONISASI 2-FASE) -->
+    <div class="page">
+        <div class="title-sub">3.4.3.5 Sequence Diagram Checkout Pesanan</div>
+        <div class="diagram-container">
+            <img src="diagrams/04_Checkout_Pesanan.png" alt="Sequence Diagram Checkout Pesanan" class="max-w-full h-auto">
+        </div>
+        <div class="caption">Gambar 3. 22 Sequence Diagram Checkout Pesanan</div>
+        <p class="description-text">
+            Gambar 3.22 sequence diagram menggambarkan tahapan konfirmasi pembuatan pesanan resmi oleh pelanggan. Pelanggan meninjau rincian item belanjaan dan kalkulasi total biaya pada halaman <em>checkout</em>. Saat pelanggan menekan tombol "Buat Pesanan", sistem memulai transaksi basis data atomik untuk membuat rekaman pesanan baru dengan status awal <em>reviewing</em> (Menunggu Review Desain) dan status pembayaran <em>unpaid</em>, membuat rincian item pada tabel <em>order_details</em>, serta menghapus item terpilih dari keranjang belanja.
+        </p>
+    </div>
+
+    <!-- 6. LACAK PESANAN & UPLOAD PEMBAYARAN -->
+    <div class="page">
+        <div class="title-sub">3.4.3.6 Sequence Diagram Lacak Pesanan</div>
+        <div class="diagram-container">
+            <img src="diagrams/05_Lacak_Pesanan.png" alt="Sequence Diagram Lacak Pesanan" class="max-w-full h-auto">
+        </div>
+        <div class="caption">Gambar 3. 23 Sequence Diagram Lacak Pesanan</div>
+        <p class="description-text">
+            Gambar 3.23 sequence diagram menggambarkan alur pemantauan status siklus hidup transaksi oleh pelanggan. Pelanggan dapat melihat riwayat dan rincian pesanan. Ketika desain pesanan telah disetujui oleh admin (status pesanan menjadi <em>awaiting_payment</em>), pelanggan mengunggah berkas bukti transfer bank melalui form pada detail pesanan. Sistem memvalidasi berkas, menyimpannya ke direktori penyimpanan, dan memperbarui status pembayaran menjadi <em>awaiting_verification</em>.
+        </p>
+    </div>
+
+    <!-- 7. KELOLA PRODUK -->
+    <div class="page">
+        <div class="title-sub">3.4.3.7 Sequence Diagram Kelola Produk</div>
+        <div class="diagram-container">
+            <img src="diagrams/07_Kelola_Produk.png" alt="Sequence Diagram Kelola Produk" class="max-w-full h-auto">
+        </div>
+        <div class="caption">Gambar 3. 24 Sequence Diagram Kelola Produk</div>
+        <p class="description-text">
+            Gambar 3.24 sequence diagram menggambarkan alur pengelolaan data master produk oleh Administrator. Admin dapat melihat seluruh daftar pakaian mentahan dalam bentuk tabel. Admin memiliki wewenang untuk menambah produk baru lengkap dengan foto dan harga dasar, mengubah rincian produk yang sudah ada, ataupun menghapus produk dari katalog sistem.
+        </p>
+    </div>
+
+    <!-- 8. KELOLA TEMPLATE -->
+    <div class="page">
+        <div class="title-sub">3.4.3.8 Sequence Diagram Kelola Template</div>
+        <div class="diagram-container">
+            <img src="diagrams/08_Kelola_Template.png" alt="Sequence Diagram Kelola Template" class="max-w-full h-auto">
+        </div>
+        <div class="caption">Gambar 3. 25 Sequence Diagram Kelola Template</div>
+        <p class="description-text">
+            Gambar 3.25 sequence diagram menggambarkan alur pengelolaan aset template desain sablon oleh Administrator. Admin dapat menambahkan template baru dengan mengunggah berkas gambar yang kemudian disimpan ke penyimpanan sistem dan didaftarkan ke tabel <em>templates</em>. Admin juga dapat menghapus template yang tidak lagi digunakan, di mana sistem akan menghapus data di database beserta berkas fisik gambarnya secara permanen.
+        </p>
+    </div>
+
+    <!-- 9. REVIEW DESAIN & REVISI (REVISI STATUS & PARENT_ID) -->
+    <div class="page">
+        <div class="title-sub">3.4.3.9 Sequence Diagram Review Desain</div>
+        <div class="diagram-container">
+            <img src="diagrams/09_Review_Desain.png" alt="Sequence Diagram Review Desain" class="max-w-full h-auto">
+        </div>
+        <div class="caption">Gambar 3. 26 Sequence Diagram Review Desain</div>
+        <p class="description-text">
+            Gambar 3.26 sequence diagram menggambarkan alur kolaboratif antara Admin dan Pelanggan dalam evaluasi kelayakan desain sablon. Jika desain tidak memenuhi standar cetak, Admin memberikan catatan dan menetapkan status <em>revision_required</em>. Pelanggan membuka editor untuk memperbaiki desain yang disimpan sebagai versi baru (<em>parent_id</em>). Jika Admin menyetujui desain (<em>approved</em>) dan seluruh item dalam pesanan telah disetujui, sistem secara otomatis memindahkan status pesanan ke tahap siap bayar (<em>pending_payment</em>).
+        </p>
+    </div>
+
+    <!-- 10. KELOLA PESANAN & VERIFIKASI PEMBAYARAN -->
+    <div class="page">
+        <div class="title-sub">3.4.3.10 Sequence Diagram Kelola Pesanan</div>
+        <div class="diagram-container">
+            <img src="diagrams/10_Kelola_Pesanan.png" alt="Sequence Diagram Kelola Pesanan" class="max-w-full h-auto">
+        </div>
+        <div class="caption">Gambar 3. 27 Sequence Diagram Kelola Pesanan</div>
+        <p class="description-text">
+            Gambar 3.27 sequence diagram menggambarkan pengelolaan transaksi operasional oleh Administrator. Admin memeriksa keabsahan bukti transfer pembayaran yang diunggah pelanggan. Apabila pembayaran sah, status diperbarui menjadi <em>paid</em> dan pesanan diteruskan ke status produksi (<em>processing</em>). Jika bukti tidak valid, status ditolak (<em>failed</em>). Admin juga dapat memperbarui status pengerjaan hingga pesanan berstatus selesai (<em>completed</em>).
+        </p>
+    </div>
+
+    <!-- 11. LAPORAN PENJUALAN (EXCEL/CSV & SURAT CETAK) -->
+    <div class="page">
+        <div class="title-sub">3.4.3.11 Sequence Diagram Laporan</div>
+        <div class="diagram-container">
+            <img src="diagrams/11_Laporan.png" alt="Sequence Diagram Laporan" class="max-w-full h-auto">
+        </div>
+        <div class="caption">Gambar 3. 28 Sequence Diagram Laporan</div>
+        <p class="description-text">
+            Gambar 3.28 sequence diagram menggambarkan alur pemantauan kinerja bisnis oleh Pemilik (Owner). Owner dapat memfilter rentang tanggal untuk melihat visualisasi grafik omzet, ringkasan transaksi, serta daftar produk terlaris. Owner dapat mengekspor rekapitulasi data transaksi ke dalam format berkas spreadsheet CSV/Excel, ataupun mencetak surat laporan resmi fisik melalui fasilitas pratinjau cetak browser (<em>window.print</em>).
+        </p>
+    </div>
+
+</body>
+</html>

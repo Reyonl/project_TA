@@ -1,4 +1,6 @@
 <map id="10_Kelola_Pesanan_map" name="10_Kelola_Pesanan_map">
-<area shape="rect" id="id1" href="Bukti" title="Bukti" alt="" coords="15,269,42,283"/>
-<area shape="rect" id="id2" href="Bukti" title="Bukti" alt="" coords="86,131,146,144"/>
+<area shape="rect" id="id1" href="Verifikasi" title="Verifikasi" alt="" coords="84,235,208,249"/>
+<area shape="rect" id="id2" href="Bukti" title="Bukti" alt="" coords="435,286,589,300"/>
+<area shape="rect" id="id3" href="Pembaruan" title="Pembaruan" alt="" coords="15,546,180,560"/>
+<area shape="rect" id="id4" href="Bukti" title="Bukti" alt="" coords="366,412,545,426"/>
 </map>

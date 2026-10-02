@@ -1,5 +1,6 @@
 <map id="09_Review_Desain_map" name="09_Review_Desain_map">
-<area shape="rect" id="id1" href="Perlu" title="Perlu" alt="" coords="86,131,174,144"/>
-<area shape="rect" id="id2" href="Mengirim" title="Mengirim" alt="" coords="141,375,263,389"/>
-<area shape="rect" id="id3" href="Desain" title="Desain" alt="" coords="86,711,214,725"/>
+<area shape="rect" id="id1" href="Kondisi:" title="Kondisi:" alt="" coords="84,628,226,642"/>
+<area shape="rect" id="id2" href="Kondisi:" title="Kondisi:" alt="" coords="139,293,318,307"/>
+<area shape="rect" id="id3" href="Kondisi:" title="Kondisi:" alt="" coords="84,124,281,138"/>
+<area shape="rect" id="id4" href="Semua" title="Semua" alt="" coords="914,803,1162,817"/>
 </map>

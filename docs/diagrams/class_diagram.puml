@@ -1,0 +1,126 @@
+﻿@startuml class_diagram
+hide empty members
+skinparam backgroundColor white
+skinparam monochrome true
+skinparam shadowing false
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 11
+skinparam classAttributeIconSize 0
+
+class Customer {
+  +int id_customer
+  +string nama_customer
+  +string email
+  +string password
+  +string no_hp
+  +string alamat
+  +register()
+  +login()
+  +createDesign()
+  +manageCart()
+  +checkoutOrder()
+  +uploadPayment()
+}
+
+class Admin {
+  +int id_admin
+  +string nama_admin
+  +string email
+  +string password
+  +string role
+  +login()
+  +manageProduct()
+  +manageTemplate()
+  +reviewDesign()
+  +verifyPayment()
+  +updateOrderStatus()
+  +viewReport()
+}
+
+class Produk {
+  +int id_produk
+  +string nama_produk
+  +string jenis_produk
+  +string tipe_produk
+  +decimal harga_dasar
+  +text deskripsi
+  +string gambar_produk
+}
+
+class Template {
+  +int id_template
+  +int id_admin
+  +string nama_template
+  +string file_template
+}
+
+class Desain {
+  +int id_desain
+  +int parent_id
+  +int id_customer
+  +int id_template
+  +string file_desain
+  +string file_desain_belakang
+  +string file_desain_kiri
+  +string file_desain_kanan
+  +string warna_baju
+  +longText canvas_front
+  +longText canvas_back
+  +longText canvas_left
+  +longText canvas_right
+  +decimal harga_desain
+  +json raw_assets
+  +text detail_sablon
+}
+
+class Cart {
+  +int id_cart
+  +int id_customer
+  +int id_produk
+  +int id_desain
+  +int quantity
+  +updateQuantity()
+  +deleteItem()
+}
+
+class Order {
+  +int id_order
+  +int id_customer
+  +datetime tanggal_order
+  +enum status_order
+  +enum payment_status
+  +decimal total_harga
+  +string bukti_pembayaran
+}
+
+class OrderDetail {
+  +int id_order_detail
+  +int id_order
+  +int id_produk
+  +int id_desain
+  +int quantity
+  +decimal harga_produk
+  +decimal harga_desain
+  +decimal subtotal
+  +enum status_desain
+  +text catatan_admin
+}
+
+Customer "1" -- "0..*" Desain : membuat >
+Customer "1" -- "0..*" Cart : memiliki >
+Customer "1" -- "0..*" Order : melakukan >
+
+Admin "1" -- "0..*" Produk : mengelola >
+Admin "1" -- "0..*" Template : mengunggah >
+
+Template "0..1" -- "0..*" Desain : mendasari >
+Desain "0..1" -- "0..*" Desain : parent_id (revisi) >
+
+Produk "1" -- "0..*" Cart : diisi ke >
+Desain "0..1" -- "0..*" Cart : diterapkan di >
+
+Order "1" *-- "1..*" OrderDetail : terdiri dari >
+Produk "1" -- "0..*" OrderDetail : merinci >
+Desain "0..1" -- "0..*" OrderDetail : memuat >
+
+@enduml

@@ -192,6 +192,12 @@
                     <div class="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center text-slate-400 font-black font-outfit text-sm">D</div>
                     <span class="font-outfit font-black text-xl text-slate-600">DAILY.CO</span>
                  </div>
+                 <div class="flex items-center gap-2 text-sm text-slate-400">
+                    <span>Hubungi Kami:</span>
+                    <a href="https://wa.me/6281330492412" target="_blank" class="text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-1 transition">
+                        <span>💬 +62 813-3049-2412</span>
+                    </a>
+                 </div>
                  <p class="text-slate-600 text-sm font-medium">&copy; 2026 DAILY.CO. Redefining your style.</p>
             </div>
         </footer>
