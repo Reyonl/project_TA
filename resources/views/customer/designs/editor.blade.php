@@ -36,12 +36,14 @@
                  setTimeout(() => {
                      if(typeof window.setupMobileCanvasScaler === 'function') window.setupMobileCanvasScaler();
                      if(window.activeCanvas) window.activeCanvas.calcOffset();
+                     if(typeof window.runPrintAnalysis === 'function') window.runPrintAnalysis();
                  }, 80);
                  if(typeof window.saveLocalDraft === 'function') window.saveLocalDraft();
              },
              changeColor(hex) {
                  this.baseColor = hex;
                  if(typeof window.canvasBackgroundChange === 'function') window.canvasBackgroundChange(hex);
+                 if(typeof window.runPrintAnalysis === 'function') window.runPrintAnalysis();
                  if(typeof window.saveLocalDraft === 'function') window.saveLocalDraft();
              },
              updateDesignStatus() {
@@ -73,6 +75,7 @@
              const urlColor = new URLSearchParams(window.location.search).get('color');
              if(urlColor && colorMap[urlColor]) { baseColor = colorMap[urlColor]; }
              if(typeof window.canvasBackgroundChange === 'function') window.canvasBackgroundChange(baseColor);
+            setTimeout(() => { if(typeof window.runPrintAnalysis === 'function') window.runPrintAnalysis(); }, 300);
          })">
 
         {{-- ===== HEADER TOOLBAR ===== --}}

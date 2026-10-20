@@ -60,6 +60,12 @@
             <span class="text-[9px] font-medium tracking-tight hidden md:block">Layers</span>
         </button>
 
+        {{-- Icon 6: ANALISIS SABLON --}}
+        <button @click="activeTab = 'analysis'; sidebarOpen = true; if(typeof window.runPrintAnalysis === 'function') window.runPrintAnalysis();" :class="activeTab === 'analysis' && sidebarOpen ? 'text-indigo-600 bg-indigo-50 font-semibold' : 'text-slate-500 hover:text-indigo-600 hover:bg-indigo-50/50'" class="w-12 h-12 flex flex-col items-center justify-center rounded-lg transition" title="Analisis Warna & Keamanan Sablon">
+            <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+            <span class="text-[9px] font-medium tracking-tight hidden md:block">Analisis</span>
+        </button>
+
         <button id="mobileEditBtn" type="button" onclick="if(typeof toggleMobileProperties === 'function') toggleMobileProperties();" class="w-12 h-12 md:hidden flex flex-col items-center justify-center rounded-lg transition text-slate-500 hover:text-slate-900 hover:bg-slate-50 hidden">
             <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
         </button>
@@ -87,7 +93,7 @@
         </div>
 
         <div class="p-3.5 sm:p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-            <h3 class="font-semibold text-slate-800 text-xs tracking-wider uppercase" x-text="activeTab === 'upload' ? 'Upload Foto / Logo' : (activeTab === 'text' ? 'Tambahkan Teks' : (activeTab === 'stickers' ? 'Cari Stiker & Ikon' : (activeTab === 'templates' ? 'Template Desain' : 'Lapisan Desain')))"></h3>
+            <h3 class="font-semibold text-slate-800 text-xs tracking-wider uppercase" x-text="activeTab === 'upload' ? 'Upload Foto / Logo' : (activeTab === 'text' ? 'Tambahkan Teks' : (activeTab === 'stickers' ? 'Cari Stiker & Ikon' : (activeTab === 'templates' ? 'Template Desain' : (activeTab === 'layers' ? 'Lapisan Desain' : 'Analisis Sablon & Cetak'))))"></h3>
             <button @click="sidebarOpen = false" class="text-slate-400 hover:text-slate-600 hidden md:block">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
@@ -155,6 +161,71 @@
                 <p class="text-[11px] font-medium text-slate-400 mb-2">Daftar objek pada sisi aktif</p>
                 <div id="layersListContainer" class="flex-1 overflow-y-auto pb-4 custom-scrollbar">
                     <div class="text-center text-xs text-slate-400 py-4 italic">Belum ada objek.</div>
+                </div>
+            </div>
+
+            {{-- Tab: ANALISIS SABLON & KUALITAS CETAK --}}
+            <div x-show="activeTab === 'analysis'" style="display: none;" class="flex flex-col h-full bg-white space-y-4">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                    <p class="text-[11px] font-medium text-slate-400">Pemeriksaan kualitas & warna sablon</p>
+                    <button type="button" onclick="if(typeof window.runPrintAnalysis === 'function') window.runPrintAnalysis();" class="text-[10px] font-semibold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-2.5 py-1 rounded-md transition flex items-center gap-1 shadow-2xs">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        <span>Pindai Ulang</span>
+                    </button>
+                </div>
+
+                {{-- Status Alert Box (Kontras & Bleed) --}}
+                <div id="analysisAlertContainer" class="space-y-2">
+                    {{-- Dinamis via JS --}}
+                </div>
+
+                {{-- Spot Colors / Pisah Warna Box --}}
+                <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-bold text-slate-700 uppercase tracking-wider">Warna Sablon Terdeteksi</span>
+                        <span id="analysisColorCountBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">0 Warna</span>
+                    </div>
+                    <div id="analysisColorsSwatches" class="flex flex-wrap gap-1.5 min-h-[32px] items-center">
+                        <span class="text-xs text-slate-400 italic">Belum ada objek di canvas.</span>
+                    </div>
+                    <div id="analysisTechniqueRecommendation" class="text-[11px] text-slate-600 bg-white p-2.5 rounded-lg border border-slate-200">
+                        <span class="font-semibold text-slate-800 block mb-0.5">Rekomendasi Teknik:</span>
+                        <span id="analysisTechText" class="text-slate-500">Tambahkan objek untuk melihat rekomendasi teknik sablon.</span>
+                    </div>
+                </div>
+
+                {{-- Dimensi Fisik Cetak Terbesar Box --}}
+                <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-bold text-slate-700 uppercase tracking-wider">Dimensi Cetak Aktual</span>
+                        <span class="text-[10px] font-medium text-slate-400">Skala 1:1</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-center">
+                        <div class="bg-white p-2 rounded-lg border border-slate-200">
+                            <span class="text-[9px] text-slate-400 uppercase block font-medium">Lebar Sablon</span>
+                            <span id="analysisTotalWidth" class="text-xs font-bold text-slate-800">0.0 cm</span>
+                        </div>
+                        <div class="bg-white p-2 rounded-lg border border-slate-200">
+                            <span class="text-[9px] text-slate-400 uppercase block font-medium">Tinggi Sablon</span>
+                            <span id="analysisTotalHeight" class="text-xs font-bold text-slate-800">0.0 cm</span>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-slate-400 leading-relaxed italic">
+                        *Dihitung proporsional terhadap lebar fisik area sablon kaos (~28 cm).
+                    </p>
+                </div>
+
+                {{-- Panduan Vendor Sablon Tips --}}
+                <div class="p-3 bg-amber-50/70 rounded-xl border border-amber-200/60 space-y-1 text-amber-900">
+                    <span class="text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 text-amber-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+                        Tips Vendor Sablon
+                    </span>
+                    <ul class="text-[10px] space-y-1 list-disc list-inside text-amber-800">
+                        <li>Jaga jarak minimal 1 cm dari batas luar agar tidak kena jahitan leher/bahu.</li>
+                        <li>Sablon manual (Plastisol/Rubber) lebih murah jika warna solid ≤ 3 warna.</li>
+                        <li>Gunakan warna kontras tinggi dengan warna kaos agar tulisan terbaca jelas.</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -268,6 +339,17 @@
                     <div class="absolute -top-1 -right-1 w-2.5 h-2.5 border-t-2 border-r-2 border-slate-400"></div>
                     <div class="absolute -bottom-1 -left-1 w-2.5 h-2.5 border-b-2 border-l-2 border-slate-400"></div>
                     <div class="absolute -bottom-1 -right-1 w-2.5 h-2.5 border-b-2 border-r-2 border-slate-400"></div>
+
+                    {{-- Safety Bleed & Margin Guide (12px inset / batas aman toleransi jahitan) --}}
+                    <div id="safetyBleedBox" class="absolute inset-[12px] border border-dashed border-amber-500/40 rounded pointer-events-none transition-all duration-200" title="Batas Aman Jahitan (Toleransi 1.5 cm)">
+                        <span class="absolute -bottom-4 right-1 text-[7.5px] text-amber-600 font-semibold bg-amber-50/90 px-1 py-0.2 rounded border border-amber-200/60 shadow-2xs">Batas Aman</span>
+                    </div>
+                </div>
+
+                {{-- Real-Time Object Dimension Floating Badge --}}
+                <div id="activeObjectDimensionBadge" class="absolute z-30 pointer-events-none hidden bg-slate-900/90 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full shadow-lg border border-slate-700/80 backdrop-blur-xs flex items-center gap-1.5 transition-all duration-75">
+                    <span class="text-amber-400">📐</span>
+                    <span id="dimensionBadgeText">0.0 × 0.0 cm</span>
                 </div>
 
                 {{-- Fabric Canvas Front --}}
@@ -343,6 +425,30 @@
                         <span class="text-[9px] text-slate-400 mt-0.5">25x35 cm</span>
                         <span class="text-[9px] font-semibold text-slate-600 mt-1">Rp 35k</span>
                     </button>
+                </div>
+            </div>
+
+            {{-- Real-World Live Dimensions Card in Properties Panel --}}
+            <div id="objectRealDimensionsCard" class="bg-slate-50 border border-slate-200/90 rounded-xl p-3 space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                        <span>📐 Dimensi Cetak Aktual</span>
+                    </span>
+                    <span id="objectDpiStatusBadge" class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700">Tajam (300 DPI)</span>
+                </div>
+                <div class="grid grid-cols-2 gap-2 text-center">
+                    <div class="bg-white p-2 rounded-lg border border-slate-200/80">
+                        <span class="text-[8px] text-slate-400 uppercase block font-medium">Lebar Fisik</span>
+                        <span id="objPropWidthCm" class="text-xs font-bold text-slate-800">0.0 cm</span>
+                    </div>
+                    <div class="bg-white p-2 rounded-lg border border-slate-200/80">
+                        <span class="text-[8px] text-slate-400 uppercase block font-medium">Tinggi Fisik</span>
+                        <span id="objPropHeightCm" class="text-xs font-bold text-slate-800">0.0 cm</span>
+                    </div>
+                </div>
+                <div id="objSafetyWarningMsg" class="hidden text-[10px] text-amber-700 bg-amber-50 p-2 rounded-lg border border-amber-200 flex items-start gap-1.5">
+                    <span class="flex-shrink-0">⚠️</span>
+                    <span id="objSafetyWarningText">Objek berada dekat batas aman jahitan (toleransi 1.5 cm).</span>
                 </div>
             </div>
 

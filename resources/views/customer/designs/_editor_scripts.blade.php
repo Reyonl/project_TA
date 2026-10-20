@@ -1685,6 +1685,336 @@ function initFabricEditor() {
         }
     };
 
+
+    // ===== ADVANCED INDUSTRIAL SABLON TOOLS (DIMENSIONS, SPOT-COLORS, SAFETY) =====
+    window.getPhysicalScaleCmPerPx = function(sideName) {
+        sideName = sideName || 'front';
+        const dims = (window.printAreaDims && window.printAreaDims[sideName]) || { width: 220, height: 320 };
+        // Physical real-world reference:
+        // Pocket polo / chest seragam (~10 cm width)
+        // Kaos / Hoodie front/back chest print (~28 cm width)
+        // Sleeves (~12 cm width)
+        let physicalCm = 28.0;
+        if (dims.width <= 100) physicalCm = 10.0;
+        else if (dims.width <= 140) physicalCm = 12.0;
+        else physicalCm = 28.0;
+        return physicalCm / dims.width;
+    };
+
+    window.updateLiveObjectDimensions = function(obj) {
+        if (!obj) {
+            window.hideLiveObjectDimensions();
+            return;
+        }
+
+        let sideName = 'front';
+        try {
+            const el = document.getElementById('editor-alpine') || document.querySelector('[x-data]');
+            if (el && window.Alpine && window.Alpine.$data) {
+                sideName = window.Alpine.$data(el).activeSide || 'front';
+            }
+        } catch(err) {}
+
+        const dims = (window.printAreaDims && window.printAreaDims[sideName]) || { width: 220, height: 320, top: 120, left: 130 };
+        const cmPerPx = window.getPhysicalScaleCmPerPx(sideName);
+
+        obj.setCoords();
+        const br = obj.getBoundingRect();
+        const wCm = (br.width * cmPerPx).toFixed(1);
+        const hCm = (br.height * cmPerPx).toFixed(1);
+
+        // 1. Update Floating Badge inside Mockup Container
+        const badge = document.getElementById('activeObjectDimensionBadge');
+        const badgeText = document.getElementById('dimensionBadgeText');
+        if (badge && badgeText) {
+            badgeText.textContent = `${wCm} × ${hCm} cm`;
+            const badgeX = Math.max(8, Math.min(380, dims.left + br.left + (br.width / 2) - 45));
+            const badgeY = Math.max(12, dims.top + br.top - 24);
+            badge.style.left = badgeX + 'px';
+            badge.style.top = badgeY + 'px';
+            badge.classList.remove('hidden');
+        }
+
+        // 2. Update Properties Panel Numbers
+        const pWidth = document.getElementById('objPropWidthCm');
+        const pHeight = document.getElementById('objPropHeightCm');
+        if (pWidth) pWidth.textContent = wCm + ' cm';
+        if (pHeight) pHeight.textContent = hCm + ' cm';
+
+        // 3. Image DPI Quality Estimate
+        const dpiBadge = document.getElementById('objectDpiStatusBadge');
+        if (dpiBadge) {
+            if (obj.type === 'image' && obj.getElement()) {
+                const imgEl = obj.getElement();
+                const naturalW = imgEl.naturalWidth || imgEl.width || 0;
+                if (naturalW > 0) {
+                    const widthInches = (br.width * cmPerPx) / 2.54;
+                    const effDpi = Math.round(naturalW / Math.max(widthInches, 0.5));
+                    if (effDpi >= 250) {
+                        dpiBadge.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700';
+                        dpiBadge.textContent = 'Tajam (' + effDpi + ' DPI)';
+                    } else if (effDpi >= 150) {
+                        dpiBadge.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700';
+                        dpiBadge.textContent = 'Cukup (' + effDpi + ' DPI)';
+                    } else {
+                        dpiBadge.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-rose-100 text-rose-700';
+                        dpiBadge.textContent = 'Pecah (' + effDpi + ' DPI)';
+                    }
+                }
+            } else {
+                dpiBadge.className = 'text-[9px] font-bold px-1.5 py-0.5 rounded bg-sky-100 text-sky-700';
+                dpiBadge.textContent = 'Vektor (Resolusi Bebas)';
+            }
+        }
+
+        // 4. Safety Bleed Check (12px inset / toleransi jahitan)
+        const safetyMargin = 12;
+        const isNearBleed = (br.left < safetyMargin || br.top < safetyMargin || (br.left + br.width) > (dims.width - safetyMargin) || (br.top + br.height) > (dims.height - safetyMargin));
+        const warnBox = document.getElementById('objSafetyWarningMsg');
+        const bleedBox = document.getElementById('safetyBleedBox');
+        if (warnBox) {
+            if (isNearBleed) warnBox.classList.remove('hidden');
+            else warnBox.classList.add('hidden');
+        }
+        if (bleedBox) {
+            if (isNearBleed) {
+                bleedBox.classList.add('border-rose-400', 'bg-rose-400/5');
+            } else {
+                bleedBox.classList.remove('border-rose-400', 'bg-rose-400/5');
+            }
+        }
+    };
+
+    window.hideLiveObjectDimensions = function() {
+        const badge = document.getElementById('activeObjectDimensionBadge');
+        if (badge) badge.classList.add('hidden');
+        const pWidth = document.getElementById('objPropWidthCm');
+        const pHeight = document.getElementById('objPropHeightCm');
+        if (pWidth) pWidth.textContent = '0.0 cm';
+        if (pHeight) pHeight.textContent = '0.0 cm';
+        const warnBox = document.getElementById('objSafetyWarningMsg');
+        if (warnBox) warnBox.classList.add('hidden');
+        const bleedBox = document.getElementById('safetyBleedBox');
+        if (bleedBox) bleedBox.classList.remove('border-rose-400', 'bg-rose-400/5');
+    };
+
+    function normalizeHexColor(val) {
+        if (!val || val === 'none' || val === 'transparent') return null;
+        if (typeof val !== 'string') return null;
+        try {
+            const col = new fabric.Color(val);
+            let hex = col.toHex();
+            if (hex && hex.length === 6) return '#' + hex.toUpperCase();
+        } catch(e) {}
+        if (val.startsWith('#') && (val.length === 7 || val.length === 4)) return val.toUpperCase();
+        return null;
+    }
+
+    function getColorDistance(hex1, hex2) {
+        try {
+            const c1 = new fabric.Color(hex1).getSource();
+            const c2 = new fabric.Color(hex2).getSource();
+            if (!c1 || !c2) return 100;
+            return Math.sqrt(
+                Math.pow(c1[0] - c2[0], 2) +
+                Math.pow(c1[1] - c2[1], 2) +
+                Math.pow(c1[2] - c2[2], 2)
+            );
+        } catch(e) {
+            return 100;
+        }
+    }
+
+    window.runPrintAnalysis = function() {
+        let sideName = 'front';
+        let baseColor = '#ffffff';
+        try {
+            const el = document.getElementById('editor-alpine') || document.querySelector('[x-data]');
+            if (el && window.Alpine && window.Alpine.$data) {
+                const data = window.Alpine.$data(el);
+                sideName = data.activeSide || 'front';
+                baseColor = data.baseColor || window.activeBaseColorLocal || '#ffffff';
+            }
+        } catch(err) {}
+
+        const canvas = window.activeCanvas;
+        if (!canvas) return;
+
+        const objects = canvas.getObjects();
+        const colorsSet = new Set();
+        let hasImage = false;
+        let minBleedMargin = 999;
+
+        const dims = (window.printAreaDims && window.printAreaDims[sideName]) || { width: 220, height: 320 };
+        const cmPerPx = window.getPhysicalScaleCmPerPx(sideName);
+
+        let totalMinX = Infinity, totalMinY = Infinity, totalMaxX = -Infinity, totalMaxY = -Infinity;
+
+        objects.forEach(obj => {
+            obj.setCoords();
+            const br = obj.getBoundingRect();
+            totalMinX = Math.min(totalMinX, br.left);
+            totalMinY = Math.min(totalMinY, br.top);
+            totalMaxX = Math.max(totalMaxX, br.left + br.width);
+            totalMaxY = Math.max(totalMaxY, br.top + br.height);
+
+            const dLeft = br.left;
+            const dTop = br.top;
+            const dRight = dims.width - (br.left + br.width);
+            const dBottom = dims.height - (br.top + br.height);
+            minBleedMargin = Math.min(minBleedMargin, dLeft, dTop, dRight, dBottom);
+
+            if (obj.type === 'i-text') {
+                const fill = normalizeHexColor(obj.fill);
+                if (fill) colorsSet.add(fill);
+                if (obj.stroke && obj.strokeWidth > 0) {
+                    const stroke = normalizeHexColor(obj.stroke);
+                    if (stroke) colorsSet.add(stroke);
+                }
+            } else if (obj.customType === 'custom-svg') {
+                function extractSvgColors(o) {
+                    if (o._objects && o._objects.length > 0) {
+                        o._objects.forEach(extractSvgColors);
+                    } else {
+                        const f = normalizeHexColor(o.fill);
+                        if (f) colorsSet.add(f);
+                        const s = normalizeHexColor(o.stroke);
+                        if (s && o.strokeWidth > 0) colorsSet.add(s);
+                    }
+                }
+                extractSvgColors(obj);
+            } else if (obj.type === 'image') {
+                hasImage = true;
+                try {
+                    const imgEl = obj.getElement();
+                    if (imgEl) {
+                        const tc = document.createElement('canvas');
+                        tc.width = 24; tc.height = 24;
+                        const tctx = tc.getContext('2d', { willReadFrequently: true });
+                        tctx.drawImage(imgEl, 0, 0, 24, 24);
+                        const imgData = tctx.getImageData(0, 0, 24, 24).data;
+                        for (let p = 0; p < imgData.length; p += 16) {
+                            if (imgData[p + 3] > 60) {
+                                const r = Math.round(imgData[p] / 32) * 32;
+                                const g = Math.round(imgData[p + 1] / 32) * 32;
+                                const b = Math.round(imgData[p + 2] / 32) * 32;
+                                const hex = new fabric.Color(`rgb(${r},${g},${b})`).toHex();
+                                if (hex) colorsSet.add('#' + hex.toUpperCase());
+                                if (colorsSet.size > 8) break;
+                            }
+                        }
+                    }
+                } catch(e) {}
+            }
+        });
+
+        const colorList = Array.from(colorsSet);
+
+        // 1. Update Swatches & Count Badge
+        const swatchesContainer = document.getElementById('analysisColorsSwatches');
+        const countBadge = document.getElementById('analysisColorCountBadge');
+        if (countBadge) {
+            countBadge.textContent = colorList.length + ' Warna' + (hasImage ? ' (Raster/Foto)' : '');
+        }
+
+        if (swatchesContainer) {
+            if (colorList.length === 0) {
+                swatchesContainer.innerHTML = '<span class="text-xs text-slate-400 italic">Belum ada objek di canvas.</span>';
+            } else {
+                let swatchesHtml = '';
+                colorList.forEach(c => {
+                    swatchesHtml += `
+                        <div class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-white border border-slate-200 shadow-2xs">
+                            <span class="w-3.5 h-3.5 rounded-full border border-slate-300 shadow-2xs flex-shrink-0" style="background-color: ${c}"></span>
+                            <span class="text-[10px] font-mono font-semibold text-slate-700">${c}</span>
+                        </div>
+                    `;
+                });
+                swatchesContainer.innerHTML = swatchesHtml;
+            }
+        }
+
+        // 2. Recommendation Engine
+        const techEl = document.getElementById('analysisTechText');
+        if (techEl) {
+            if (objects.length === 0) {
+                techEl.textContent = 'Tambahkan objek untuk melihat rekomendasi teknik sablon.';
+            } else if (hasImage || colorList.length > 4) {
+                techEl.innerHTML = '<strong class="text-indigo-600">Sablon DTF (Digital Transfer Film)</strong> disarankan. Sangat ideal untuk desain gradasi, multi-warna, atau foto raster resolusi tinggi.';
+            } else if (colorList.length <= 2) {
+                techEl.innerHTML = '<strong class="text-emerald-600">Sablon Manual (Rubber / Plastisol)</strong> sangat hemat! Cocok untuk pesanan massal/lusinan dengan biaya afdruk screen minimum.';
+            } else {
+                techEl.innerHTML = '<strong class="text-sky-600">Sablon DTF atau Plastisol 3–4 Warna</strong>. Efisien untuk sablon grafis solid dengan warna spot terpisah.';
+            }
+        }
+
+        // 3. Contrast & Bleed Alert Box
+        const alertBox = document.getElementById('analysisAlertContainer');
+        if (alertBox) {
+            let alertsHtml = '';
+
+            let lowContrastColors = [];
+            colorList.forEach(col => {
+                if (getColorDistance(col, baseColor) < 45) {
+                    lowContrastColors.push(col);
+                }
+            });
+
+            if (lowContrastColors.length > 0) {
+                alertsHtml += `
+                    <div class="p-2.5 rounded-lg bg-amber-50 border border-amber-200/80 text-amber-900 flex items-start gap-2 shadow-2xs">
+                        <span class="text-amber-500 font-bold text-xs mt-0.5">⚠️</span>
+                        <div class="text-[10.5px] leading-tight">
+                            <strong class="font-semibold block text-amber-950 mb-0.5">Peringatan Kontras Rendah:</strong>
+                            Warna ${lowContrastColors.join(', ')} sangat mirip dengan warna kain kaos (${baseColor}). Sablon berisiko sulit terbaca.
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (objects.length > 0 && minBleedMargin < 12) {
+                alertsHtml += `
+                    <div class="p-2.5 rounded-lg bg-rose-50 border border-rose-200/80 text-rose-900 flex items-start gap-2 shadow-2xs">
+                        <span class="text-rose-500 font-bold text-xs mt-0.5">⚠️</span>
+                        <div class="text-[10.5px] leading-tight">
+                            <strong class="font-semibold block text-rose-950 mb-0.5">Dekat Batas Jahitan:</strong>
+                            Ada objek berjarak < 1.5 cm dari garis batas. Geser ke tengah agar tidak terkena jahitan obras.
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (objects.length > 0 && lowContrastColors.length === 0 && minBleedMargin >= 12) {
+                alertsHtml += `
+                    <div class="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200/80 text-emerald-900 flex items-start gap-2 shadow-2xs">
+                        <span class="text-emerald-500 font-bold text-xs mt-0.5">✓</span>
+                        <div class="text-[10.5px] leading-tight">
+                            <strong class="font-semibold block text-emerald-950 mb-0.5">Kualitas Desain Aman:</strong>
+                            Kontras warna jelas dan posisi objek berada di dalam batas aman sablon.
+                        </div>
+                    </div>
+                `;
+            }
+
+            alertBox.innerHTML = alertsHtml;
+        }
+
+        // 4. Total Physical Dimensions
+        const totWEl = document.getElementById('analysisTotalWidth');
+        const totHEl = document.getElementById('analysisTotalHeight');
+        if (totWEl && totHEl) {
+            if (objects.length === 0 || totalMinX === Infinity) {
+                totWEl.textContent = '0.0 cm';
+                totHEl.textContent = '0.0 cm';
+            } else {
+                const totalWPx = Math.max(0, totalMaxX - totalMinX);
+                const totalHPx = Math.max(0, totalMaxY - totalMinY);
+                totWEl.textContent = (totalWPx * cmPerPx).toFixed(1) + ' cm';
+                totHEl.textContent = (totalHPx * cmPerPx).toFixed(1) + ' cm';
+            }
+        }
+    };
+
     canvasesToHandle.forEach(c => { 
         c.on('selection:created', showControls); 
         c.on('selection:updated', showControls); 
@@ -1700,6 +2030,7 @@ function initFabricEditor() {
                 if(typeof window.recalculateTotalPrice === 'function') window.recalculateTotalPrice();
                 if(typeof window.renderLayersList === 'function') window.renderLayersList();
                 if(typeof window.saveHistory === 'function') window.saveHistory();
+                if(typeof window.runPrintAnalysis === 'function') window.runPrintAnalysis();
             }
         });
         c.on('object:removed', function(e) {
@@ -1715,10 +2046,20 @@ function initFabricEditor() {
             if (!window.isLoadingJSON && !window.isHistoryAction) {
                 if(typeof window.renderLayersList === 'function') window.renderLayersList();
                 if(typeof window.saveHistory === 'function') window.saveHistory();
+                if(typeof window.runPrintAnalysis === 'function') window.runPrintAnalysis();
             }
         });
-        c.on('object:moving', constrainObjectBounds);
-        c.on('object:scaling', constrainObjectBounds);
+        c.on('object:moving', function(e) {
+            constrainObjectBounds(e);
+            if(typeof window.updateLiveObjectDimensions === 'function') window.updateLiveObjectDimensions(e.target);
+        });
+        c.on('object:scaling', function(e) {
+            constrainObjectBounds(e);
+            if(typeof window.updateLiveObjectDimensions === 'function') window.updateLiveObjectDimensions(e.target);
+        });
+        c.on('object:rotating', function(e) {
+            if(typeof window.updateLiveObjectDimensions === 'function') window.updateLiveObjectDimensions(e.target);
+        });
     });
 
     // Workspace Wheel: Touchpad 2-finger Pan & Pinch Zoom + Mouse Wheel Zoom
@@ -1922,6 +2263,7 @@ function initFabricEditor() {
 
         const activeObj = (e && e.selected) ? e.selected[0] : window.activeCanvas.getActiveObject();
         if(!activeObj) return;
+        if(typeof window.updateLiveObjectDimensions === 'function') window.updateLiveObjectDimensions(activeObj);
         textControls.classList.add('hidden'); textControls.classList.remove('flex');
         imageControls.classList.add('hidden'); imageControls.classList.remove('flex');
         svgControls.classList.add('hidden'); svgControls.classList.remove('flex');
@@ -2129,6 +2471,7 @@ function initFabricEditor() {
 
     function hideControls() { 
         if(typeof window.renderLayersList === 'function') window.renderLayersList();
+        if(typeof window.hideLiveObjectDimensions === 'function') window.hideLiveObjectDimensions();
         if(editorControls) { editorControls.classList.add('hidden'); editorControls.classList.remove('flex'); } 
         const backdrop = document.getElementById('editorControlsBackdrop');
         if(backdrop) { backdrop.classList.add('hidden'); backdrop.classList.remove('block'); }
