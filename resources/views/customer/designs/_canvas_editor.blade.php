@@ -289,6 +289,14 @@
 
         {{-- Canvas Workspace --}}
         <div class="flex-1 overflow-hidden flex justify-center items-center relative bg-slate-50 mobile-canvas-scaler" id="canvasScalerWrapper">
+            {{-- Real-time Contrast Alert Floating Banner --}}
+            <div id="canvasContrastWarningBanner" class="absolute top-3 left-1/2 transform -translate-x-1/2 z-40 hidden max-w-sm sm:max-w-md w-[92%] bg-amber-500 text-slate-950 px-3 py-1.5 rounded-lg shadow-lg border border-amber-600/50 flex items-center justify-between gap-2 transition-all duration-300">
+                <div class="flex items-center gap-1.5 text-[11px] font-semibold leading-tight">
+                    <span class="text-sm">⚠️</span>
+                    <span id="contrastWarningBannerText">Warna teks/desain hampir sama dengan warna kaos!</span>
+                </div>
+                <button type="button" onclick="document.getElementById('canvasContrastWarningBanner').classList.add('hidden')" class="text-slate-900 hover:text-black font-bold text-xs p-0.5" title="Tutup">✕</button>
+            </div>
             <div class="relative shadow-xl rounded-xl overflow-hidden pointer-events-auto flex items-center justify-center bg-slate-100 origin-center border border-slate-200/60" id="mockupContainer" style="width: 480px; height: 600px;">
                 {{-- Minimal Subtle Side Indicator Badge --}}
                 <div class="absolute top-3 left-3 z-30 pointer-events-none">
@@ -552,6 +560,10 @@
                     <div id="solidColorGroup" class="flex items-center gap-3">
                         <input type="color" id="textColorControl" class="w-9 h-9 p-0.5 border border-slate-200 rounded-lg cursor-pointer bg-white shadow-2xs" value="#000000">
                         <div class="flex flex-col text-xs font-medium text-slate-400"><span>HEX</span><span class="text-slate-800 font-semibold" id="textColorVal">#000000</span></div>
+                    </div>
+                    <div id="textContrastNotice" class="hidden text-[10.5px] text-amber-900 bg-amber-50 p-2 rounded-lg border border-amber-200/80 flex items-start gap-1.5 shadow-2xs mt-1.5">
+                        <span class="text-amber-500 font-bold">⚠️</span>
+                        <span>Warna teks ini terlalu mirip dengan warna kaos. Hasil sablon berisiko tidak terbaca.</span>
                     </div>
                     {{-- Gradient Color Pickers --}}
                     <div id="gradientColorGroup" class="hidden space-y-2.5 bg-slate-50 p-2.5 rounded-lg border border-slate-200/80">

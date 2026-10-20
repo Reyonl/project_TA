@@ -1096,7 +1096,7 @@ function initFabricEditor() {
             if(typeof window.saveHistory === 'function') window.saveHistory(); 
         } 
     });
-    if(textColorControl) textColorControl.addEventListener('input', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set('fill', this.value); window.activeCanvas.renderAll(); if(typeof window.saveHistory === 'function') window.saveHistory(); } });
+    if(textColorControl) textColorControl.addEventListener('input', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set('fill', this.value); window.activeCanvas.renderAll(); if(typeof window.saveHistory === 'function') window.saveHistory(); if(typeof window.runPrintAnalysis === 'function') window.runPrintAnalysis(); } });
     if(textStrokeColor) textStrokeColor.addEventListener('input', function() { const o = window.activeCanvas.getActiveObject(); if(o && o.type === 'i-text') { o.set({ stroke: this.value, strokeWidth: parseInt(textStrokeWidth.value) }); window.activeCanvas.renderAll(); if(typeof window.saveHistory === 'function') window.saveHistory(); } });
     if(textShadowToggle) textShadowToggle.addEventListener('change', function() { 
         const o = window.activeCanvas.getActiveObject(); 
@@ -1825,6 +1825,44 @@ function initFabricEditor() {
         }
     }
 
+    function getLuminance(r, g, b) {
+        const a = [r, g, b].map(v => {
+            v /= 255;
+            return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+        });
+        return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
+    }
+
+    function getContrastRatio(hex1, hex2) {
+        try {
+            const c1 = new fabric.Color(hex1).getSource();
+            const c2 = new fabric.Color(hex2).getSource();
+            if (!c1 || !c2) return 5.0;
+            const l1 = getLuminance(c1[0], c1[1], c1[2]);
+            const l2 = getLuminance(c2[0], c2[1], c2[2]);
+            const brighter = Math.max(l1, l2);
+            const darker = Math.min(l1, l2);
+            return (brighter + 0.05) / (darker + 0.05);
+        } catch(e) {
+            return 5.0;
+        }
+    }
+
+    function isPoorContrast(hex1, hex2) {
+        if (!hex1 || !hex2) return false;
+        try {
+            const dist = getColorDistance(hex1, hex2);
+            // In RGB space: distance < 95 means very similar shades (like black on charcoal, or white on light cream)
+            if (dist < 95) return true;
+            // In WCAG perceptual luminance: contrast ratio < 2.0:1 means poor contrast
+            const ratio = getContrastRatio(hex1, hex2);
+            if (ratio < 2.0) return true;
+            return false;
+        } catch(e) {
+            return false;
+        }
+    }
+
     window.runPrintAnalysis = function() {
         let sideName = 'front';
         let baseColor = '#ffffff';
@@ -1955,10 +1993,33 @@ function initFabricEditor() {
 
             let lowContrastColors = [];
             colorList.forEach(col => {
-                if (getColorDistance(col, baseColor) < 45) {
+                if (isPoorContrast(col, baseColor)) {
                     lowContrastColors.push(col);
                 }
             });
+
+            // Update Floating Canvas Warning Banner
+            const floatBanner = document.getElementById('canvasContrastWarningBanner');
+            const floatBannerText = document.getElementById('contrastWarningBannerText');
+            if (floatBanner && floatBannerText) {
+                if (lowContrastColors.length > 0) {
+                    floatBannerText.textContent = `Peringatan: Warna elemen (${lowContrastColors.join(', ')}) hampir sama dengan warna kaos (${baseColor})!`;
+                    floatBanner.classList.remove('hidden');
+                } else {
+                    floatBanner.classList.add('hidden');
+                }
+            }
+
+            // Update Properties Panel Inline Text Contrast Notice
+            const textNotice = document.getElementById('textContrastNotice');
+            if (textNotice) {
+                const activeObj = window.activeCanvas ? window.activeCanvas.getActiveObject() : null;
+                if (activeObj && activeObj.type === 'i-text' && activeObj.fill && isPoorContrast(normalizeHexColor(activeObj.fill), baseColor)) {
+                    textNotice.classList.remove('hidden');
+                } else {
+                    textNotice.classList.add('hidden');
+                }
+            }
 
             if (lowContrastColors.length > 0) {
                 alertsHtml += `
